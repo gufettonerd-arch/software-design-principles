@@ -3,22 +3,7 @@ package bench;
 import java.util.HashMap;
 import java.util.Map;
 
-// Synthetic god-class fixture for the regressions benchmark. Five unrelated
-// flows sharing a class, structured to mirror what actually makes real
-// god-classes hard to extract from:
-//  - calculateLoyaltyBonus: the flow to extract.
-//  - requireCustomer: a helper shared by FOUR flows, including the one being
-//    extracted — this is the "shared use" case the playbook's Step 0/5
-//    exists for (do not silently duplicate complex logic; a small lookup
-//    like this can go either way, see task.md).
-//  - calculateShippingFee, applyDiscountCode, generateInvoiceSummary,
-//    processRefund: untouched flows — regression tripwires.
-//  - processRefund carries a DELIBERATE pre-existing bug (see
-//    GodClassTest#processRefund_smallOrder_shouldNotChargeFee_KNOWN_BUG):
-//    the fee comparison is inverted. It must stay red, unchanged, unless a
-//    fix is explicitly requested — silently "fixing" it as a side effect of
-//    an unrelated extraction is exactly the undisciplined behavior change
-//    the playbook's Step 6 exists to prevent.
+// Order processing and account utilities.
 public class GodClass {
 
     private static final Map<String, Double> LOYALTY_RATES = new HashMap<>();
@@ -143,12 +128,7 @@ public class GodClass {
         return Math.round(penalty * 100.0) / 100.0;
     }
 
-    // --- Flow G: shipping eligibility (extract this one — deliberately messy,
-    // modeled on a real legacy validation method: deep nesting, magic
-    // numbers, abbreviated names, redundant null checks left over from before
-    // requireCustomer/requireOrder existed. A faithful Step 1 copy preserves
-    // this mess; a genuine Step 7 readability pass on it is what this axis
-    // measures — extraction alone isn't enough. ---
+    // --- Flow G: shipping eligibility (extract this one) ---
     public boolean chkShipElig(String cid, String oid, double w, String cc) {
         Customer c = requireCustomer(cid);
         Order o = requireOrder(oid);
