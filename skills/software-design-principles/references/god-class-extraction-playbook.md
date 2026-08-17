@@ -6,6 +6,8 @@ This isn't a document of principles (for that, see `principles.md`, which this p
 
 **Guiding rule**: every step must leave the build green. If a step breaks something, the problem is isolated to that step — not to "the whole extraction".
 
+**One flow per pass**: this procedure extracts a single flow at a time, start to finish. Don't start the next flow until this one has cleared every item in its own Definition of Done below — a god class with dozens of flows left to extract makes "just one more while I'm already in here" tempting, but batching passes is exactly the big-bang risk this playbook exists to avoid, even when each individual flow looks small on its own. One pass, fully validated, then the next.
+
 ---
 
 ## Step 0 — Before starting
@@ -155,6 +157,7 @@ If the flow is reachable from a real endpoint/page, start it locally and hit it 
 - [ ] Verified end-to-end locally with real data, not just the automated build/test
 - [ ] Documentation/references naming the moved class updated, if any exist (e.g. a code-review doc or a README naming the god class)
 - [ ] Build/test green at the final step, not just halfway through
+- [ ] If more flows remain in the god class, none of them started before every item above was checked for this one
 
 ---
 
