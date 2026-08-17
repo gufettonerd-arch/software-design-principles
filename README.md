@@ -19,9 +19,11 @@ A second, longer document — the **god-class extraction playbook** — walks th
 ## What's inside
 
 ```
-SKILL.md                                   entry point: when to trigger, working checklist
-references/principles.md                   the 20 principles, in full
-references/god-class-extraction-playbook.md  the 0→12 extraction procedure
+.claude-plugin/marketplace.json                           lets /plugin install this repo directly
+.claude-plugin/plugin.json                                plugin manifest (no hooks, no commands — skill only)
+skills/software-design-principles/SKILL.md                entry point: when to trigger, working checklist
+skills/software-design-principles/references/principles.md                    the 20 principles, in full
+skills/software-design-principles/references/god-class-extraction-playbook.md the 0→12 extraction procedure
 ```
 
 **The 20 principles**, grouped the way the doc groups them:
@@ -88,11 +90,23 @@ If you only install one: install ponytail first, it's the one that stops you fro
 
 ## Install
 
-```bash
-git clone https://github.com/gufettonerd-arch/software-design-principles ~/.claude/skills/software-design-principles
+### Claude Code (plugin, recommended)
+
+```
+/plugin marketplace add gufettonerd-arch/software-design-principles
+/plugin install software-design-principles@software-design-principles
 ```
 
-Claude Code picks up user-level skills from `~/.claude/skills/`. For a single project instead, clone into `.claude/skills/` at the repo root.
+This is the only install path that gets you updates — see [Known limitations](#known-limitations). Auto-update is off by default for third-party marketplaces like this one; turn it on from `/plugin` → **Marketplaces** → *Enable auto-update*, or pull the latest manually with `/plugin marketplace update software-design-principles`.
+
+### Any skill-capable agent (manual)
+
+```bash
+git clone https://github.com/gufettonerd-arch/software-design-principles /tmp/sdp
+cp -r /tmp/sdp/skills/software-design-principles ~/.claude/skills/software-design-principles
+```
+
+Swap the destination for your host's user-level skills folder (e.g. `~/.openjarvis/skills/` for OpenJarvis) — the skill itself is just `SKILL.md` + `references/`, no Claude-specific parts. For a single project instead of user-wide, copy into `.claude/skills/` (or the equivalent) at the repo root. This path is a snapshot: see [Known limitations](#known-limitations) for what that means.
 
 Restart the session (or start a new one) so the skill shows up in the available-skills list.
 

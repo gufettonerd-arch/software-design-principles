@@ -49,4 +49,4 @@ Both reference files are written to be language/project-independent: where a con
 
 ## Pairs well with [ponytail](https://github.com/DietrichGebert/ponytail)
 
-Opposite pole, same discipline. Ponytail asks "does this need to exist at all?" before you write anything; this skill answers "given that it needs to exist, which structure, and how do you extract it safely from a legacy mess?" Run both — see the [README](README.md#pairs-well-with-ponytail) for the long version.
+Opposite pole, same discipline. Ponytail asks "does this need to exist at all?" before you write anything; this skill answers "given that it needs to exist, which structure, and how do you extract it safely from a legacy mess?" Run both: ponytail keeps this skill honest (a principle applied without judgment is over-engineering with better vocabulary — every principle here ends in a "when NOT to apply it" for that reason), and this skill keeps YAGNI from becoming an excuse to skip tests or ship an unisolated fix.

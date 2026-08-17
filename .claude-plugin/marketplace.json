@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "software-design-principles",
+  "description": "20 software design principles (each with a 'when NOT to apply it') and a god-class extraction playbook, as a Claude Code skill. Pairs with ponytail.",
+  "owner": {
+    "name": "federico-casciero",
+    "url": "https://github.com/gufettonerd-arch"
+  },
+  "plugins": [
+    {
+      "name": "software-design-principles",
+      "description": "SOLID through Fail Fast, each with a 'when NOT to apply it' section, plus a step-by-step (0-12) procedure for extracting a flow from a legacy god class.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
