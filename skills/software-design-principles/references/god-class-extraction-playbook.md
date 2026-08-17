@@ -59,6 +59,7 @@ When a helper is also used by other flows not yet extracted (e.g. a validation/l
 
 - **Don't** leave it coupled to the god class (the next flow would just re-duplicate it from there).
 - **Don't** try to extract it for all its callers in one shot (a regression risk disproportionate to the task).
+- **A third option exists and is tempting**: instead of duplicating the shared lookup, push it to the caller — the extracted class takes an already-resolved object instead of an id, and the god class keeps doing the lookup itself before delegating. This avoids duplication for *this* extraction, but only pays off if **both** hold: (1) this is genuinely the only flow you're pulling out of this god class — no more extractions are planned — and (2) the shared lookup has no anticipated need to change. If either is uncertain, duplicate with a `REFACTOR NOTE` instead, even though it looks like the less clean option today. A real god class worth writing a playbook for rarely has just one flow worth extracting — every later extraction that still has to resolve the same lookup through the god class keeps that god class necessary indefinitely, no matter how thin its own logic gets. Duplication with a tracked removal criterion is what actually lets the god class's surface shrink toward zero, one pass at a time; a clean-looking dependency back into it does not.
 - Duplicate it into a dedicated class/module **once**, with an explicit comment (syntax adapted to your language):
   ```
   // REFACTOR NOTE (#ticket): duplicated from GodClass.originalMethod() to isolate this
