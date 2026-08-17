@@ -143,6 +143,42 @@ public class GodClass {
         return Math.round(penalty * 100.0) / 100.0;
     }
 
+    // --- Flow G: shipping eligibility (extract this one — deliberately messy,
+    // modeled on a real legacy validation method: deep nesting, magic
+    // numbers, abbreviated names, redundant null checks left over from before
+    // requireCustomer/requireOrder existed. A faithful Step 1 copy preserves
+    // this mess; a genuine Step 7 readability pass on it is what this axis
+    // measures — extraction alone isn't enough. ---
+    public boolean chkShipElig(String cid, String oid, double w, String cc) {
+        Customer c = requireCustomer(cid);
+        Order o = requireOrder(oid);
+        boolean ok = false;
+        if (c != null) {
+            if (o != null) {
+                if (w > 0) {
+                    if (w <= 30) {
+                        if (cc != null) {
+                            if (cc.equals("IT") || cc.equals("FR") || cc.equals("DE")) {
+                                if (o.total() >= 20) {
+                                    ok = true;
+                                } else {
+                                    if ("GOLD".equals(c.tier())) {
+                                        ok = true;
+                                    }
+                                }
+                            } else {
+                                if (w <= 5) {
+                                    ok = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return ok;
+    }
+
     public record Customer(String id, String tier) {}
     public record Order(String id, double total) {}
 }

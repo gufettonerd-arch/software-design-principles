@@ -17,7 +17,8 @@ class GodClassTest {
         ),
         Map.of(
             "o-small", new GodClass.Order("o-small", 30.0),
-            "o-large", new GodClass.Order("o-large", 200.0)
+            "o-large", new GodClass.Order("o-large", 200.0),
+            "o-tiny", new GodClass.Order("o-tiny", 15.0)
         )
     );
 
@@ -127,5 +128,57 @@ class GodClassTest {
         // Characterization test: pins today's actual behavior for a large
         // refund, not a claim that it's correct.
         assertEquals(200.0, god.processRefund("c1", "o-large"));
+    }
+
+    // --- chkShipElig (the flow to extract for the quality axis) ---
+
+    @Test
+    void shipElig_zeroWeight_isFalse() {
+        assertFalse(god.chkShipElig("c1", "o-large", 0, "IT"));
+    }
+
+    @Test
+    void shipElig_tooHeavy_isFalse() {
+        assertFalse(god.chkShipElig("c1", "o-large", 35, "IT"));
+    }
+
+    @Test
+    void shipElig_nullCountry_isFalse() {
+        assertFalse(god.chkShipElig("c1", "o-large", 10, null));
+    }
+
+    @Test
+    void shipElig_euCountry_orderAboveThreshold_isTrue() {
+        assertTrue(god.chkShipElig("c1", "o-large", 10, "IT"));
+    }
+
+    @Test
+    void shipElig_euCountry_smallOrder_goldTier_isTrue() {
+        assertTrue(god.chkShipElig("c1", "o-tiny", 10, "IT"));
+    }
+
+    @Test
+    void shipElig_euCountry_smallOrder_nonGoldTier_isFalse() {
+        assertFalse(god.chkShipElig("c2", "o-tiny", 10, "IT"));
+    }
+
+    @Test
+    void shipElig_nonEuCountry_lightWeight_isTrue() {
+        assertTrue(god.chkShipElig("c1", "o-large", 3, "US"));
+    }
+
+    @Test
+    void shipElig_nonEuCountry_heavierWeight_isFalse() {
+        assertFalse(god.chkShipElig("c1", "o-large", 10, "US"));
+    }
+
+    @Test
+    void shipElig_unknownCustomer_throws() {
+        assertThrows(RuntimeException.class, () -> god.chkShipElig("nope", "o-large", 10, "IT"));
+    }
+
+    @Test
+    void shipElig_unknownOrder_throws() {
+        assertThrows(RuntimeException.class, () -> god.chkShipElig("c1", "nope", 10, "IT"));
     }
 }
