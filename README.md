@@ -20,7 +20,9 @@ A second, longer document — the **god-class extraction playbook** — walks th
 
 ```
 .claude-plugin/marketplace.json                           lets /plugin install this repo directly
-.claude-plugin/plugin.json                                plugin manifest (no hooks, no commands — skill only)
+.claude-plugin/plugin.json                                plugin manifest, points at hooks/hooks.json
+hooks/hooks.json                                           registers the SessionStart hook below
+hooks/activate.js                                          the hook itself (see "Session-start nudge")
 skills/software-design-principles/SKILL.md                entry point: when to trigger, working checklist
 skills/software-design-principles/references/principles.md                    the 20 principles, in full
 skills/software-design-principles/references/god-class-extraction-playbook.md the 0→12 extraction procedure
@@ -53,6 +55,12 @@ Before a review or a refactor, the skill runs through the same three questions t
 ```
 
 The god-class playbook adds one more: map who else calls the code you're about to move, *before* you move it — the plan for "exclusive use" and "shared use" is not the same, and finding out mid-extraction is expensive.
+
+## Session-start nudge
+
+Installed as the plugin, this skill also ships one `SessionStart` hook (`hooks/activate.js`) — no other hooks, no slash commands, no MCP server. Once, when a session starts, it checks whether the working directory looks like a real code project: a git repo, or a common build/package manifest (`package.json`, `pom.xml`, `go.mod`, `Cargo.toml`, ...), searched at the root and up to two levels of subdirectories so monorepo layouts like `backend/pom.xml` + `frontend/package.json` are caught, skipping `node_modules`/`dist`/`target`/etc. If it finds nothing, it stays silent. If it finds something, it prints the working checklist above straight into the session's context — read live out of `SKILL.md` at hook time, not duplicated in the hook script, so it can't drift out of sync.
+
+That's the entire gate: "does this look like code at all." It deliberately does not try to guess whether *this specific task* needs the checklist — a `SessionStart` hook runs before your first message exists, so it has no signal about the task, only the environment. Getting that guess wrong in the loose direction costs a few hundred tokens once per session; getting it wrong in the strict direction means the reminder silently never shows up when it should. On-demand triggering (the skill matching your request by its `description`, same as any other skill) still does the actual relevance judgment — this hook only makes sure the checklist is already in context before that judgment has to fire.
 
 ## Validated on
 
