@@ -62,6 +62,17 @@ No synthetic benchmark yet — this is genuinely early. What it has done so far,
 
 One project, two languages, a handful of files. Small sample, real findings — treat it as promising, not proven.
 
+## Known limitations
+
+Nothing here blocks usage — it's MIT, plain markdown, zero runtime dependencies, zero config. But before you install it expecting it to behave exactly as it did for the author, know this:
+
+- **Trigger accuracy is untuned.** The `description` field is what an agent matches against your request to decide whether to consult the skill. It was written by hand, not run through a trigger-accuracy eval loop (query variety, hit rate measured, description iterated against it). It may under- or over-trigger on phrasing the author never tried.
+- **Validated on one project, by one person.** Everything under "Validated on" above comes from a single Spring Boot + Angular codebase. Principle 18 already had a real gap (missed the client-side case entirely) that only surfaced once it was applied outside the context it was written in — expect more gaps like that on a different stack.
+- **Examples still skew OOP.** The prose is written to be language-agnostic, but concepts like SOLID, Strategy, DDD, and Hexagonal are inherently object-oriented framings. On a functional or non-OOP-heavy codebase, several principles will need more translation than the text implies.
+- **No auto-update.** A `git clone` install is a snapshot. If the principles get revised later, installs don't learn about it — see [Install](#install).
+- **Verified on two hosts, not more.** Confirmed working unchanged on Claude Code and [OpenJarvis](https://github.com/openjarvis) (same files, no edits). The skill format follows the [agentskills.io](https://agentskills.io/specification) standard, so it should work on any compliant host — but "should" isn't "verified" for anything beyond those two.
+- **Installing via an indexed-skill flow may show a generic warning.** Hosts with a trust-tier system (e.g. OpenJarvis's `jarvis skill install github:...`) classify anything from an unindexed GitHub repo as "unreviewed" and show a sandbox notice — not because the skill declares any dangerous capability (it declares none), just because it hasn't been submitted to that host's official index.
+
 ## Pairs well with [ponytail](https://github.com/DietrichGebert/ponytail)
 
 They pull in opposite directions on purpose, and that's the point.
