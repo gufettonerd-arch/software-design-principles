@@ -7,7 +7,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
   <img src="https://img.shields.io/badge/for-Claude%20Code-111111?style=flat-square" alt="For Claude Code">
-  <img src="https://img.shields.io/badge/status-early%20%26%20validated%20once-111111?style=flat-square" alt="Status: early, validated once">
+  <img src="https://img.shields.io/badge/status-40%20benchmark%20runs-111111?style=flat-square" alt="Status: 40 benchmark runs">
 </p>
 
 ---
@@ -64,13 +64,33 @@ That's the entire gate: "does this look like code at all." It deliberately does 
 
 ## Validated on
 
-No synthetic benchmark yet — this is genuinely early. What it has done so far, on one real Spring Boot + Angular app:
+Two different kinds of evidence, kept separate on purpose: what happened on a real project, and what a controlled benchmark shows.
+
+### One real project
+
+On a real Spring Boot + Angular app (not a demo):
 
 - **Caught a real bug**: a generic `RuntimeException` in a service method was silently mapped to a 500 by the global handler instead of a 404 — traced by reading the exception handler, not guessed. Fixed and verified with the existing test suite (21/21 green).
 - **Caught a second one, client-side**: an Angular singleton service holding an admin's unread-notification count with no reset on logout — the exact "shared state beyond its boundary" smell principle 18 describes, found by applying the principle, not the other way around.
 - **Ran the extraction playbook end-to-end**: pulled a ZIP-export feature out of an oversized gallery component into its own service, step 0 through 12. Step 0's dependency mapping caught an already-diverged duplicate of the same feature in a second component *before* the extraction started — exactly the situation the playbook's "shared use" branch exists for.
 
-One project, two languages, a handful of files. Small sample, real findings — treat it as promising, not proven.
+One project, two languages, a handful of files. Real findings, small sample.
+
+### A synthetic benchmark, three independent designs
+
+Full reports and reproducible fixtures in [`benchmarks/regressions/`](benchmarks/regressions/). Same core task — extract one flow out of a small but structurally real god class (five or six unrelated methods, a helper shared by most of them, one deliberately preserved pre-existing bug) — examined three different ways: headless Claude Code sessions, with the skill and without, 4 seeds per arm, 40 runs total.
+
+| Axis | What it checks | Result |
+|---|---|---|
+| [Regressions](benchmarks/regressions/results/2026-08-17-godclass-n4.md) | Did the extraction break anything it wasn't supposed to touch? | 8/8 PASS, both arms — no difference at this task's difficulty |
+| [Zero pre-existing tests](benchmarks/regressions/results/2026-08-17-godclass-notests-n4.md) | Extracting a flow with no tests and an undocumented bug — does it get tested, does behavior stay identical? | 4/4 clean PASS with-skill vs. 1/4 baseline |
+| [Process adherence](benchmarks/regressions/results/2026-08-17-godclass-process-n4.md) | Does the build stay green at *every* commit, not just the end? | 8/8 clean, both arms — same non-result as regressions |
+
+The one finding that repeats across all three: **whether a deliberate, transitional duplication of shared code gets documented** — what's duplicated, why, and when to remove it — not whether either arm breaks anything. Across all three axes combined, 0 baseline runs left that note; the large majority of with-skill runs did, every time. Read it as a maintainability signal, not a correctness one — nobody's code broke in either arm; the skill's runs left the next person an explanation and the baseline's didn't.
+
+One wrinkle, not smoothed over: about 1 in 4 with-skill runs chose an alternative, defensible design (push the shared lookup's resolution to the caller instead of duplicating it) even after the underlying rule was sharpened mid-benchmark specifically to discourage that in ambiguous cases. A real, stable illustration that an explicit rule reduces judgment calls without eliminating them.
+
+This is still one task family — extracting one flow from one small synthetic god class — examined three ways, at N=4, on one model. A real result with a narrow scope, not "extensively benchmarked."
 
 ## Known limitations
 
