@@ -130,7 +130,7 @@ class GodClassTest {
         assertEquals(200.0, god.processRefund("c1", "o-large"));
     }
 
-    // --- chkShipElig (the flow to extract for the quality axis) ---
+    // --- chkShipElig (the flow to extract) ---
 
     @Test
     void shipElig_zeroWeight_isFalse() {
