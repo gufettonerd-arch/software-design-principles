@@ -1,5 +1,30 @@
 # Process-adherence benchmark — GodClass fixture, N=4 (2026-08-17)
 
+> **Correction added 2026-08-17, after this run.** Same issue as the other
+> two reports from this day: `GodClass.java`'s class-level comment, present
+> in the fixture for this entire run, named the playbook directly — the
+> shared `requireCustomer` helper was labeled "the 'shared use' case the
+> playbook's Step 0/5 exists for," and the known `processRefund` bug was
+> labeled as something that "must stay red, unchanged... exactly the
+> undisciplined behavior change the playbook's Step 6 exists to prevent."
+> Confirmed via git history: present unchanged from before this run until
+> removed today (commit `8d46545`).
+>
+> This report's two headline numbers are affected to different degrees:
+> - **`REFACTOR_NOTE_PRESENT` (0/4 baseline vs. 3/4 with-skill)** — this is
+>   the finding repeated across all three published reports, so it's the
+>   one most worth re-checking cleanly. The with-skill runs that duplicated
+>   `requireCustomer` and cited Step 5 by name could have been prompted by
+>   the fixture's own comment rather than by consulting the skill.
+> - **`ALL_CHECKPOINTS_CLEAN` (8/8 both arms)** — not affected. This is
+>   computed by literally checking out and testing every commit; nothing
+>   about that depends on what either arm read in a comment.
+>
+> The result as published below should be read as "consistent with three
+> benchmark designs" rather than "confirmed by three independent designs" —
+> the independence between them was weaker than stated, since all three
+> shared the same leaked hint.
+
 ## What this measures
 
 The third axis of the three planned for the playbook (after regressions and zero-pre-existing-tests, both run the same day). Those two only ever checked the *final* state of a run. This one checks the playbook's actual guiding rule — "every step must leave the build green" — literally, by replaying each run's own commit history and running `mvn test` at every checkpoint, not just at the end. A single big commit that happens to be green at the finish line can still represent a risky, non-incremental process; this axis is built to catch that difference, which the other two structurally can't see.

@@ -88,6 +88,8 @@ Full reports and reproducible fixtures in [`benchmarks/regressions/`](benchmarks
 
 The one finding that repeats across all three: **whether a deliberate, transitional duplication of shared code gets documented** — what's duplicated, why, and when to remove it — not whether either arm breaks anything. Across all three axes combined, 0 baseline runs left that note; the large majority of with-skill runs did, every time. Read it as a maintainability signal, not a correctness one — nobody's code broke in either arm; the skill's runs left the next person an explanation and the baseline's didn't.
 
+**Correction, added after these three runs**: the fixture's own source comments named the playbook by step number for part of what these axes measure (the shared-helper duplication and the known-bug discipline) — visible to both arms, not just the one using the skill. Fixed in the fixture, but all three reports above still reflect the contaminated version; each report's own correction note has the specifics. Read the finding above as "consistent across three benchmark designs" rather than "confirmed by three independent ones" until it's re-run clean.
+
 One wrinkle, not smoothed over: about 1 in 4 with-skill runs chose an alternative, defensible design (push the shared lookup's resolution to the caller instead of duplicating it) even after the underlying rule was sharpened mid-benchmark specifically to discourage that in ambiguous cases. A real, stable illustration that an explicit rule reduces judgment calls without eliminating them.
 
 This is still one task family — extracting one flow from one small synthetic god class — examined three ways, at N=4, on one model. A real result with a narrow scope, not "extensively benchmarked."

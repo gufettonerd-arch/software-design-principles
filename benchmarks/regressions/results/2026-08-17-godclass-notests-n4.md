@@ -1,5 +1,33 @@
 # Zero-pre-existing-tests benchmark — GodClass fixture, N=4 (2026-08-17)
 
+> **Correction added 2026-08-17, after this run.** `GodClass.java`'s
+> class-level comment (unrelated to `calculateLatePaymentPenalty` itself,
+> but present above it in the same file both arms read) named the playbook
+> by step number for the *other* flows: it called the shared
+> `requireCustomer` helper "the 'shared use' case the playbook's Step 0/5
+> exists for" and said the known `processRefund` bug "must stay red,
+> unchanged... exactly the undisciplined behavior change the playbook's
+> Step 6 exists to prevent." Confirmed via git history: introduced in the
+> same commit that built this fixture, present unchanged through this run,
+> removed only after the quality-axis pilot (commit `8d46545`).
+>
+> Two things in this report are affected:
+> - **`KNOWN_BUG_STATUS`**, same issue as the other two reports — both arms
+>   could read in plain English that it must stay red.
+> - **The "Step 5 divergence" analysis below.** The stale reference to
+>   `calculateLoyaltyBonus` as "the flow to extract" is real and was read
+>   correctly — but the comment sitting right above it *also* names "the
+>   playbook's Step 0/5" directly. The three with-skill runs that duplicated
+>   `requireCustomer` citing Step 5 may have been pointed at the rule by the
+>   fixture, not purely by recalling it from the skill. The divergence
+>   itself (3 duplicated, 1 pushed to caller) is still a real, observed
+>   split — but "the skill applied its own judgment here" is a weaker claim
+>   than the original write-up made it sound.
+>
+> Not affected: whether tests got written for `calculateLatePaymentPenalty`,
+> or whether its behavior matched the reference values after extraction —
+> neither was hinted at anywhere in the leaked comment.
+
 ## What this measures
 
 A follow-up to the regressions-axis run the same day (`2026-08-17-godclass-n4.md`). That run's fixture had the target flow already fully covered by tests, so it could never exercise Step 3 ("if the old flow had no dedicated tests, write them now") or principle 19 (Characterization Test). This run adds a sixth flow, `calculateLatePaymentPenalty`, with **zero dedicated tests and no comment flagging anything about it** — including one deliberately ambiguous rule (a GOLD-tier discount that only applies when `daysLate <= 5`, debatable as intentional or backwards, not an obvious typo). Two questions, scored independently: does the extraction get a test written for it, and does the flow's actual output stay identical to what it was before anyone touched it?
