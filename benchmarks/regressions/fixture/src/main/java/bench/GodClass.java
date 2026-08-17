@@ -120,6 +120,29 @@ public class GodClass {
         return Math.round(refund * 100.0) / 100.0;
     }
 
+    // --- Flow F: late payment penalty (extract this one — no dedicated tests exist for it yet) ---
+    public double calculateLatePaymentPenalty(String customerId, String orderId, int daysLate) {
+        Customer customer = requireCustomer(customerId);
+        Order order = requireOrder(orderId);
+
+        if (daysLate <= 0) {
+            return 0.0;
+        }
+
+        double penalty = order.total() * 0.02 * daysLate;
+
+        if ("GOLD".equals(customer.tier()) && daysLate <= 5) {
+            penalty *= 0.5;
+        }
+
+        double cap = order.total() * 0.4;
+        if (penalty > cap) {
+            penalty = cap;
+        }
+
+        return Math.round(penalty * 100.0) / 100.0;
+    }
+
     public record Customer(String id, String tier) {}
     public record Order(String id, double total) {}
 }
