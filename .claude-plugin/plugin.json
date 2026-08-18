@@ -5,6 +5,5 @@
   "author": {
     "name": "federico-casciero",
     "url": "https://github.com/gufettonerd-arch"
-  },
-  "hooks": "./hooks/hooks.json"
+  }
 }
