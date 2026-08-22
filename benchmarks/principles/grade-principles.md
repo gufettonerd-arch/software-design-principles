@@ -18,33 +18,100 @@ The agent's response: (paste)
 
 Answer three questions:
 
-1. VERDICT_MATCH — for a Case A (should-flag) snippet: did the agent flag
-   the specific issue described in the expected verdict (not just *some*
-   issue — reviewers can always find something to say; does the response
-   name the actual violation)? For a Case B (should-not-flag) snippet: did
-   the agent correctly stay quiet on this specific point, or explicitly
-   reason through it and conclude it's fine? Answer MATCH / MISS.
+1. For a **Case A** (should-flag) snippet — VERDICT_MATCH: did the agent
+   flag the specific issue described in the expected verdict (not just
+   *some* issue — reviewers can always find something to say; does the
+   response name the actual violation)? Answer MATCH / MISS.
+
+   For a **Case B** (should-not-flag) snippet, answer two separate
+   questions instead of one (see "Splitting Case B's match" below for
+   why):
+
+   1a. CALIBRATION_VERDICT — did the response *actively contradict* the
+       calibration point (flag the exact thing the case says is fine, or
+       argue against it under a different principle's name — e.g. "not
+       Law of Demeter, but a Tell Don't Ask violation" when the case is
+       specifically testing whether this navigation is acceptable)?
+       Answer CONTRADICTED / not contradicted. This is the only thing
+       that should count as a hard miss on the calibration point itself.
+
+   1b. CALIBRATION_ENGAGEMENT — separately from 1a, did the response
+       *explicitly* reason about the specific point being tested and
+       affirm it's fine ("I considered X and it's correct because Y"),
+       or was it silent on that point — flagging other things in the
+       snippet without ever addressing the one being measured? Answer
+       EXPLICIT / SILENT. SILENT is not the same as CONTRADICTED — a
+       response can be SILENT on the calibration point while still
+       correctly not flagging it, which is a weaker result than an
+       EXPLICIT pass but not a failure.
 
 2. PRINCIPLE_NAMED — did the response name the specific principle (SOLID,
    DRY, Fail Fast, whichever applies), or use language that clearly maps to
    it, even without the exact name? A correct diagnosis described in plain
    English without the principle's name still counts. Answer YES / NO.
 
-3. NOISE — for Case B specifically: did the agent flag anything else in the
-   snippet that isn't actually a problem, beyond the one point being
-   tested? This is a secondary precision check, since a response could
-   correctly pass check 1 while still being generally trigger-happy.
-   Answer NONE / SOME / A LOT, with what was flagged.
+3. NOISE — for Case B specifically: did the agent flag anything that
+   isn't actually a problem, beyond the one point being tested (i.e. a
+   *wrong* observation, not just an unrelated one)? A secondary
+   precision check, since a response could correctly pass check 1 while
+   still being generally trigger-happy. Answer NONE / SOME / A LOT, with
+   what was flagged.
+
+4. OTHER_FINDINGS — for Case B: did the response find genuine, correct
+   issues in the snippet that aren't what the case is testing (a real
+   bug, a real edge case, a legitimate different design critique)? Not
+   scored pass/fail — recorded as context. High OTHER_FINDINGS + SILENT
+   on 1b is exactly the shape that shows up when a calibration snippet
+   is realistic enough to contain other real things to say; it explains
+   *why* a response might be SILENT without that being a quality
+   problem with the response itself.
 
 One sentence of evidence per answer, quoting the agent's response.
 ```
 
+## Splitting Case B's match into two axes (added 2026-08-22)
+
+Across a day of N=4 runs on 8 principles, the same pattern kept
+recurring on Case B (calibration) responses: a response finds real,
+legitimate *other* issues in the snippet and never explicitly addresses
+the one specific thing being tested. Under the original single
+MATCH/MISS question, this was hard to score consistently — sometimes
+called MATCH (it didn't flag the wrong thing), sometimes AMBIGUOUS
+(no formal answer existed for "didn't address it either way"), with no
+principled way to tell "quietly correct" apart from "never looked."
+
+It happened on 7 different principles the same day (CQS, Readability,
+Value Object, Tell Don't Ask, Law of Demeter, and — before being
+root-caused as case-file defects — Fail Fast and CQS again), at a
+frequency that stopped looking like isolated case-file problems and
+started looking like a property of realistic-enough calibration
+snippets in general: the more genuinely interesting a snippet is, the
+more it pulls attention toward its other real properties and away from
+the one thing being measured.
+
+Splitting the old single MATCH/MISS into 1a (CONTRADICTED — a real
+miss) and 1b (EXPLICIT vs. SILENT — a *quality* distinction, not a
+pass/fail one) makes this legible instead of forcing every response
+into a binary that doesn't fit it. A principle whose Case B responses
+are consistently SILENT-but-not-CONTRADICTED across many runs isn't
+failing calibration — it's revealing that the snippet doesn't isolate
+its point cleanly enough to *test* calibration reliably, which is
+useful to know for a different reason (fix the case file, the same way
+`07-cqs.md` and `14-fail-fast.md` were fixed this session) than a
+response that actively argues the wrong thing (fix the principle's
+wording, or investigate the model's reasoning, the way `05-dry.md`'s
+rule-of-three trap was this session). Proposed and documented here;
+**not yet run** — the next principles pass should use this version of
+the rubric rather than the original single-question one.
+
 ## Aggregation
 
-Per principle, per arm: recall = MATCH rate on Case A across seeds; precision
-proxy = MATCH rate on Case B (staying quiet correctly) combined with NOISE
-staying at NONE/SOME rather than A LOT. Report per-principle, not just an
-overall average — an average across 14 principles hides exactly the kind of
+Per principle, per arm: recall = MATCH rate on Case A across seeds;
+precision proxy = "not CONTRADICTED" rate on Case B (1a), with NOISE
+staying at NONE/SOME rather than A LOT — report the EXPLICIT vs. SILENT
+split (1b) and OTHER_FINDINGS alongside as secondary signal, not folded
+into the same number. Report per-principle, not just an overall average
+— an average across 14 principles hides exactly the kind of
 principle-specific gap (e.g., good at SOLID, weak at Fail Fast) that's
 useful to know and fix.
 

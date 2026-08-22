@@ -127,3 +127,14 @@ B anyway isn't validated — it's found a way to always sound thorough, which
 is exactly the over-application failure mode the "when NOT to apply it"
 sections exist to prevent. Optimizing recall alone would make the skill
 look better on this benchmark while making it worse to actually use.
+
+**Precision on Case B is itself two things, not one** (see
+`grade-principles.md`'s 2026-08-22 addition): did the response actively
+contradict the calibration point (a real miss), versus did it explicitly
+engage with and affirm the specific point being tested versus stay
+silent on it while finding other real issues in the snippet (a
+quality-of-signal distinction, not a pass/fail one). A day of N=4 runs
+found the "silent, finds other real things" shape on 7 different
+principles' Case B — not case-file noise at that frequency, closer to a
+property of realistic-enough calibration snippets in general. Splitting
+the score keeps that visible instead of averaging it away.
