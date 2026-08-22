@@ -1,4 +1,4 @@
-# Principles benchmark — grading rubric (not run yet)
+# Principles benchmark — grading rubric
 
 Companion to `README.md`. One grading pass per (case, arm) response.
 

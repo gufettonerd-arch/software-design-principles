@@ -7,8 +7,9 @@ agent reading blind — it sees only the final `ShippingEligibilityService.java`
 from a run, not which arm produced it, not the other arm's version, and not
 this rubric's answer key.
 
-Not run yet — this is the rubric and grading procedure, written so it's ready
-to use once testing resumes.
+Run clean at N=4 — see
+[the 2026-08-19 report](results/2026-08-19-principles-and-rerun.md) for
+results.
 
 ## Why an LLM judge, not another mechanical check
 

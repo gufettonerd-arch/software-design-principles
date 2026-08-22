@@ -1,4 +1,4 @@
-# Principles benchmark — methodology (not run yet)
+# Principles benchmark — methodology
 
 The other benchmark (`benchmarks/regressions/`) tests one document — the
 god-class extraction playbook — on one kind of task: extracting a flow.
@@ -13,8 +13,10 @@ because the most common failure mode, once you know a principle, isn't
 ignoring it — it's overusing it. A benchmark that only rewards flagging
 violations would train straight past that and measure the wrong thing.
 
-Written today, not run — see the parent conversation's decision to write
-benchmark infrastructure first and test everything tomorrow.
+Run at N=2 across all 20 principles (14 snippet-based + 6 scenario-based,
+see below) — see
+[the 2026-08-19 report](../regressions/results/2026-08-19-principles-and-rerun.md)
+for full results.
 
 ## Format
 
@@ -90,7 +92,7 @@ one exception (`16-modular-monolith`) had 2 baseline responses land on
 the right general fix without naming the case's specific point
 (automated enforcement, not just a cleaner design).
 
-## Running it (for tomorrow, not today)
+## Running it
 
 For each case, two arms — same as the god-class benchmark: baseline (no
 skill) and with-skill, same neutral prompt:

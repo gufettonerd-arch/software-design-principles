@@ -7,14 +7,14 @@
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
   <img src="https://img.shields.io/badge/for-Claude%20Code-111111?style=flat-square" alt="For Claude Code">
-  <img src="https://img.shields.io/badge/status-40%20benchmark%20runs-111111?style=flat-square" alt="Status: 40 benchmark runs">
+  <img src="https://img.shields.io/badge/status-200%2B%20benchmark%20runs-111111?style=flat-square" alt="Status: 200+ benchmark runs">
 </p>
 
 ---
 
 Most "clean code" references are a wall of theory you read once and never open again. This one is a [Claude Code](https://claude.com/claude-code) skill: a checklist and 20 principles the agent actually consults mid-task — before touching business logic, while deciding whether that `catch (Exception e)` deserves a narrower type, before extending a class "just to reuse a method". Each principle carries the same four questions: what it is, what it fixes, how to apply it, and — the part most guides skip — **when not to**. The second most common mistake, once you know the principles, isn't ignoring them. It's applying them everywhere.
 
-A second, longer document — the **god-class extraction playbook** — walks through extracting one flow out of an oversized legacy class (Java, Python, PHP, doesn't matter) without a big-bang rewrite: map the dependencies first, copy before you delete, move the tests, isolate the bug fix from the move, harden last. Twelve steps, each one required to leave the build green before the next starts.
+A second, longer document — the **god-class extraction playbook** — walks through extracting one flow out of an oversized legacy class (Java, Python, PHP, doesn't matter) without a big-bang rewrite: map the dependencies first, copy before you delete, move the tests, isolate the bug fix from the move, harden last, review the finished result cold before calling it done. Fourteen steps (0 through 13), each one required to leave the build green before the next starts.
 
 ## What's inside
 
@@ -91,8 +91,10 @@ god class (five or six unrelated methods, a helper shared by most of
 them, one deliberately preserved pre-existing bug), examined four
 different ways, headless Claude Code sessions with the skill and without,
 4 seeds per arm. The 20 principles: 14 of them tested with a
-should-flag/should-not-flag snippet pair each, one cold review per
-(principle, case, arm).
+should-flag/should-not-flag snippet pair each, 2 independent cold
+reviews per (principle, case, arm); the other 6 (structural/process
+decisions, not single-file smells) tested the same way with a
+scenario description instead of a snippet, also at 2 seeds.
 
 | Axis | What it checks | Result |
 |---|---|---|
@@ -155,8 +157,8 @@ Nothing here blocks usage — it's MIT, plain markdown, zero runtime dependencie
 - **Trigger accuracy has one small test, not a real eval loop.** The `description` field is what an agent matches against your request to decide whether to consult the skill — written by hand, not run through a proper trigger-accuracy eval (large query variety, hit rate measured, description iterated against it). A first check (8 prompts, 4 that should trigger it and 4 that shouldn't, see [the report](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md)) went 8/8, but every prompt was written to be fairly clear-cut in one direction — it says the description isn't badly miscalibrated, not that it's tuned at the margin. It may still under- or over-trigger on phrasing closer to the boundary.
 - **Validated on one project, by one person.** Everything under "Validated on" above comes from a single Spring Boot + Angular codebase. Principle 18 already had a real gap (missed the client-side case entirely) that only surfaced once it was applied outside the context it was written in — expect more gaps like that on a different stack.
 - **Examples still skew OOP.** The prose is written to be language-agnostic, but concepts like SOLID, Strategy, DDD, and Hexagonal are inherently object-oriented framings. On a functional or non-OOP-heavy codebase, several principles will need more translation than the text implies.
-- **No auto-update.** A `git clone` install is a snapshot. If the principles get revised later, installs don't learn about it — see [Install](#install).
-- **Verified on two hosts, not more.** Confirmed working unchanged on Claude Code and [OpenJarvis](https://github.com/openjarvis) (same files, no edits). The skill format follows the [agentskills.io](https://agentskills.io/specification) standard, so it should work on any compliant host — but "should" isn't "verified" for anything beyond those two.
+- **No auto-update by default, on either install path.** A `git clone` install is always a snapshot. The plugin *can* stay current, but auto-update is off by default for third-party marketplaces — found this out firsthand mid-benchmark: an install left on default settings sat pinned to the commit it was installed at while the repo moved on, silently. Check `gitCommitSha` in `~/.claude/plugins/installed_plugins.json` if you want to know which commit you're actually running — see [Install](#install).
+- **Format-verified on two hosts, effectiveness verified on one.** Loads unchanged on Claude Code and [OpenJarvis](https://github.com/openjarvis) — same files, no edits, agentskills.io-compliant hosts should work the same way. Loading and *using it well* aren't the same claim, though: a single OpenJarvis test (a local `qwen3.5:9b`, the skill loaded) missed a violation both Claude arms caught every time, citing a real passage from the skill out of context — one data point, not a verdict on small local models generally, but real enough that "verified on two hosts" shouldn't be read as "works equally well on both." See the 2026-08-19 report.
 - **Installing via an indexed-skill flow may show a generic warning.** Hosts with a trust-tier system (e.g. OpenJarvis's `jarvis skill install github:...`) classify anything from an unindexed GitHub repo as "unreviewed" and show a sandbox notice — not because the skill declares any dangerous capability (it declares none), just because it hasn't been submitted to that host's official index.
 
 ## Pairs well with [ponytail](https://github.com/DietrichGebert/ponytail)
@@ -181,7 +183,7 @@ If you only install one: install ponytail first, it's the one that stops you fro
 /plugin install software-design-principles@software-design-principles
 ```
 
-This is the only install path that gets you updates — see [Known limitations](#known-limitations). Auto-update is off by default for third-party marketplaces like this one; turn it on from `/plugin` → **Marketplaces** → *Enable auto-update*, or pull the latest manually with `/plugin marketplace update software-design-principles`.
+This is the install path that *can* get you updates — but auto-update is off by default for third-party marketplaces like this one, so a plugin install left alone is just as much a frozen snapshot as the manual method below. Turn it on from `/plugin` → **Marketplaces** → *Enable auto-update*, or pull the latest manually with `/plugin marketplace update software-design-principles` — check `gitCommitSha` in `~/.claude/plugins/installed_plugins.json` against this repo's latest commit if you want to confirm which one you're actually running. See [Known limitations](#known-limitations).
 
 ### Any skill-capable agent (manual)
 
