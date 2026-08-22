@@ -93,9 +93,11 @@ same case-file confound in CQS Case B that Fail Fast had, verified with
 one run per arm. One more finding, different in kind: DRY Case B
 with-skill misses at a real ~33% rate (4/6) on a case file with nothing
 wrong with it — the skill sometimes over-applies DRY on a genuinely close
-call, which points at the principle's own calibration guidance rather
-than at test infrastructure; left open. The other 17 principles remain at
-N=2. A worthwhile checklist audit came out of this too — reread the other
+call. Added the missing inverse to `principles.md`'s DRY section (similar
+shape isn't necessarily the same knowledge) same day, but 2 verification
+runs both passed without actually using the new reasoning — inconclusive,
+not confirmed fixed, needs a real reseed. The other 17 principles remain
+at N=2. A worthwhile checklist audit came out of this too — reread the other
 17 case files for the same confound shape Fail Fast/CQS had; found none
 serious enough to fix.
 
