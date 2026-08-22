@@ -97,10 +97,14 @@ transcripts for *why*, not just *what*, found none of them using the
 fix's new reasoning — all 6 reason via rule-of-three timing, which
 happens to give the right surface answer only because the snippet shows
 exactly 2 instances. That reasoning wouldn't survive a third
-similarly-shaped-but-unrelated variant being added — a real gap in the
-skill's DRY calibration that a wording edit alone doesn't seem to fix
-(see the report for the full chase, including where today's own earlier
-hit/miss count was too shallow). The other 17 principles remain at N=2. A
+similarly-shaped-but-unrelated variant being added. Tested that
+prediction directly with a 4-run exploratory check adding a third,
+still-unrelated builder — **confirmed 4/4**: every response reasoned
+about instance count against a moving threshold, none recognized three
+unrelated business rules sharing a shape. Rule-of-three itself, not the
+wording, is the mechanism — see the report for the full chase, including
+where today's own earlier hit/miss count was too shallow. The other 17
+principles remain at N=2. A
 worthwhile checklist audit came out of this too — reread the other 17
 case files for the same confound shape Fail Fast/CQS had; found none
 serious enough to fix.
