@@ -67,6 +67,17 @@ Every with-skill false positive was on a case baseline also got wrong;
 the skill introduced no new mistakes anywhere baseline was already
 correct.
 
+**The 6 scenario-based principles** (structural/process decisions, not
+single-file smells — see `principles/scenario-cases/`): first run, 46/48
+clean matches at N=2. 5 of 6 principles went 8/8 on both arms; the one
+exception (`16-modular-monolith`) had baseline land on the right general
+direction without naming the case's specific point twice, still logged as
+partial rather than a clean miss. Notably cleaner than the snippet
+benchmark's headline number — see the 2026-08-19 report's Part 3 for why
+that's a hypothesis (scenario prompts spell out the situation; snippet
+prompts require noticing what to look for first) rather than a settled
+conclusion.
+
 **Trigger accuracy** (does the skill actually fire on the right requests,
 unprompted): first test, 8/8 correct — 4 prompts designed to plausibly
 need it (god-class extraction, a pre-PR review, a generic-catch call, an

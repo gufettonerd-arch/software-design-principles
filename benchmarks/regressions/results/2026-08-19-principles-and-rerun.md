@@ -328,6 +328,49 @@ looks like it needs judgment but doesn't). This run establishes the
 skill's description isn't badly miscalibrated in an obvious way, not that
 it's precisely tuned at the margin.
 
+### Part 3 — Scenario benchmark, first run (48 cases, N=2)
+
+The 6 out-of-scope principles (see `scenario-cases/`) got their own
+first run: same recall/precision structure as the 56-snippet benchmark,
+but each case is a short scenario description (a situation, sometimes a
+folder layout) instead of a code block, and the expected answer is a
+recommendation rather than a flag/no-flag. 6 principles × 2 cases × 2
+arms × 2 seeds = 48 runs, graded inline against each case's expected
+answer as results came in (same caveat as Part 2 about blindness —
+`grade-principles.md` now documents how to fix this for the next round).
+
+Model split: caseA on haiku, caseB on the default model — same reasoning
+as Part 2's mid-run correction, applied from the start here.
+
+**Result: 46/48 clean matches.** 5 of 6 principles (`11-ddd-strategic`,
+`13-package-by-feature`, `14-anti-corruption-layer`, `15-strangler-fig`,
+`19-characterization-test`) went 8/8 on both arms — every recommendation
+matched, every "fine as-is" call on the calibration case matched. The
+one exception, `16-modular-monolith`/caseA, had 2 baseline responses that
+recommended a fix in the right direction (a public API layer to enforce
+the module boundary) without naming the case's actual point (that
+*automated* enforcement, not just a cleaner design, is what closes the
+gap a discipline-only boundary already failed to hold) — logged as
+partial matches, not clean misses. With-skill was 4/4 clean on that same
+principle, always naming automated enforcement explicitly (ArchUnit-style
+tooling, a lint rule).
+
+**Read against Part 2's headline number, this is a real contrast worth
+naming plainly**: the snippet benchmark's baseline arm was wrong on 8/14
+calibration cases (43% correct); the scenario benchmark's baseline arm
+was wrong on 0/12 calibration-case pairs outright (only 2 *partial*
+misses out of 24 total baseline responses, both still directionally
+correct). Both benchmarks measure the same underlying question
+(recognize a principle correctly, including its exception), but scenario
+prompts spell out the situation in prose ("here's what's true, here's
+what you'd recommend") while snippet prompts require noticing what to
+even look for in raw code first. That extra step — deciding a review is
+even warranted before judging it — may be where most of Part 2's baseline
+failures actually live, not in the principle-application judgment itself.
+Worth treating as a hypothesis, not a conclusion: N=2 per scenario case is
+thin, and the two methodologies were never designed to be compared to
+each other directly.
+
 ### Limitations
 
 - N=1 per case, not N=4 — a single cold read per (principle, case, arm)

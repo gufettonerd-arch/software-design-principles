@@ -84,8 +84,11 @@ applies with the same VERDICT_MATCH/PRINCIPLE_NAMED/NOISE structure, read
 as "did the recommendation (or the deliberate non-recommendation) match
 the expected one" rather than "did it name the exact section header."
 
-Not run yet — written alongside the god-class rerun and the first
-56-case principles run, same day, but not launched in that batch.
+First run: 46/48 clean matches (N=2, all 6 principles) — see the
+2026-08-19 report's Part 3. 5 of 6 principles went 8/8 on both arms; the
+one exception (`16-modular-monolith`) had 2 baseline responses land on
+the right general fix without naming the case's specific point
+(automated enforcement, not just a cleaner design).
 
 ## Running it (for tomorrow, not today)
 
