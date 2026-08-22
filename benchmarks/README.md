@@ -102,12 +102,17 @@ prediction directly with a 4-run exploratory check adding a third,
 still-unrelated builder — **confirmed 4/4**: every response reasoned
 about instance count against a moving threshold, none recognized three
 unrelated business rules sharing a shape. Rule-of-three itself, not the
-wording, is the mechanism — see the report for the full chase, including
-where today's own earlier hit/miss count was too shallow. The other 17
-principles remain at N=2. A
-worthwhile checklist audit came out of this too — reread the other 17
-case files for the same confound shape Fail Fast/CQS had; found none
-serious enough to fix.
+wording, is the mechanism — so restructured `principles.md`'s DRY section
+same day to demote rule of three below the knowledge question, and
+reverified against the same 3-instance scenario: **0/4 improved**, all
+four hard-flagged, worse than the pre-fix batch on the surface. A wording
+fix — even a structural one, not just an added sentence — doesn't touch
+this failure mode. Left as a documented, open limitation rather than a
+false "fixed" — see the report for the full chase, including where
+today's own earlier hit/miss counts were too shallow twice over. The
+other 17 principles remain at N=2. A worthwhile checklist audit came out
+of this too — reread the other 17 case files for the same confound shape
+Fail Fast/CQS had; found none serious enough to fix.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
