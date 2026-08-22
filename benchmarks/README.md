@@ -1,10 +1,15 @@
 # Benchmarks — index
 
-Two separate benchmarks, testing the two documents this skill ships
+Two synthetic benchmarks, testing the two documents this skill ships
 (`references/god-class-extraction-playbook.md` and `references/principles.md`)
-on different axes. Everything here is real infrastructure — fixtures that
-compile and run, scorers that were self-tested against synthetic pass/fail
-cases before being trusted on real agent output — not a plan.
+on different axes, plus a third, non-synthetic one:
+[`real-world-validation/`](real-world-validation/) — a template for
+running baseline-vs-with-skill on one real flow in a real project, filled
+in as people actually run it (see `TEMPLATE.md`), not scored
+automatically like the two below. Everything here is real infrastructure
+— fixtures that compile and run, scorers that were self-tested against
+synthetic pass/fail cases before being trusted on real agent output — not
+a plan.
 
 **Status as of 2026-08-19**: all four god-class axes (regressions,
 zero-pre-existing-tests, process adherence, quality) have been run clean

@@ -76,6 +76,13 @@ On a real Spring Boot + Angular app (not a demo):
 
 One project, two languages, a handful of files. Real findings, small sample.
 
+Adding a second real-world validation on a different stack is exactly
+what would make this less narrow — there's a ready-to-fill template at
+[`benchmarks/real-world-validation/TEMPLATE.md`](benchmarks/real-world-validation/TEMPLATE.md)
+for anyone running one (baseline vs with-skill on one real flow, same
+comparison shape as the synthetic benchmarks below, on a project neither
+was written against).
+
 ### A synthetic benchmark, two documents, five axes
 
 Full reports and reproducible fixtures in [`benchmarks/`](benchmarks/). The
