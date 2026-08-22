@@ -84,11 +84,13 @@ weaker model. See the report for the full case-by-case breakdown.
 **Partial N=4 on the 3 highest-signal principles** (DRY, CQS, Fail Fast —
 the ones with real N=2 misses): see
 [the 2026-08-22 report](regressions/results/2026-08-22-n4-partial.md).
-Confirms the Fail Fast case-file fix is stable (not a fluke), surfaces a
-new repeatable CQS Case A baseline recall miss (2/2 on fresh seeds, not
-visible at N=2), and finds the same case-file confound in CQS Case B that
-Fail Fast had — fixed same day and verified with one run per arm (see
-the report). The other 17 principles remain at N=2.
+Confirms the Fail Fast case-file fix is stable (not a fluke). Investigates
+a CQS Case A baseline recall wobble that looked repeatable at 2 seeds but
+turned out to be ~50% variance across 6 (3/6 baseline vs. 4/4 with-skill)
+— read as a real, not-yet-proven hypothesis about semantic vs. syntactic
+smells, not a settled finding (see the report). Also finds and fixes the
+same case-file confound in CQS Case B that Fail Fast had, verified with
+one run per arm. The other 17 principles remain at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
