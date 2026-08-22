@@ -161,7 +161,38 @@ particular batch, axis 1a did no discriminating work at all (constant
 across all 4) — the real signal came entirely from 1b. That's expected,
 not a flaw: 1a exists to catch a different failure mode (active
 contradiction) that this batch simply didn't have. A batch that does
-contain a real miss would need both axes to tell the full story. One
-principle, N=2 per arm — not enough to claim this split generalizes
-before it's run on a broader set, but it did exactly what it was
-proposed to do on the first real test.
+contain a real miss would need both axes to tell the full story.
+
+**Two more spot checks, deliberately including one predicted to fail,
+so this isn't just reporting confirmations.**
+
+**Value Object Case B** (same procedure, blind R1–R4): same clean
+split. R1/R3 SILENT, R2/R4 EXPLICIT — decoded, R1/R3 are both baseline,
+R2/R4 are both with-skill. Second principle in a row with the exact same
+arm-correlated pattern.
+
+**Readability Case B** (the *original, pre-fix* case file — the one
+already known to have its own confound, root-caused and fixed earlier
+today): picked specifically because a null result was expected here, to
+avoid only reporting the pattern where it happens to show up. It didn't
+replicate. Decoded: baseline-seed3 was CONTRADICTED+EXPLICIT (flagged a
+real naming nitpick, but reasoned through the comment's scope first);
+with-skill-seed3 was not-contradicted+SILENT (never touched the comment
+at all); baseline-seed4 was not-contradicted+EXPLICIT; with-skill-seed4
+was CONTRADICTED+SILENT (same naming nitpick as baseline-seed3, but
+without ever engaging the comment). No arm-correlation at all — each arm
+split internally across both axes.
+
+**Read together, three principles**: the arm-correlated EXPLICIT/SILENT
+split isn't an artifact of the rubric itself (it's not "with-skill
+responses always sound more careful regardless of content" — if that
+were true, Readability would have shown it too, on a case file the
+skill's own reference content had no special reason to help with more
+than baseline). It tracked something real on 2 of 3 principles and
+correctly didn't manufacture a pattern on the third, which is exactly
+what a genuinely discriminating rubric should do. Three principles,
+small N per arm — still not broad enough to claim this generalizes
+across the other 17, but it's now demonstrated in the specific sense
+that matters most for a grading tool: it finds a real signal when one
+exists (Tell Don't Ask, Value Object) and doesn't manufacture one when
+there isn't (Readability), rather than a single confirming anecdote.
