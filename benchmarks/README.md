@@ -90,7 +90,14 @@ turned out to be ~50% variance across 6 (3/6 baseline vs. 4/4 with-skill)
 — read as a real, not-yet-proven hypothesis about semantic vs. syntactic
 smells, not a settled finding (see the report). Also finds and fixes the
 same case-file confound in CQS Case B that Fail Fast had, verified with
-one run per arm. The other 17 principles remain at N=2.
+one run per arm. One more finding, different in kind: DRY Case B
+with-skill misses at a real ~33% rate (4/6) on a case file with nothing
+wrong with it — the skill sometimes over-applies DRY on a genuinely close
+call, which points at the principle's own calibration guidance rather
+than at test infrastructure; left open. The other 17 principles remain at
+N=2. A worthwhile checklist audit came out of this too — reread the other
+17 case files for the same confound shape Fail Fast/CQS had; found none
+serious enough to fix.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
