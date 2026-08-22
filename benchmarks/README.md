@@ -67,6 +67,14 @@ Every with-skill false positive was on a case baseline also got wrong;
 the skill introduced no new mistakes anywhere baseline was already
 correct.
 
+**Trigger accuracy** (does the skill actually fire on the right requests,
+unprompted): first test, 8/8 correct — 4 prompts designed to plausibly
+need it (god-class extraction, a pre-PR review, a generic-catch call, an
+interface-or-not question) all triggered it with substantively correct
+content; 4 designed not to (JS syntax, a bash one-liner, timezone trivia,
+a CSS fix) all correctly didn't. Small, clear-cut sample — see the
+2026-08-19 report for the caveat about boundary cases not yet tested.
+
 **Before running it again**: the case files under `principles/cases/`
 contain the snippet *and* the answer key ("Expected: ...") in the same
 file. Only the code block gets shown to a reviewing agent — never the

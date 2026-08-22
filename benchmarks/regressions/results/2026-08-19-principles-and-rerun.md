@@ -295,6 +295,39 @@ use this skill the way the Claude arms did. On this evidence, no. Worth
 a real N=4-or-more run on OpenJarvis before drawing a firmer conclusion,
 but not worth assuming the answer is "yes" in the meantime.
 
+### Trigger accuracy — first test (8 prompts, no code/skill hints)
+
+Separate question from everything above: given the skill is *available*,
+does its `description` field actually cause it to fire on the requests
+it should, and stay quiet on the ones it shouldn't? Never tested until
+now — the god-class and principles benchmarks both explicitly told the
+with-skill arm to use it, which validates content quality but says
+nothing about triggering.
+
+Method: 8 fresh subagents, general-purpose, no mention of any skill by
+name. Each got a plain user-style request — 4 designed to plausibly
+trigger it (god-class extraction, a pre-PR design review, a generic-catch
+judgment call, a should-I-add-an-interface question) and 4 designed not
+to (JS `let`/`const`, a bash rename one-liner, UTC+2 trivia, a CSS
+centering fix) — and was asked to answer normally, then report which
+tools/skills it used on a separate line, so the trigger decision itself
+wasn't influenced by the reporting instruction.
+
+**8/8 correct.** All 4 positive prompts invoked
+`software-design-principles` unprompted, and each response's content was
+substantively correct (Tell Don't Ask, specific exceptions + the
+legitimate-boundary exception, YAGNI + the testability exception — the
+same principle-specific nuance the 56-case benchmark measured directly).
+All 4 negative prompts didn't invoke it and answered normally.
+
+Small sample, and every prompt here was written to be fairly clear-cut in
+one direction or the other — a harder test would include boundary cases
+deliberately close to the trigger line (e.g. a question that's partly
+about code style but not architecture, or a small isolated snippet that
+looks like it needs judgment but doesn't). This run establishes the
+skill's description isn't badly miscalibrated in an obvious way, not that
+it's precisely tuned at the margin.
+
 ### Limitations
 
 - N=1 per case, not N=4 — a single cold read per (principle, case, arm)
