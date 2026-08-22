@@ -15,6 +15,34 @@ Two levels, because they're two different problems:
 
 For each principle you'll find: **what it is**, **the problem it solves** (the code smell that reveals its absence), **how to apply it** in practice, an **example**, and **when NOT to apply it** — because the most common risk, once you're past the "I didn't know these" stage, isn't ignoring them but overusing them.
 
+## Table of contents
+
+**Part 1 — Writing code**
+1. SOLID
+2. Value Object & Immutability
+3. Tell, Don't Ask
+4. Law of Demeter
+5. DRY / KISS / YAGNI
+6. Named design patterns (Strategy, Factory, Builder, Specification)
+7. Command-Query Separation
+8. Specific exceptions, not generic ones
+9. Readability: methods, variables, comments
+
+**Part 2 — Organizing a project**
+10. Domain-Driven Design (DDD) — tactical part
+11. Domain-Driven Design — strategic part (Bounded Context)
+12. Hexagonal Architecture / Ports & Adapters (Clean/Onion Architecture)
+13. Package by feature vs package by layer
+14. Anti-Corruption Layer (ACL)
+15. Strangler Fig Pattern
+16. Modular Monolith
+17. Composition over Inheritance
+18. Shared state beyond its boundary (server-side concurrency, client-side survival)
+19. Legacy code: Characterization Test first
+20. Fail Fast: where to validate, where to trust
+
+**Also in this file**: Suggested learning roadmap, Working checklist, How to measure progress over time.
+
 ---
 
 # Part 1 — Writing code
