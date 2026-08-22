@@ -138,9 +138,12 @@ calibration point" Case B pattern has now shown up on **7 principles
 today**. Past the point of hand-fixing each case file — read as a
 question about the grading methodology itself (score the specific point
 and unrelated findings separately, not folded into one MATCH/MISS) —
-see the report for the full reasoning. One plain case-file bug found in
-passing (`04-law-of-demeter.md` prints raw cents unformatted), not yet
-fixed. 12 principles remain at N=2.
+see the report for the full reasoning. The `04-law-of-demeter.md`
+formatting bug found in passing is fixed and reverified same day — first
+attempt introduced a new bug (broken on negative cents), caught by the
+first verification run and corrected before moving on; 2 more runs
+clean, one giving the cleanest calibration pass of the day. 12
+principles remain at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48

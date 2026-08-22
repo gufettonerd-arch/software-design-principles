@@ -27,7 +27,10 @@ public record Order(String id, List<LineItem> items) {}
 
 public class ReceiptPrinter {
     public String priceOf(LineItem item) {
-        return item.unitPrice().currency() + " " + item.unitPrice().cents();
+        Money price = item.unitPrice();
+        long absCents = Math.abs(price.cents());
+        String sign = price.cents() < 0 ? "-" : "";
+        return "%s %s%d.%02d".formatted(price.currency(), sign, absCents / 100, absCents % 100);
     }
 }
 ```

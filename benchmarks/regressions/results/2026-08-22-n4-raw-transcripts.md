@@ -484,3 +484,30 @@ Verdict: **AMBIGUOUS on Law of Demeter, but flags a real, independent formatting
 Verdict: **soft miss** — confirms the same formatting bug as baseline, but also pushes back on the exact Value-Object navigation pattern the case says is normal, filed under "Value Object violation" rather than "Law of Demeter" by name — doesn't use the principle's name, but the substance argues against what the calibration point wants validated as fine.
 
 **Tally: Case A 4/6 clean (2 baseline misses, both caught by with-skill). Case B: the "silent on the specific point, finds real other issues" pattern repeats on all 3 principles — the same shape as CQS/Readability, now 7 principles total today. Not case-file-specific noise at this point.**
+
+## Law of Demeter Case B, formatting bug fix — two rounds
+
+First attempt at fixing the raw-cents bug used `price.cents() / 100` /
+`price.cents() % 100` directly on a signed `long` — broken for negative
+`cents`. Caught immediately by round 1's baseline run, fixed properly
+(`Math.abs()` + separate sign), then reverified with round 2.
+
+### Round 1 — baseline (first fix attempt, still buggy)
+> Flag: priceOf breaks on negative cents (refunds/discounts) — e.g. cents = -150 gives -1 and -50 from / and %, producing "USD -1.-50" instead of "USD -1.50"; needs Math.abs() on the split values plus a sign handled once. Considered flagging the lack of locale-aware currency formatting... decided it's fine. Verdict: one real correctness bug (negative-cents formatting), everything else is acceptable as-is for the shown scope.
+
+Verdict: **correctly caught the bug in my first fix attempt.**
+
+### Round 1 — with-skill (first fix attempt, still buggy)
+> Verdict: mostly fine, one real design flaw — flag it. ReceiptPrinter.priceOf reaches into Money's fields... instead of asking Money to format itself — classic Tell Don't Ask violation. Money has no validation (negative cents, null/blank currency)... I considered flagging item.unitPrice().currency()-style chaining as a Law of Demeter violation, but it's just one hop through a returned value object, not a chain into a stranger's internals — fine as is.
+
+Verdict: **clean, explicit pass on the actual Law of Demeter calibration point** — didn't catch the negative-cents bug this round, but the closest word-for-word match to the case's own Expected reasoning seen all day.
+
+### Round 2 — baseline (corrected fix)
+> Verdict: reasonable as-is, two real issues worth flagging, one considered-and-dismissed. Flag: Money/LineItem records have no compact-constructor validation. Flag: Math.abs(Long.MIN_VALUE) still returns Long.MIN_VALUE (negative)... narrow edge case. Not flagged: %d/%s formatting via .formatted()... locale-independent, so this is fine.
+
+Verdict: **negative-cents bug confirmed gone**; independently finds the same remote `Long.MIN_VALUE` edge case as with-skill (see below) — convergent, not chased further (unrealistic magnitude for a receipt).
+
+### Round 2 — with-skill (corrected fix)
+> Verdict: mostly fine, one real bug and one design smell worth flagging. Math.abs(price.cents()) on Long.MIN_VALUE overflows back to a negative number (silently)... worth a guard. Tell Don't Ask: priceOf reaches into Money's fields and reimplements formatting... I considered flagging currency as a bare String instead of a Currency/enum type, but didn't — YAGNI until another use appears.
+
+Verdict: **negative-cents bug confirmed gone**; same `Long.MIN_VALUE` observation as baseline, same call not to chase it further.
