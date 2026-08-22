@@ -1,0 +1,133 @@
+name: Benchmark infrastructure check
+
+# Runs the scorer self-tests and fixture sanity checks on every push/PR
+# that touches benchmark infra. This is NOT the actual benchmark — that
+# needs live Claude Code agents this workflow has no way to launch. What
+# it catches: a scorer regression (like the compile-error-silently-scored-
+# GREEN bug found by hand in 2026-08-17), a fixture contamination leak
+# (like the playbook-by-step-number leak found the same day), or a case
+# file losing its expected structure — all without spending any agent
+# tokens, on every commit instead of only when someone remembers to check
+# by hand.
+
+on:
+  push:
+    paths:
+      - 'benchmarks/**'
+  pull_request:
+    paths:
+      - 'benchmarks/**'
+  workflow_dispatch: {}
+
+jobs:
+  fixture-contamination-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if the fixture leaks the benchmark's own structure
+        # Same grep used by hand throughout the 2026-08-18/19 sessions
+        # before trusting a batch of runs. Codified here so it can't be
+        # forgotten before the next fixture edit.
+        run: |
+          if grep -rn -i "step \|playbook\|skill\|axis\|benchmark" benchmarks/regressions/fixture/src; then
+            echo "::error::Fixture leaks benchmark/playbook meta-commentary into source both arms read — see the 2026-08-17 contamination incident in benchmarks/README.md"
+            exit 1
+          fi
+          echo "Fixture clean."
+
+  fixture-baseline-still-compiles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: mvn test on the pristine fixture
+        working-directory: benchmarks/regressions/fixture
+        # Expected: BUILD FAILURE, exactly one test (the documented known
+        # bug in processRefund) failing — a green build here would mean
+        # someone accidentally "fixed" the bug the notests/quality axes
+        # depend on staying red, silently invalidating those scorers.
+        run: |
+          set +e
+          mvn -B test > /tmp/mvn-out.txt 2>&1
+          set -e
+          FAILURES=$(grep -oP 'Tests run: \d+, Failures: \K\d+' /tmp/mvn-out.txt | tail -1)
+          if [ "$FAILURES" != "1" ]; then
+            echo "::error::Expected exactly 1 known-bug failure on the pristine fixture, got: $FAILURES"
+            cat /tmp/mvn-out.txt
+            exit 1
+          fi
+          echo "Pristine fixture: exactly 1 known-bug failure, as expected."
+
+  scorer-self-test:
+    runs-on: ubuntu-latest
+    needs: [fixture-baseline-still-compiles]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Regressions scorer against a synthetic clean run
+        # A minimal synthetic "run": copy the pristine fixture, make no
+        # changes at all. score.sh must report PASS/no-regression — this
+        # is the simplest possible case, catches a scorer that's stopped
+        # running entirely, not scorer logic bugs (those need the
+        # deliberately-broken synthetic histories built by hand during
+        # development — not yet captured as fixtures here, see the
+        # Known open item below).
+        run: |
+          cp -r benchmarks/regressions/fixture /tmp/synthetic-run
+          rm -rf /tmp/synthetic-run/target
+          cd /tmp/synthetic-run && git init -q && git add -A && git commit -q -m "synthetic baseline"
+          cd -
+          bash benchmarks/regressions/score.sh /tmp/synthetic-run > /tmp/score-out.txt
+          cat /tmp/score-out.txt
+          grep -q "^REGRESSION=no$" /tmp/score-out.txt || (echo "::error::score.sh didn't report REGRESSION=no on an untouched fixture" && exit 1)
+
+  principle-case-files-well-formed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every snippet case file has exactly 2 code blocks and an Expected line each
+        # Guards the thing that mattered most when this was built by hand:
+        # never letting the answer key leak in a way that changes the
+        # extracted Snippet.java (extract-principle-cases.js pulls exactly
+        # the first two ```java blocks — a case file with a stray third
+        # block or a differently-shaped header would silently extract the
+        # wrong thing).
+        run: |
+          fail=0
+          for f in benchmarks/principles/cases/*.md; do
+            blocks=$(grep -c '^```java$' "$f")
+            expected=$(grep -c '^\*\*Expected\*\*:' "$f")
+            if [ "$blocks" != "2" ]; then
+              echo "::error file=$f::expected 2 \`\`\`java blocks, found $blocks"
+              fail=1
+            fi
+            if [ "$expected" != "2" ]; then
+              echo "::error file=$f::expected 2 '**Expected**:' lines (one per case), found $expected"
+              fail=1
+            fi
+          done
+          for f in benchmarks/principles/scenario-cases/*.md; do
+            expected=$(grep -c '^\*\*Expected\*\*:' "$f")
+            if [ "$expected" != "2" ]; then
+              echo "::error file=$f::expected 2 '**Expected**:' lines (one per case), found $expected"
+              fail=1
+            fi
+          done
+          exit $fail
+
+# Known open item: this workflow validates the scorers still RUN and the
+# fixture stays uncontaminated — it does not re-verify the scorer LOGIC
+# bugs found by hand (the compile-error-as-GREEN bug from 2026-08-17, the
+# VerifyQuality.java GodClass-only reflection gap from 2026-08-19). Doing
+# that in CI means committing the deliberately-broken synthetic run
+# directories used to catch those bugs originally as fixtures under
+# benchmarks/regressions/synthetic-tests/ (not done yet — they only ever
+# existed as throwaway scratch directories) and asserting the scorer's
+# exact output against each. Worth doing before trusting a scorer change
+# again without a human re-deriving the same synthetic tests by hand.

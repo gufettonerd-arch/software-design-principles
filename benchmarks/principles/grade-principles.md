@@ -48,6 +48,30 @@ overall average — an average across 14 principles hides exactly the kind of
 principle-specific gap (e.g., good at SOLID, weak at Fail Fast) that's
 useful to know and fix.
 
+## Making "blind" actually blind (added after the 2026-08-19 run)
+
+The rubric above says the grader shouldn't know which arm produced a
+response — the 2026-08-19 run didn't actually enforce that: grading was
+done inline, by the same session that launched the runs and therefore
+already knew which directory (`.../baseline/` or `.../with-skill/`) each
+response came from. The per-case VERDICT_MATCH numbers are still
+trustworthy (they're checked against an objective answer key, not a
+subjective feel), but the softer PRINCIPLE_NAMED/NOISE judgment calls
+carry a real risk of the grader's prior expectation ("this is the
+with-skill one, it should be more careful") leaking into borderline
+calls.
+
+**Concrete fix for the next run**: before grading, copy each response
+into a flat directory with an opaque, non-suggestive filename (e.g. a
+random 6-character id, tracked in a separate manifest not shown to the
+grader) — never `baseline-response.txt` / `with-skill-response.txt`
+sitting next to each other. The grading pass reads only the case file's
+expected verdict and the anonymized response; the arm mapping gets
+joined back in only after every verdict is recorded, at aggregation
+time. This is a filing convention, not new infrastructure — costs
+nothing but discipline, and removes the one documented gap between the
+rubric's stated design and how the first run actually graded.
+
 ## A risk to watch, same shape as the quality-axis rubric
 
 The grading agent is itself making a judgment call about whether a named

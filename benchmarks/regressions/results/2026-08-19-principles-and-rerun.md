@@ -225,6 +225,76 @@ independent of which model runs it. This is the direct cost of the
 precision gain above — worth stating plainly rather than reporting only
 the upside.
 
+### The 3 with-skill misses, examined (added after the run)
+
+The report originally flagged these as "worth a closer read" without one.
+Rereading each transcript against its case file:
+
+- **`05-dry`/caseB** (`WelcomeEmailBuilder`/`ReminderEmailBuilder`,
+  haiku): the with-skill review said "both classes duplicate identical
+  method structure with only the template string varying" — it correctly
+  spotted the *shape* is identical, but never checked whether that shape
+  represents the same underlying business rule (shared knowledge) or two
+  unrelated rules that happen to look alike (coincidental similarity) —
+  exactly the distinction `principles.md`'s DRY section states explicitly
+  ("the same knowledge, not necessarily the same text"). A shape-match
+  substituted for the semantic check the skill's own text calls for.
+- **`07-cqs`/caseB** (`ProductCatalog.findById` with cache-fill +
+  metrics, haiku): with-skill flagged "query method but executes
+  commands (metrics.increment, cache.put)" — true as a literal
+  description, but it treated *any* side effect inside a query as
+  automatically disqualifying, without checking whether that side effect
+  is externally observable (changes what any caller can detect) or
+  purely internal bookkeeping that doesn't affect the returned value —
+  the specific gray area the principle's own text names as accepted.
+- **`14-fail-fast`/caseB** (single check at a real HTTP boundary, then
+  trust downstream, sonnet): with-skill argued the one check performed
+  (`items().isEmpty()`) isn't *thorough* enough, since other fields go
+  unchecked. This is a different failure shape than the other two — not
+  a surface-pattern match overriding a semantic check, but conflating
+  "validate once, at the real boundary, then trust" (what Fail Fast
+  actually asks for) with "validate everything exhaustively up front"
+  (a stricter standard the principle doesn't set).
+
+Two of three (`05-dry`, `07-cqs`) share a pattern: the skill correctly
+*applied* the general rule but skipped checking the specific named
+exception in the same principle's text — recognizing the shape of a
+violation without verifying the exception clause doesn't apply. The third
+(`14-fail-fast`) is a different, narrower failure: reading "trust after
+validating" as "validate more," not a pattern-match issue at all. Not
+enough data (N=1 per case) to say whether the first pattern generalizes
+to other principles' calibration cases, but it's a concrete, falsifiable
+hypothesis for the next run: **does re-prompting to explicitly check the
+principle's "when NOT to apply it" section, not just its main rule, fix
+`05-dry` and `07-cqs` specifically** — worth testing directly rather than
+folding into the existing 56-case rerun.
+
+### A first, real cross-host data point: OpenJarvis + a local 9B model
+
+Not part of the 56-case run (different host, different model, N=1, not
+integrated into the scoring pipeline) — but a real, single test worth
+recording rather than leaving as an untested assumption. Ran
+`01-solid`/caseA (the DIP violation both Claude arms caught 14/14
+combined) through `jarvis ask` on OpenJarvis, `qwen3.5:9b` via Ollama,
+told to read the skill's `SKILL.md`/`principles.md` before reviewing.
+
+**Result: missed it.** "Nessuna violazione significativa da flaggare" —
+and the justification it gave wasn't empty, it was a real passage from
+`principles.md` cited out of context: a historical, illustrative anecdote
+about *this specific project's own* decision to skip DI for one
+repository (because nothing else in that codebase used DI and its tests
+already used a real in-memory database) got treated as a general license
+to skip DI whenever a repository has no interface — despite the snippet
+under review giving no information about DI use elsewhere or test setup.
+A keyword-shaped match substituted for checking whether the cited
+exception's actual conditions held.
+
+One data point, not a benchmark — but it directly answers a question
+raised earlier and never tested: whether a small local model can reliably
+use this skill the way the Claude arms did. On this evidence, no. Worth
+a real N=4-or-more run on OpenJarvis before drawing a firmer conclusion,
+but not worth assuming the answer is "yes" in the meantime.
+
 ### Limitations
 
 - N=1 per case, not N=4 — a single cold read per (principle, case, arm)

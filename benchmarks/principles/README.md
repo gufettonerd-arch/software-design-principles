@@ -46,17 +46,46 @@ DDD tactical, Hexagonal Architecture, Composition over Inheritance, Shared
 state beyond its boundary, Fail Fast. All of these have a smell that shows
 up within a handful of lines of code.
 
-**Out of scope for this methodology (6 principles)**: DDD strategic
+**Out of scope for the snippet methodology (6 principles)**: DDD strategic
 (bounded context), Package by feature vs by layer, Anti-Corruption Layer,
 Strangler Fig, Modular Monolith, Legacy code/Characterization Test. These
 are either about project *structure* (folders, module boundaries — no
 single file shows a "bounded context violation") or about a *process*
 decision over time (Strangler Fig, Characterization Test — the question
 isn't "is this snippet wrong," it's "given this situation, what do you do
-next"). They need a different benchmark shape: either a small multi-file
-project layout to review, or a scenario description with a decision to
-grade, not a code snippet. Not designed yet — noted here so the gap is
-visible, not silently absent.
+next"). They get a different case format instead — see
+`scenario-cases/` below — not silently absent.
+
+## `scenario-cases/` — the other 6 principles
+
+Same Case A (should recommend the principle) / Case B (should NOT,
+calibration) structure, but each case is a **short scenario description**
+(a situation, sometimes with a small illustrative snippet or folder
+layout) instead of a code block, because the thing being judged is a
+structural or process decision, not a line-level smell. One file per
+principle, matching `principles.md`'s own numbering: `11-ddd-strategic.md`,
+`13-package-by-feature.md`, `14-anti-corruption-layer.md`,
+`15-strangler-fig.md`, `16-modular-monolith.md`,
+`19-characterization-test.md`.
+
+Review prompt for these (replaces the snippet-review prompt above, same
+two arms):
+
+> You're asked for an architectural/process recommendation on the
+> scenario below. State: (1) any recommendation you'd make, with a
+> one-line reason, or (2) that the current approach is fine as-is and
+> why. Don't assume more context than what's given.
+
+Scored the same way as the snippet cases — recall on Case A, precision
+on Case B — but grading is necessarily softer here: there's no single
+"named the principle" string to match, since the expected answer is a
+recommendation plus reasoning, not a flag. `grade-principles.md`'s rubric
+applies with the same VERDICT_MATCH/PRINCIPLE_NAMED/NOISE structure, read
+as "did the recommendation (or the deliberate non-recommendation) match
+the expected one" rather than "did it name the exact section header."
+
+Not run yet — written alongside the god-class rerun and the first
+56-case principles run, same day, but not launched in that batch.
 
 ## Running it (for tomorrow, not today)
 
