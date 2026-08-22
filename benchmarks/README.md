@@ -81,6 +81,14 @@ the second time); the third (`14-fail-fast`) missed on **both** seeds, on
 the default model both times — a real, repeatable gap, not noise or a
 weaker model. See the report for the full case-by-case breakdown.
 
+**Partial N=4 on the 3 highest-signal principles** (DRY, CQS, Fail Fast —
+the ones with real N=2 misses): see
+[the 2026-08-22 report](regressions/results/2026-08-22-n4-partial.md).
+Confirms the Fail Fast case-file fix is stable (not a fluke), surfaces a
+new repeatable CQS Case A baseline recall miss (2/2 on fresh seeds, not
+visible at N=2), and finds the same case-file confound in CQS Case B that
+Fail Fast had — not yet fixed. The other 17 principles remain at N=2.
+
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
 clean matches at N=2. 5 of 6 principles went 8/8 on both arms; the one
