@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "software-design-principles",
-      "description": "SOLID through Fail Fast, each with a 'when NOT to apply it' section, plus a step-by-step (0-12) procedure for extracting a flow from a legacy god class.",
+      "description": "SOLID through Fail Fast, each with a 'when NOT to apply it' section, plus a step-by-step (0-13) procedure for extracting a flow from a legacy god class.",
       "source": "./",
       "category": "productivity"
     }

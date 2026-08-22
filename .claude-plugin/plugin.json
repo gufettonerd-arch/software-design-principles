@@ -1,6 +1,6 @@
 {
   "name": "software-design-principles",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "20 software design principles and a god-class extraction playbook, as a Claude Code skill.",
   "author": {
     "name": "federico-casciero",

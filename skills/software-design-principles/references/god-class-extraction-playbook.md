@@ -143,6 +143,18 @@ If the flow is reachable from a real endpoint/page, start it locally and hit it 
 - Compare the output/logs for known cases (e.g. the inputs from the original bug report) before/after the fix — application logs often give the most direct, readable proof, more convincing than an assert in a test.
 - Stop the containers/processes when you're done.
 
+## Step 13 — Fresh-eyes re-review (after the move is verified safe)
+
+Steps 1–12 are necessarily conservative: every choice in them is constrained by "don't change behavior, don't break the build." That constraint is exactly right during the move, but it also means some principles only become visible once the flow no longer lives inside the god class — a Value Object that wasn't worth introducing for one field buried in a 3000-line class, a Strategy pattern invisible when the branch was one of forty in the same method, a name that made sense as "part of X's fifth responsibility" but not as the name of a standalone class. Extracting safely and finishing the job aren't the same checklist.
+
+Once the extraction is verified safe (Steps 1–12 done, tests green, coverage met), step back and review the finished new class **cold — as if it were someone else's PR you're seeing for the first time**, not as the extraction you just performed:
+
+- Re-run the Working Checklist (see `SKILL.md`) against the new class as a whole, not just the specific lines touched during Steps 7–10.
+- Ask explicitly: does anything about this class only make sense in light of where it came from? A comment referencing "the original method in GodClass," a name that echoes the old context, a parameter shaped the way the god class happened to pass it rather than the way this class actually needs it, a usage pattern that was a workaround for something the god class did nearby that no longer applies.
+- If this surfaces a genuine improvement (not a speculative one — see YAGNI in principle 5), treat it as its own small step: change, run the build/test script, don't fold it silently into an earlier commit.
+
+This is also why **one flow per pass** matters more than it looks: the fresh-eyes review works best right after the extraction, not three flows deep into the same god class and eager to move on.
+
 ---
 
 ## Definition of done (condensed checklist)
@@ -156,6 +168,7 @@ If the flow is reachable from a real endpoint/page, start it locally and hit it 
 - [ ] Queries with bind parameters (not concatenation), no mutable formatters/parsers shared in static fields, immutable Value Objects — none of these change an observable output
 - [ ] Coverage ≥80% per new class, guard branches included
 - [ ] Verified end-to-end locally with real data, not just the automated build/test
+- [ ] Reviewed the finished class cold, as a fresh PR — not just the lines touched during the move (Step 13)
 - [ ] Documentation/references naming the moved class updated, if any exist (e.g. a code-review doc or a README naming the god class)
 - [ ] Build/test green at the final step, not just halfway through
 - [ ] If more flows remain in the god class, none of them started before every item above was checked for this one

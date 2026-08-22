@@ -25,7 +25,7 @@ hooks/hooks.json                                           registers the Session
 hooks/activate.js                                          the hook itself (see "Session-start nudge")
 skills/software-design-principles/SKILL.md                entry point: when to trigger, working checklist
 skills/software-design-principles/references/principles.md                    the 20 principles, in full
-skills/software-design-principles/references/god-class-extraction-playbook.md the 0→12 extraction procedure
+skills/software-design-principles/references/god-class-extraction-playbook.md the 0→13 extraction procedure
 ```
 
 **The 20 principles**, grouped the way the doc groups them:
