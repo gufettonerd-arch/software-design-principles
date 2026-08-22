@@ -19,6 +19,13 @@ has run once across all 56 cases (14 principles × 2 cases × 2 arms). See
 for both — it's the current source of truth; the three 2026-08-17 reports
 are kept for history but each now links forward to the clean rerun.
 
+**Before trusting a with-skill run**: check that the installed plugin's
+`gitCommitSha` (in `~/.claude/plugins/installed_plugins.json`) matches
+the repo's latest commit. It doesn't auto-update silently — a run found
+this the hard way after every principles-benchmark with-skill run that
+day had read a version pinned to install time, missing two same-day
+fixes. See the correction note at the top of the 2026-08-19 report.
+
 ## `regressions/` — god-class extraction playbook
 
 One fixture (`fixture/`, a small Maven project shaped like a real god

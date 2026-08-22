@@ -5,6 +5,25 @@ rerun of the three contaminated axes plus quality's first-ever N=4, and
 the first run of the separate 14-principle benchmark (56 cases). See
 [`benchmarks/README.md`](../../README.md) for how these fit together.
 
+> **Caveat found after the fact, applies to Parts 2-4 below.** The
+> installed plugin turned out to be pinned to the commit it first became
+> installable at (`04d7506`, 2026-08-18) — it never auto-updated after
+> that, silently. Every with-skill agent run in Parts 2-4 (the N=1 and
+> N=2 principles runs, both snippet and scenario) read that pinned
+> version via the `Skill` tool, not the latest repo state. That version
+> already has all 20 principles, the original 0-12 playbook, and Step
+> 5's sharpened two-condition rule — it's missing exactly two things
+> added later the same day: playbook Step 13 (fresh-eyes re-review,
+> never actually exercised by any agent yet) and one clarifying sentence
+> in the Fail Fast section (added, then a rerun against it looked like a
+> failed fix — see Part 4's correction, that test never actually saw the
+> new sentence either). Part 1 (the god-class N=4 rerun) is unaffected —
+> it ran before the plugin existed, against a manually-synced copy that
+> was current at the time. Fix going forward: check
+> `~/.claude/plugins/installed_plugins.json`'s `gitCommitSha` against
+> the repo's latest commit before trusting a with-skill run reflects
+> current content, not just after installing once.
+
 ## Part 1 — God-class playbook, clean rerun (N=4, all four axes)
 
 ### Why this run exists
@@ -406,28 +425,41 @@ at N=2, not an N=1 artifact.
   from the mid-run model switch) — reran clean on seed 2 (sonnet, the
   now-default model for Case B). Same skill, same case, different
   result by model capability alone.
-- **One with-skill miss, root-caused after a failed fix and a correct
-  one.** `14-fail-fast`/Case B false-positived on both seeds, both on
-  the default model. First hypothesis: a gap in `principles.md`'s
-  wording — added an explicit sentence distinguishing *where* validation
-  happens from *how exhaustive* it is. **That fix didn't work**: reran
-  the same case twice more (seeds 3 and 4) against the updated text,
-  same miss both times, identical reasoning both times ("other fields go
-  unvalidated"). The real cause was the case file, not the principle: the
-  snippet only ever checked one field (`items.isEmpty()`) on a `/checkout`
-  endpoint that obviously has more relevant fields (customerId, payment)
-  — a reasonable reviewer has no way to know those are out of scope for
-  *this* check, so "boundary looks incomplete" is a defensible read, not
-  a model error. Fixed by making the snippet demonstrably complete
-  (`@Valid` covers the other fields declaratively, the one manual check
-  handles the one rule bean-validation can't express) — reran once more
-  against the fixed case: correct immediately. Two lessons, not one: (1)
-  don't assume the principle's wording is the problem before checking
-  whether the test case itself is fair — this is the same shape of
-  mistake the fixture-contamination corrections earlier in this project
-  kept surfacing; (2) a repeatable miss across multiple seeds and models
-  is a real signal worth chasing down to its actual root, not a random
-  variance to average away.
+- **One with-skill miss, root-caused — with a correction to how it was
+  root-caused.** `14-fail-fast`/Case B false-positived on both seeds,
+  both on the default model. First hypothesis: a gap in `principles.md`'s
+  wording — added a sentence distinguishing *where* validation happens
+  from *how exhaustive* it is, committed, reran the case twice more
+  (seeds 3 and 4). Same miss both times, identical reasoning. Concluded
+  the wording fix didn't work and the real cause was the case file (the
+  snippet only checked one field on an endpoint that plausibly has more
+  relevant ones) — fixed the snippet to make the boundary demonstrably
+  complete (`@Valid` covers the rest declaratively), reran: correct
+  immediately.
+
+  **Correction, found afterward**: the installed plugin was pinned to an
+  old commit (installed the day it first became installable, never
+  auto-updated since) — the wording-fix commit landed in the repo but
+  never actually reached what the Skill tool served to those seed-3/4
+  verification runs. So "the wording fix didn't work" was never actually
+  tested; what really happened is *the original, pre-fix wording* failed
+  the same way a third and fourth time, which is itself useful (a stable,
+  repeatable miss, not seed noise) but isn't evidence against the wording
+  fix specifically. The case-file fix and its clean rerun are unaffected
+  by this — that fix targets the test input (`Snippet.java`), not the
+  skill's own reference text, so it didn't depend on the plugin being
+  current. Both the case fix and the wording addition are kept; only the
+  claim that the wording addition was tried-and-failed is withdrawn.
+
+  Three lessons, not two: (1) a repeatable miss across multiple seeds and
+  models is a real signal worth chasing to its root, not variance to
+  average away; (2) the test case itself can be the actual bug, the same
+  shape of mistake the fixture-contamination corrections kept surfacing
+  earlier in this project; (3) **verify the thing under test is actually
+  the thing that changed** — an installed plugin silently pinned to a
+  stale commit is exactly the kind of measurement gap that makes a
+  correctly-diagnosed root cause look like it came from a clean
+  experiment when it didn't.
 
 ### Limitations
 
