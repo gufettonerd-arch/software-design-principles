@@ -97,24 +97,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Every snippet case file has exactly 2 code blocks and an Expected line each
+      - name: Every snippet case file has a matched, well-formed code block per case
         # Guards the thing that mattered most when this was built by hand:
-        # never letting the answer key leak in a way that changes the
-        # extracted Snippet.java (extract-principle-cases.js pulls exactly
-        # the first two ```java blocks — a case file with a stray third
-        # block or a differently-shaped header would silently extract the
-        # wrong thing).
+        # never letting the answer key leak in a way that changes what a
+        # reviewing agent is shown, and never leaving a case's code block
+        # and its **Expected** line out of sync. Most principles have
+        # exactly 2 cases (A/B); some (e.g. 05-dry.md's Case C, added
+        # 2026-08-22 to test the rule-of-three trap specifically) have 3+
+        # — the invariant that matters is blocks == expected lines and at
+        # least 2 of each, not a fixed count of exactly 2.
         run: |
           fail=0
           for f in benchmarks/principles/cases/*.md; do
             blocks=$(grep -c '^```java$' "$f")
             expected=$(grep -c '^\*\*Expected\*\*:' "$f")
-            if [ "$blocks" != "2" ]; then
-              echo "::error file=$f::expected 2 \`\`\`java blocks, found $blocks"
+            if [ "$blocks" -lt "2" ]; then
+              echo "::error file=$f::expected at least 2 \`\`\`java blocks, found $blocks"
               fail=1
             fi
-            if [ "$expected" != "2" ]; then
-              echo "::error file=$f::expected 2 '**Expected**:' lines (one per case), found $expected"
+            if [ "$expected" != "$blocks" ]; then
+              echo "::error file=$f::\`\`\`java blocks ($blocks) and '**Expected**:' lines ($expected) don't match — every case needs exactly one of each"
               fail=1
             fi
           done

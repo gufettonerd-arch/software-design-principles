@@ -20,7 +20,7 @@ for full results.
 
 ## Format
 
-One file per principle under `cases/`, each with two snippets:
+One file per principle under `cases/`, normally with two snippets:
 
 - **Case A — should flag**: a small, realistic snippet with a genuine
   violation of that principle. Expected: the reviewing agent names the
@@ -30,6 +30,16 @@ One file per principle under `cases/`, each with two snippets:
   condition. Expected: the agent doesn't flag it, or flags it and then
   correctly reasons its way out — either is fine, silently missing it
   because it never looked is not the same as correctly deciding it's fine.
+
+A principle can have more than two cases when a specific, real failure
+mode needs its own probe — `05-dry.md` has a Case C (added 2026-08-22)
+testing specifically whether "rule of three" reasoning survives a third,
+still-coincidental instance, after that exact gap showed up in
+exploratory testing (see
+[2026-08-22-n4-partial.md](../regressions/results/2026-08-22-n4-partial.md)).
+CI (`principle-case-files-well-formed`) only asserts code blocks and
+`**Expected**:` lines match 1:1 and there are at least 2 of each — it
+doesn't assume exactly 2.
 
 Each snippet is 10-25 lines, self-contained, no fixture/project context
 needed — deliberately smaller and more isolated than the god-class
