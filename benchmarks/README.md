@@ -156,8 +156,21 @@ see [the blind-grading report](regressions/results/2026-08-22-blind-grading.md).
 
 Extended once more to Strategy and Specific Exceptions, seed3 only
 (N=3). Strategy Case A baseline missed and explicitly dismissed the
-real issue as fine; Specific Exceptions Case A went 2/2 clean. 10
-principles remain untouched at N=2.
+real issue as fine; Specific Exceptions Case A went 2/2 clean.
+
+Extended to the last 4 untouched snippet principles — DDD tactical,
+Hexagonal, Composition over Inheritance, Shared state, seed3 only —
+completing all 14 snippet-based principles with data beyond N=2 (8 at
+full N=4, 6 at N=3). Composition over Inheritance came back cleanest of
+the day. One finding worth flagging: **DDD tactical Case B with-skill
+actively contradicted its own calibration point** — correctly applied
+Tell Don't Ask to Case A's anemic domain object, then over-applied the
+same critique to Case B's deliberately-anemic JPA entity in the same
+review. Second contradiction of this exact shape today, after Law of
+Demeter — not a case-file wording problem either time, looks more like
+the model over-generalizing a principle it just used correctly. See the
+report for the full reasoning. The 6 scenario-based principles remain
+untouched at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48

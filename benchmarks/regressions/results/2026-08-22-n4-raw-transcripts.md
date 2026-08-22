@@ -619,3 +619,87 @@ Verdict: **near-EXPLICIT** — "acceptable as a last-resort catch-all" directly 
 Verdict: **HIT** — clean, explicit, names the exact reasoning from the case's own Expected text.
 
 **Tally: Strategy Case A 1/2 (baseline missed and dismissed the real issue), Case B 0/2 explicit (both silent on the Strategy question specifically). Specific Exceptions Case A 2/2 clean. Case B: with-skill clean explicit, baseline near-explicit — the strongest baseline Case B engagement seen all day on either principle tested today.**
+
+## DDD tactical, Hexagonal, Composition over Inheritance, Shared state — seed3 only (N=3)
+
+### DDD Tactical Case A — baseline
+> Flag: NPE risk on null status. Flag: Magic strings instead of enum — "ACTIVE" and "CANCELLED" should be an enum. Flag: Weak idempotency guard — checking cancelledDate == null doesn't prevent status being set inconsistently by direct setter. Verdict: Ship after fixing status to enum and adding null/initialization safety.
+
+Verdict: **MISS** — never names the anemic-model point.
+
+### DDD Tactical Case A — with-skill
+> Flag: String status constant — use an enum. Flag: Tell-Don't-Ask violation. The service queries the subscription's state then decides to mutate it—the subscription should own the cancellation decision. Consider s.cancel() on the object itself. Considered but not flagging: defensive coupling of cancelledDate and status — warranted here. Flag: Silent failure — if cancel() does nothing when conditions fail, the caller won't know.
+
+Verdict: **HIT** — via Tell Don't Ask framing, same underlying diagnosis as anemic model.
+
+### DDD Tactical Case B — baseline
+> Verdict: mostly fine for a simple JPA row mapping. Flag: status as a raw String is unconstrained — @Enumerated(EnumType.STRING) enum would catch typos. Flag: @Id private Long id has no @GeneratedValue. I considered flagging missing equals/hashCode but let it pass. I also considered the lack of @Table/@Column annotations but that's fine.
+
+Verdict: **SILENT** on whether the entity should stay anemic.
+
+### DDD Tactical Case B — with-skill
+> Flag: status as a raw String invites invalid/typo values — model it as an enum. Flag: public setters on every field make this an anemic entity that invites "ask" logic scattered across callers instead of a renew()/cancel() method on the entity itself — Tell Don't Ask. Flag: no equals/hashCode. I considered flagging missing @Column/@Table annotations but that's fine. I considered flagging the lack of an interface/repository abstraction here but that's YAGNI.
+
+Verdict: **CONTRADICTED** — applies the same Tell Don't Ask critique that correctly diagnosed Case A to this deliberately-anemic JPA entity, arguing it needs domain methods when the case explicitly says JPA entities should stay anemic.
+
+### Hexagonal Case A — baseline
+> Flag: Hardcoded "payroll.internal" and port 22 prevent environment-specific deployment. Flag: SFTP connection instantiated as field initializer creates resource leak and hides connection failures. Flag: No error handling on upload()/toPdf() means silent payroll failures. Flag: No null check on payslips parameter.
+
+Verdict: **soft MISS** — real, adjacent issues (config, resource leak) but never names the interface/ports-and-adapters abstraction the case is testing.
+
+### Hexagonal Case A — with-skill
+> Flags: 1. Hardcoded infrastructure config violates Dependency Inversion. 2. Tight coupling via direct instantiation — can't mock SftpPayslipUploader in tests or swap it for a different transport; inject it instead. 3. No error handling or transactional semantics. 4. SRP violation — mixing domain logic with infrastructure details.
+
+Verdict: **HIT** — explicit.
+
+### Hexagonal Case B — baseline
+> Verdict: needs changes before merge — one likely bug, one unverifiable risk. The loop calls writer.write(r.toCsvLine()) but never writes a line terminator, so every row will be concatenated into a single unbroken line — flag this as the main correctness issue. CSV escaping is delegated entirely to Row.toCsvLine(), reasonable but unverifiable from this snippet. I considered charset handling and decided not to flag it — UTF-8 default is sane.
+
+Verdict: **SILENT** on ports/adapters overhead — but catches a real, independent bug (missing line terminator).
+
+### Hexagonal Case B — with-skill
+> Silent write failure: writer.write() doesn't flush per-row... exception mid-loop leaves a truncated file with no cleanup. No CSV escaping shown — assumed handled in toCsvLine() (Tell Don't Ask: ask Row for its already-valid line — fine as-is). Missing line separator — looks like an actual bug. I considered flagging the lack of an injected Writer/interface for testability, but for a single-method file-export tool that's YAGNI.
+
+Verdict: **soft EXPLICIT** — explicitly considers and declines a testability abstraction, functionally the same judgment as the Hexagonal calibration question, just not labeled as such.
+
+### Composition Case A — baseline
+> Flag: Inheritance misuse. This should use composition, not extend DecimalFormat—hold a DecimalFormat instance instead. Extending a concrete class just to wrap one method creates a misleading inheritance hierarchy. I considered: no null checks on total, but that's fine.
+
+Verdict: **HIT** — clean, explicit, even on baseline (unusual today).
+
+### Composition Case A — with-skill
+> Flag: Extends DecimalFormat when composition would be safer — violates Composition over Inheritance. ReportFormatter isn't genuinely an "is-a" relationship. Flag: SRP — exposes the entire DecimalFormat API when the class only owns formatTotal(). Lazy fix: replace inheritance with a private DecimalFormat formatter member.
+
+Verdict: **HIT** — explicit.
+
+### Composition Case B — baseline
+> Verdict: acceptable as a minimal exception type, but missing a (String reason, Throwable cause) constructor. I considered flagging the unchecked (RuntimeException) choice, but that's fine since payment failures are typically a business-flow signal. One real design question: reason is a free-text String — an error-code field would be needed later if callers need to branch.
+
+Verdict: **soft EXPLICIT** — "acceptable as a minimal exception type" affirms the pattern before moving to other findings.
+
+### Composition Case B — with-skill
+> Looks fine — approve, no changes needed. It's a specific unchecked exception (extends RuntimeException, not a generic catch-all), which is exactly what the "specific exceptions" principle asks for. I considered whether reason should be a Value Object... YAGNI holds. One nit: no (String message, Throwable cause) constructor.
+
+Verdict: **soft EXPLICIT** — affirms it's fine, via Specific Exceptions framing rather than Composition over Inheritance's own "is-a" reasoning.
+
+### Shared State Case A — baseline
+> FLAG: SimpleDateFormat is not thread-safe — as a static field, concurrent calls to renderDate() will corrupt the formatter's internal state. FLAG: No null check.
+
+Verdict: **HIT** — explicit.
+
+### Shared State Case A — with-skill
+> Flag: SimpleDateFormat is not thread-safe. Storing it as a static field creates a shared mutable state problem. This violates the "Shared state beyond its boundary" principle (server-side concurrency scenario). I considered but won't flag: hardcoded date format.
+
+Verdict: **HIT** — names the principle by name.
+
+### Shared State Case B — baseline
+> Flag: double for VAT rates risks floating-point rounding errors. Flag: no private constructor, so this static-constant holder can be pointlessly instantiated or subclassed. Flag: rates are hardcoded with no comment on jurisdiction or effective date. I considered a missing third rate but didn't flag it — speculative.
+
+Verdict: **SILENT** on the immutability/shared-state point.
+
+### Shared State Case B — with-skill
+> Verdict: flag the double type for tax rates. I considered flagging the lack of a TaxRate value object (Primitive Obsession) but decided against it — YAGNI. I also considered the class being a public field bag rather than an enum, but that's idiomatic. No other design smells here.
+
+Verdict: **SILENT** on the immutability/shared-state point.
+
+**Tally: DDD tactical Case A 1/2 (baseline miss), Case B 1 SILENT + 1 CONTRADICTED (with-skill). Hexagonal Case A 1/2 (baseline soft-miss), Case B both soft/silent, real bug caught by both. Composition Case A 2/2 clean (unusually including baseline), Case B 2/2 soft-explicit. Shared state Case A 2/2 clean, Case B 2/2 silent.**
