@@ -101,22 +101,27 @@ useful to know for a different reason (fix the case file, the same way
 response that actively argues the wrong thing (fix the principle's
 wording, or investigate the model's reasoning, the way `05-dry.md`'s
 rule-of-three trap was this session). Proposed and documented here, then
-spot-checked blind on 3 principles same day — see
+spot-checked blind on 5 principles same day — see
 [the blind-grading report](../regressions/results/2026-08-22-blind-grading.md)'s
-"Testing the new two-axis Case B rubric" section: Tell Don't Ask and
-Value Object both showed a clean, arm-correlated split (baseline SILENT
-both seeds, with-skill EXPLICIT both seeds) the old single question
-couldn't see, since all responses landed on the same top-line verdict.
-Readability — deliberately included as a predicted negative result,
-since its case file was already known to have its own confound — showed
-no such correlation, each arm split internally instead. That's the
-right behavior for a discriminating rubric: real signal where it exists,
-no manufactured pattern where it doesn't. Still small N per arm, not run
-broadly enough to claim it generalizes past these 3, but it did what it
-was proposed to do on every test run so far. The next full principles
-pass should use
-this version of the rubric rather than the original single-question
-one.
+"Testing the new two-axis Case B rubric" section for the full picture:
+Tell Don't Ask and Value Object (clean case files) both showed a clean,
+arm-correlated split — baseline SILENT, with-skill EXPLICIT — the old
+single question couldn't see, since all responses landed on the same
+top-line verdict. Readability and CQS (both known-confounded case
+files, one moderate, one severe) showed no such correlation — CQS in
+particular went uniformly SILENT on both arms, the confound drowning out
+everyone rather than exposing a skill-specific gap. Law of Demeter
+(smaller sample, one collection error disclosed rather than hidden)
+showed a different failure mode again: with-skill was the one that
+*explicitly* reasoned through the calibration point and reached the
+wrong conclusion. Four different, internally consistent stories from
+one rubric — real signal where it exists, no manufactured pattern where
+it doesn't, and honest reporting of a genuinely different (less
+flattering) result on the one principle that showed it. Still small N
+per arm on every principle — not broad enough to claim precise rates —
+but it did the actual job of a grading tool on every test run so far.
+The next full principles pass should use this version of the rubric
+rather than the original single-question one.
 
 ## Aggregation
 

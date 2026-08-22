@@ -183,16 +183,56 @@ was CONTRADICTED+SILENT (same naming nitpick as baseline-seed3, but
 without ever engaging the comment). No arm-correlation at all — each arm
 split internally across both axes.
 
-**Read together, three principles**: the arm-correlated EXPLICIT/SILENT
-split isn't an artifact of the rubric itself (it's not "with-skill
-responses always sound more careful regardless of content" — if that
-were true, Readability would have shown it too, on a case file the
-skill's own reference content had no special reason to help with more
-than baseline). It tracked something real on 2 of 3 principles and
-correctly didn't manufacture a pattern on the third, which is exactly
-what a genuinely discriminating rubric should do. Three principles,
-small N per arm — still not broad enough to claim this generalizes
-across the other 17, but it's now demonstrated in the specific sense
-that matters most for a grading tool: it finds a real signal when one
-exists (Tell Don't Ask, Value Object) and doesn't manufacture one when
-there isn't (Readability), rather than a single confirming anecdote.
+**Two more, on the two already-known-confounded case files, for a
+complete picture across every principle that showed the ambiguity
+pattern today — with one collection mistake, disclosed rather than
+hidden.**
+
+**CQS Case B** (pre-fix, the case with the most severe confound found
+today — undeclared fields, a null-caching bug, a race condition): **all
+4 responses SILENT, none CONTRADICTED, on both arms**. No arm split at
+all — baseline and with-skill alike spent their entire response on the
+other real bugs and never touched the metrics/CQS question. Consistent
+with the case being severely confounded rather than principle-specific:
+the distraction was strong enough to drown out both arms equally, not
+just weaken the with-skill signal.
+
+**Law of Demeter Case B** (pre-fix): a collection error here — the
+prompt for this check accidentally included 2 responses from a
+*different* case (Case A's getter-chain example) instead of the actual
+seed4 pre-fix Case B responses, which were never saved as a separate
+data point (seed4 was only ever run against the already-corrected
+version). The grading agent caught the mismatch immediately and refused
+to score the 2 mismatched responses against the wrong material — exactly
+the right behavior, and it's the kind of check this project has leaned
+on all day. That leaves only 2 valid data points (seed3 baseline,
+seed3 with-skill), not 4. On those 2: baseline was not-contradicted,
+SILENT (found the raw-cents bug, never touched navigation); **with-skill
+was CONTRADICTED, EXPLICIT** — it reasoned through the navigation
+pattern and reached the wrong conclusion, reframing it as a Tell Don't
+Ask violation ("Money should own its own `format()`... rather than
+letting `ReceiptPrinter` reach into it"). This matches this report's own
+same-day inline read of that exact response ("soft miss... argues
+against the exact navigation the calibration point says is normal").
+N=1 per arm here, not 2 — too small to treat as more than a single
+confirmed data point, but not swept under the rug either.
+
+**Read together, five principles, four case files' worth of real
+signal**: the picture is more nuanced than "with-skill always wins
+Case B," and that nuance is exactly what the split was built to
+surface. Tell Don't Ask and Value Object (clean case files): with-skill
+consistently EXPLICIT, baseline consistently SILENT — a real capability
+difference. Readability (known confound, moderate): no arm correlation,
+noise. CQS (known confound, severe): uniform SILENT on both arms, the
+confound overwhelming everyone equally rather than exposing a
+skill-specific gap. Law of Demeter (small sample, collection error
+disclosed): the one case where with-skill's *explicit* engagement led it
+to actively contradict the calibration point — reasoning more, but to
+the wrong conclusion, which is a real and different failure mode than
+silence. The rubric didn't just find one flattering pattern and stop —
+across 5 principles it produced 3 different, internally consistent
+stories, tracking case-file quality and reasoning depth in ways a single
+MATCH/MISS number never could. Still small N per arm on every principle
+— not broad enough to claim precise rates — but demonstrated, repeatedly
+today, to do the actual job of a grading tool: surface what's really
+happening instead of flattening it into one number.
