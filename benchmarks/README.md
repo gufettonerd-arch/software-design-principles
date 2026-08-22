@@ -186,11 +186,15 @@ Ask by name** on a snippet shape it doesn't own — 3 of 4 land wrong,
 because the correct exemption for each case is written under a
 *different* principle's own "when NOT to apply it" heading (Law of
 Demeter's Value-Object-navigation carve-out, DDD tactical's
-persistence-entity carve-out), not under Tell Don't Ask's. A candidate
-fix (cross-referencing those exemptions from Tell Don't Ask's own
-clause) is identified but deliberately not applied yet — investigation
-only, fix deferred to a future session. The 6 scenario-based principles
-remain untouched at N=2.
+persistence-entity carve-out), not under Tell Don't Ask's. **Fixed the
+same day**: added both exemptions directly to Tell Don't Ask's own
+clause (plugin 1.2.4 → 1.2.5), reverified against exactly the two named
+case files — 1 with-skill run each, both clean EXPLICIT passes on the
+first attempt. See
+[the report](regressions/results/2026-08-23-contradiction-pattern-investigation.md)
+for the full reasoning and both transcripts; N=1 per case, not yet
+confirmed at scale. The 6 scenario-based principles remain untouched at
+N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48

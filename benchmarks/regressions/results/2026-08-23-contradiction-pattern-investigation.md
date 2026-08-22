@@ -115,3 +115,33 @@ fixes (a cross-reference note vs. a clearer numeric heuristic).
   Reverify against exactly these two case files (Law of Demeter Case B,
   DDD tactical Case B) before touching anything broader, the same
   discipline used for the DRY/CQS/Fail Fast fixes.
+
+## Fix applied and reverified, same day (2026-08-23)
+
+Applied the candidate fix above to Tell Don't Ask's "When NOT to apply
+it" clause (`skills/software-design-principles/references/principles.md`,
+plugin version 1.2.4 → 1.2.5) and reverified against exactly the two
+case files the investigation named — 1 with-skill run each.
+
+- **Law of Demeter Case B**: clean EXPLICIT pass, opening line "Tell,
+  Don't Ask / Law of Demeter — not violations here... both records are
+  immutable Value Objects, and what's happening is formatting/display
+  logic being built from a VO's own already-validated fields for a
+  different consumer's representation — that's the explicit exception in
+  both principles above." Names the exact new clause, correctly.
+- **DDD tactical Case B**: clean EXPLICIT pass, opening line "this class
+  is *correctly* anemic. It's a JPA `@Entity`, and both principles in the
+  checklist carve out exactly this case." Also goes on to correctly
+  redirect the real Tell Don't Ask question to "where does the business
+  logic live," rather than pushing behavior onto the entity itself —
+  exactly the distinction the case is testing.
+
+Both fixed on the first attempt, unlike DRY's three failed attempts —
+consistent with this session's earlier finding that a real wording/gap
+defect (as this was: the correct answer existed elsewhere in the same
+document, just not cross-referenced) closes cleanly with one fix, while
+a genuine reasoning-pattern limit (DRY's rule-of-three instinct) doesn't.
+N=1 per case here — the same next step as every other single-run
+reverification this session: hold as "fixed, lightly verified" until a
+future N=3+ pass confirms it generalizes, not yet claimed as fully
+proven at scale.
