@@ -31,7 +31,10 @@ second place to keep in sync if the rule ever changes.
 
 ```java
 @PostMapping("/checkout")
-public ResponseEntity<?> checkout(@RequestBody CheckoutRequest request) {
+public ResponseEntity<?> checkout(@Valid @RequestBody CheckoutRequest request) {
+    // @Valid already enforces customerId/paymentMethod/shippingAddress via
+    // bean-validation annotations on CheckoutRequest; "at least one item"
+    // isn't expressible there, so it's the one manual check still needed here.
     if (request.items().isEmpty()) {
         return ResponseEntity.badRequest().body("No items");
     }
@@ -43,4 +46,8 @@ public ResponseEntity<?> checkout(@RequestBody CheckoutRequest request) {
 **Expected**: do NOT flag. Why: this validates exactly once, at the real
 trust boundary (an HTTP request from an external caller), and everything
 downstream trusts that guarantee instead of re-checking it — this is the
-principle applied correctly, not a violation to find.
+principle applied correctly, not a violation to find. The boundary isn't
+incomplete: `@Valid` already covers every field bean-validation annotations
+can express, and the one manual check handles the one rule that can't be
+expressed that way (a non-empty collection) — not a gap, two complementary
+mechanisms at the same boundary.

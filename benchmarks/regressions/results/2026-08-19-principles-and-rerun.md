@@ -406,15 +406,28 @@ at N=2, not an N=1 artifact.
   from the mid-run model switch) — reran clean on seed 2 (sonnet, the
   now-default model for Case B). Same skill, same case, different
   result by model capability alone.
-- **One with-skill miss confirmed as a real gap, not noise or model
-  capability.** `14-fail-fast`/Case B false-positived on **both** seeds,
-  **both on the default model** — the with-skill arm keeps reinterpreting
-  "validate once, at the real trust boundary, then trust downstream" as
-  "this validation isn't thorough enough," even with the skill's own
-  text stating the opposite. This is now the strongest single finding
-  for what to fix next: not a benchmark artifact, not a haiku limitation,
-  a genuine gap in how principle 20's exception is currently worded.
-  Worth revisiting `principles.md`'s Fail Fast section directly, next.
+- **One with-skill miss, root-caused after a failed fix and a correct
+  one.** `14-fail-fast`/Case B false-positived on both seeds, both on
+  the default model. First hypothesis: a gap in `principles.md`'s
+  wording — added an explicit sentence distinguishing *where* validation
+  happens from *how exhaustive* it is. **That fix didn't work**: reran
+  the same case twice more (seeds 3 and 4) against the updated text,
+  same miss both times, identical reasoning both times ("other fields go
+  unvalidated"). The real cause was the case file, not the principle: the
+  snippet only ever checked one field (`items.isEmpty()`) on a `/checkout`
+  endpoint that obviously has more relevant fields (customerId, payment)
+  — a reasonable reviewer has no way to know those are out of scope for
+  *this* check, so "boundary looks incomplete" is a defensible read, not
+  a model error. Fixed by making the snippet demonstrably complete
+  (`@Valid` covers the other fields declaratively, the one manual check
+  handles the one rule bean-validation can't express) — reran once more
+  against the fixed case: correct immediately. Two lessons, not one: (1)
+  don't assume the principle's wording is the problem before checking
+  whether the test case itself is fair — this is the same shape of
+  mistake the fixture-contamination corrections earlier in this project
+  kept surfacing; (2) a repeatable miss across multiple seeds and models
+  is a real signal worth chasing down to its actual root, not a random
+  variance to average away.
 
 ### Limitations
 
