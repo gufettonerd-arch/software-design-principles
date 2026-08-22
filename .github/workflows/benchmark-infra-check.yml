@@ -14,9 +14,11 @@ on:
   push:
     paths:
       - 'benchmarks/**'
+      - '.github/workflows/benchmark-infra-check.yml'
   pull_request:
     paths:
       - 'benchmarks/**'
+      - '.github/workflows/benchmark-infra-check.yml'
   workflow_dispatch: {}
 
 jobs:
