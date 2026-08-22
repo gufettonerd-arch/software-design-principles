@@ -173,14 +173,24 @@ completing all 14 snippet-based principles with data beyond N=2 (8 at
 full N=4, 6 at N=3 — now 10 at N=4, 4 at N=3 after Strategy/Specific
 Exceptions reached seed4 on 2026-08-23). Composition over Inheritance
 came back cleanest of the day. One finding worth flagging: **DDD tactical Case B with-skill
-actively contradicted its own calibration point** — correctly applied
-Tell Don't Ask to Case A's anemic domain object, then over-applied the
-same critique to Case B's deliberately-anemic JPA entity in the same
-review. Second contradiction of this exact shape today, after Law of
-Demeter — not a case-file wording problem either time, looks more like
-the model over-generalizing a principle it just used correctly. See the
-report for the full reasoning. The 6 scenario-based principles remain
-untouched at N=2.
+actively contradicted its own calibration point**, reframing a
+deliberately-anemic JPA entity as a Tell Don't Ask violation. Second
+contradiction of this shape today, after Law of Demeter. **Investigated
+further on 2026-08-23** — see
+[the contradiction-pattern report](regressions/results/2026-08-23-contradiction-pattern-investigation.md):
+Case A and Case B are independent runs with no shared context, so
+"over-applied in the same review" was the wrong framing. What's actually
+happening: 4 separate with-skill Case B responses across 3 principles
+(Law of Demeter ×2, DDD tactical, Hexagonal) all reach for **Tell Don't
+Ask by name** on a snippet shape it doesn't own — 3 of 4 land wrong,
+because the correct exemption for each case is written under a
+*different* principle's own "when NOT to apply it" heading (Law of
+Demeter's Value-Object-navigation carve-out, DDD tactical's
+persistence-entity carve-out), not under Tell Don't Ask's. A candidate
+fix (cross-referencing those exemptions from Tell Don't Ask's own
+clause) is identified but deliberately not applied yet — investigation
+only, fix deferred to a future session. The 6 scenario-based principles
+remain untouched at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
