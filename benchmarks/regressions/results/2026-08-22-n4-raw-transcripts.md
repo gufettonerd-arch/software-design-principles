@@ -292,3 +292,33 @@ Verdict: soft — first and only use of "unrelated" across all transcripts colle
 Verdict: soft, same "if more types are coming" framing.
 
 **2/4 — statistically the same as the unedited baseline (also 2/4).**
+
+## Fail Fast Case B, with-skill, reverified against the corrected case file
+
+Corrected case file: the "isn't expressible via bean-validation" claim
+replaced with a shared-DTO conflict (a save-for-later endpoint that
+allows an empty cart). Found via
+[the blind grading pass](2026-08-22-blind-grading.md) — see that report
+for how the original claim's error was caught.
+
+### seed1
+> Verdict: reasonable, ship it — the comment explaining why the empty-cart check stays local to this endpoint rather than on the shared DTO is a legitimate Fail-Fast/YAGNI call, not speculative duplication, and I considered pushing it into a validator instead but that would be an unrequested abstraction for one call site. Flag: "trusts the request from here on" is worth a second look — bean validation on paymentMethod/shippingAddress checks shape, not whether customerId actually belongs to the authenticated caller, so unless checkoutService.process (or a filter upstream) verifies ownership, this is an IDOR risk at a real trust boundary. Flag: returning ResponseEntity.badRequest().body("No items") is a bare string, not the app's structured error type. I considered flagging the @Valid DTO reuse across two endpoints as an SRP smell but decided it's fine — the type represents the same request shape for two workflows and the doc comment already states the tradeoff, so a split DTO would be premature.
+
+Verdict: **HIT** — explicitly endorses the shared-DTO reasoning.
+
+### seed2
+> Verdict: acceptable as written — the comment earns its keep by explaining a genuine constraint (shared DTO with the draft endpoint), which is exactly the kind of note the "deliberate duplication" checklist item asks for, so I wouldn't push this logic into a @NotEmpty on the DTO. Two things I'd flag: the error response returns a bare string ("No items") rather than a structured error body. I considered whether the empty-items check is the right trust boundary (Fail Fast) and it is — but the comment "trusts the request from here on" overstates it, since @Valid only validates DTO shape, not business invariants inside each item. I also considered whether the local if should instead be a Strategy/validator object, but two call sites with genuinely different rules is not enough repetition to justify that abstraction (YAGNI holds here).
+
+Verdict: **HIT** — explicitly declines the `@NotEmpty` move.
+
+### seed3
+> Verdict: mostly sound, one real gap. The empty-items check correctly lives in the handler rather than on the shared CheckoutRequest DTO — that's Fail Fast applied at the actual trust boundary, and I considered flagging DRY (validation logic scattered vs. centralized) but it's not duplicated elsewhere, so no flag there. Flag: return ResponseEntity.badRequest().body("No items") returns a bare string instead of the same structured error type presumably used elsewhere in the API. Flag: the comment "trusts the request from here on" is only true if each Item in the list carries its own validation — that's not visible in this snippet, and if it's missing, checkoutService.process receives unvalidated item data despite the comment's claim.
+
+Verdict: **HIT** — names the shared-DTO reasoning as the correct call.
+
+### seed4
+> Verdict: solid, only one real flag. request.items().isEmpty() — flag: if items isn't annotated @NotNull on CheckoutRequest, a missing items field NPEs before the bad-request path ever fires. I considered whether the empty-cart check belongs on the DTO instead of the handler, but the comment's reasoning holds — the DTO is shared with the save-for-later endpoint where an empty cart is valid, so this is Fail Fast applied at the correct trust boundary (the rule lives where it's actually true), not a violation of DRY. ResponseEntity<?> with a bare string body ("No items") is a minor smell. The "trusts the request from here on" comment is accurate and appropriately scoped.
+
+Verdict: **HIT** — "the comment's reasoning holds... not a violation of DRY."
+
+**4/4 clean — the fix held on direct reverification, unlike any of the three DRY fix attempts.**
