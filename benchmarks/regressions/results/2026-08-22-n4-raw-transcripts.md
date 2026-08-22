@@ -420,3 +420,67 @@ Verdict: **partial improvement** — explicitly says "the holiday-scope comment 
 > Flag: method name daysUntil misleads callers... rename to businessDaysUntil. Flag: no guard on target being before today — datesUntil throws IllegalArgumentException... Flag: the exclusive-end semantics of datesUntil(target) isn't stated anywhere. I considered suggesting a BusinessDayCounter/Value Object abstraction but decided against it... the Clock parameter already gives it good testability. I considered the (int) cast... left it alone.
 
 Verdict: **partial improvement** — explicitly confirms "the Clock parameter already gives it good testability" (the testability tangent is closed), but raises 2 new issues (past-date exception, exclusive-end semantics) plus a naming complaint not neutralized by the fix.
+
+## Value Object, Tell Don't Ask, Law of Demeter — seed3 only (N=3)
+
+### Value Object Case A — baseline
+> Duplicated validation—extract to EmailValidator utility. Hardcoded 0.9 discount is suspicious... sendPromo is incomplete (just a comment stub). Naive email check (allows "a@b.") is tolerable if this runs post-auth, so I'm not flagging it separately. Core issue: DRY violation coupled with a method contract that doesn't match its implementation.
+
+Verdict: **HIT** (generic "extract to utility" framing, not "Value Object" by name, but the substance matches).
+
+### Value Object Case A — with-skill
+> Flags: 1. Email validation duplicated — extract to a reusable Email Value Object that validates on construction (Tell Don't Ask pattern). 2. Insufficient email validation — just checking for "@" and "." is brittle. Considered and not flagging: IllegalArgumentException is appropriate here.
+
+Verdict: **HIT** — explicit.
+
+### Value Object Case B — baseline
+> Verdict: Small fix needed before merge. (1) No null/blank validation on recipientName/trackingNumber. (2) The literal em-dash risks mojibake if the source isn't UTF-8. I considered whether render should be doing more but didn't flag it. I also considered thread-safety/mutability concerns but dismissed them.
+
+Verdict: **AMBIGUOUS** — silent on whether a Value Object is needed for trackingNumber.
+
+### Value Object Case B — with-skill
+> Flags: ShippingLabelPrinter doesn't print anything — misleading name. No null/blank guard on recipientName/trackingNumber. Deliberately not flagged: I considered introducing a TrackingNumber Value Object to own format/validation, but with a single untyped string used once and no validation rules yet described, that's YAGNI.
+
+Verdict: **HIT** — explicit.
+
+### Tell Don't Ask Case A — baseline
+> Flag: Missing null checks on order parameter and order.getItems() return value. Flag: Silent failure on validation — method doesn't signal whether the transition succeeded. I considered the .size() > 0 pattern but it's not wrong. I also considered incomplete validation logic but that may be delegated elsewhere by design.
+
+Verdict: **MISS** — never names the actual Tell Don't Ask violation (business decision made via getters outside the object).
+
+### Tell Don't Ask Case A — with-skill
+> Flag 1: Tell Don't Ask / Anemic Domain Model — Controller asks Order questions and decides when to confirm; this business logic belongs in order.confirm() instead. Flag 2: No return value or error handling. Considered but won't flag: getStatus() == Status.PENDING is correct for enums.
+
+Verdict: **HIT** — explicit.
+
+### Tell Don't Ask Case B — baseline
+> Verdict: needs changes before merge. 1. customerId taken from request body instead of the authenticated principal — IDOR risk. 2. No validation shown (itemIds null/empty, couponCode). 3. CreateOrderRequest holds a List<String> without defensive copying. I considered flagging the comment-only method body, but that's clearly a stand-in for omitted implementation.
+
+Verdict: **AMBIGUOUS** — silent on whether the DTO is correctly anemic; finds other real issues instead.
+
+### Tell Don't Ask Case B — with-skill
+> Flag: no validation before mapping to the command. Flag: couponCode being a bare String hides that it's optional. Considered, not flagging: customerId/itemIds staying as raw types — this is a boundary DTO, Value Objects here would be premature (YAGNI). Considered, not flagging: the controller doing only map→delegate→map with no business logic — that's exactly what Tell Don't Ask wants from a controller.
+
+Verdict: **HIT** — explicit.
+
+### Law of Demeter Case A — baseline
+> Flag: NullPointerException risk — chained getters with no null checks. Flag: Misleading naming — buildLabel() suggests a complete shipping label but returns only a city string. Considered but not flagging: unnecessary intermediate variable.
+
+Verdict: **MISS** — never names the Law of Demeter coupling itself.
+
+### Law of Demeter Case A — with-skill
+> Flag: Law of Demeter violation — the order.getCustomer().getAddress().getCity() chain couples this service to Order's internal structure; a null at any level crashes silently. Flag: Method name doesn't match behavior. Considered the temporary city variable and decided it's fine.
+
+Verdict: **HIT** — explicit.
+
+### Law of Demeter Case B — baseline
+> Verdict: needs work before merge. priceOf prints raw cents (e.g. "USD 1050") instead of a formatted decimal amount ("USD 10.50") — a receipt-facing money bug, not cosmetic. Money has no compact constructor validating currency or rejecting negative cents. I considered flagging that priceOf ignores quantity, but the method is named priceOf (unit price), not lineTotal, so that's consistent. I considered missing null checks but records with non-null-by-convention fields are fine here.
+
+Verdict: **AMBIGUOUS on Law of Demeter, but flags a real, independent formatting bug in the snippet** — silent on the navigation-through-Value-Objects question the case tests.
+
+### Law of Demeter Case B — with-skill
+> Money is a primitive-obsessed record that duplicates currency/cents formatting logic wherever it's used — Value Object should own its own format()/display() rather than letting ReceiptPrinter reach into it (Tell Don't Ask / Value Object violation). No arithmetic or currency-mismatch guard exists on Money. ReceiptPrinter.priceOf formats cents as a raw integer instead of dividing/formatting as major units — a correctness bug more than a design one. I considered flagging the lack of validation as a Fail-Fast gap... noting it as a question rather than a confirmed defect. I did not flag Order/LineItem as records or List mutability.
+
+Verdict: **soft miss** — confirms the same formatting bug as baseline, but also pushes back on the exact Value-Object navigation pattern the case says is normal, filed under "Value Object violation" rather than "Law of Demeter" by name — doesn't use the principle's name, but the substance argues against what the calibration point wants validated as fine.
+
+**Tally: Case A 4/6 clean (2 baseline misses, both caught by with-skill). Case B: the "silent on the specific point, finds real other issues" pattern repeats on all 3 principles — the same shape as CQS/Readability, now 7 principles total today. Not case-file-specific noise at this point.**

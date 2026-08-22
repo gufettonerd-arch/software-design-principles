@@ -130,7 +130,17 @@ same confound shape** — fixed the two dominant distractions, reverified
 1 run per arm: both confirmed closed by name in the responses, but two
 different, previously-secondary issues took their place. Reported as
 "measurably improved, not clean" rather than rounded up — see the report.
-15 principles remain at N=2.
+
+Extended once more to Value Object, Tell Don't Ask, and Law of Demeter —
+seed3 only (N=3, not N=4 yet). The result that matters isn't about any
+one of these: the "finds real secondary issues, stays silent on the
+calibration point" Case B pattern has now shown up on **7 principles
+today**. Past the point of hand-fixing each case file — read as a
+question about the grading methodology itself (score the specific point
+and unrelated findings separately, not folded into one MATCH/MISS) —
+see the report for the full reasoning. One plain case-file bug found in
+passing (`04-law-of-demeter.md` prints raw cents unformatted), not yet
+fixed. 12 principles remain at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
