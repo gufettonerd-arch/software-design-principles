@@ -81,7 +81,11 @@ jobs:
         run: |
           cp -r benchmarks/regressions/fixture /tmp/synthetic-run
           rm -rf /tmp/synthetic-run/target
-          cd /tmp/synthetic-run && git init -q && git add -A && git commit -q -m "synthetic baseline"
+          cd /tmp/synthetic-run
+          git init -q
+          git config user.email "ci@example.com"
+          git config user.name "CI"
+          git add -A && git commit -q -m "synthetic baseline"
           cd -
           bash benchmarks/regressions/score.sh /tmp/synthetic-run > /tmp/score-out.txt
           cat /tmp/score-out.txt
