@@ -87,7 +87,8 @@ the ones with real N=2 misses): see
 Confirms the Fail Fast case-file fix is stable (not a fluke), surfaces a
 new repeatable CQS Case A baseline recall miss (2/2 on fresh seeds, not
 visible at N=2), and finds the same case-file confound in CQS Case B that
-Fail Fast had — not yet fixed. The other 17 principles remain at N=2.
+Fail Fast had — fixed same day and verified with one run per arm (see
+the report). The other 17 principles remain at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
