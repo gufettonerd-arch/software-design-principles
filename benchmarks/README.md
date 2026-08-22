@@ -156,13 +156,23 @@ see [the blind-grading report](regressions/results/2026-08-22-blind-grading.md).
 
 Extended once more to Strategy and Specific Exceptions, seed3 only
 (N=3). Strategy Case A baseline missed and explicitly dismissed the
-real issue as fine; Specific Exceptions Case A went 2/2 clean.
+real issue as fine; Specific Exceptions Case A went 2/2 clean. Brought
+both to full N=4 the next day (2026-08-23): Specific Exceptions held
+clean (Case A 4/4, Case B with-skill 2/2 explicit). **Strategy did
+not** — seed4's with-skill response missed Case A, explicitly invoking
+the checklist's own "when NOT to apply it" clause to argue *against*
+Strategy for a 5-branch, already-growing snippet, the same clause it
+used correctly to pass Case B in the same batch. First with-skill
+Case A regression this session on a principle a single earlier seed
+had called clean — direct evidence a one-seed read shouldn't be
+trusted as settled, on either arm.
 
 Extended to the last 4 untouched snippet principles — DDD tactical,
 Hexagonal, Composition over Inheritance, Shared state, seed3 only —
 completing all 14 snippet-based principles with data beyond N=2 (8 at
-full N=4, 6 at N=3). Composition over Inheritance came back cleanest of
-the day. One finding worth flagging: **DDD tactical Case B with-skill
+full N=4, 6 at N=3 — now 10 at N=4, 4 at N=3 after Strategy/Specific
+Exceptions reached seed4 on 2026-08-23). Composition over Inheritance
+came back cleanest of the day. One finding worth flagging: **DDD tactical Case B with-skill
 actively contradicted its own calibration point** — correctly applied
 Tell Don't Ask to Case A's anemic domain object, then over-applied the
 same critique to Case B's deliberately-anemic JPA entity in the same

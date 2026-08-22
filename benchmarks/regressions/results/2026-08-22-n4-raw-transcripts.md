@@ -620,6 +620,52 @@ Verdict: **HIT** — clean, explicit, names the exact reasoning from the case's 
 
 **Tally: Strategy Case A 1/2 (baseline missed and dismissed the real issue), Case B 0/2 explicit (both silent on the Strategy question specifically). Specific Exceptions Case A 2/2 clean. Case B: with-skill clean explicit, baseline near-explicit — the strongest baseline Case B engagement seen all day on either principle tested today.**
 
+## Strategy, Specific Exceptions — seed4 (N=4 complete), 2026-08-23
+
+### Strategy Case A — baseline
+> Flags: Open/Closed violation (chain of if statements, editing required for every new method), stringly-typed payment method (no compile-time safety), magic numbers, `BANK_TRANSFER` inconsistency, null input NPE, no amount validation, vague method name. Fix proposed: enum with `rate`/`fixedFee` fields, collapsing the `if`-chain into one line via the enum's fields.
+
+Verdict: **MISS (soft)** — correctly names the OCP/growth problem but resolves it via enum-with-fields dispatch, never naming or considering Strategy (interface + implementations) as the fix.
+
+### Strategy Case A — with-skill
+> "Named pattern — Strategy is not warranted here (checklist item 6, 'when NOT to apply it')... Five branches mapping a type to a formula is exactly the shape Strategy addresses, but... Five fee formulas that rarely change do not justify five new classes/interfaces." Recommends an enum + exhaustive `switch` instead. Closing line: "Reach for Strategy only if this genuinely grows toward the '20-30 implementations' scale."
+
+Verdict: **MISS (real)** — explicitly invokes the checklist's own "when NOT to apply it" clause and argues *against* Strategy for a snippet the case file describes as "already at 5 branches and structured so every new payment method requires editing this method again," which is precisely the growing-and-editable shape the checklist says warrants Strategy, not the exception to it. First with-skill Case A miss recorded this session on a principle previously clean.
+
+### Strategy Case B — baseline
+> Flags: NPE risk (`customerType.equals("VIP")`), `double` for money, magic values (`"VIP"`, `200`), stringly-typed `customerType`, no validation on `orderTotal`, no business-rule documentation. No mention of Strategy either way.
+
+Verdict: **SILENT** on Strategy — not contradicted, real bugs flagged instead (NPE is the same finding as seed3's baseline).
+
+### Strategy Case B — with-skill
+> "Strategy pattern — checklist item 6 — explicitly does NOT apply here. There are exactly two rules... combined with simple OR logic, and nothing in the class signals more are coming. Per the checklist's own 'when NOT to apply it' clause, introducing an `EligibilityRule` interface with two implementations plus a coordinator would spread two lines of logic across four files for no readability gain."
+
+Verdict: **EXPLICIT, correct** — clean pass, closely mirrors the case's own Expected reasoning. Notably invokes the *same* checklist clause as the Case A miss above, correctly here.
+
+### Specific Exceptions Case A — baseline
+> Flags: catches `Exception` not `NumberFormatException`, silent failure with no logging, no range validation, parsing conflating "convert" with "what to do on failure" (proposes `OptionalDouble`), missing Javadoc. Priority fix stated explicitly: narrow the catch.
+
+Verdict: **HIT** — explicit, names the specific exception type as the priority fix.
+
+### Specific Exceptions Case A — with-skill
+> "Generic exception catch (checklist #8 — violation)... The only call in the block is `Double.parseDouble(raw)`, which throws exactly two things: `NumberFormatException`... `NullPointerException`... Catching `Exception` swallows both of these *and* anything else." Proposes explicit `NumberFormatException` catch plus a deliberate null-check branch, citing the checklist's own "undeclared error" language.
+
+Verdict: **HIT** — explicit, ties directly to the checklist text.
+
+### Specific Exceptions Case B — baseline
+> "Nothing structurally wrong otherwise—logging before responding, generic (non-leaking) error message, and a dedicated `ErrorResponse` type are all correct choices for a global fallback handler." Also flags magic number `500`, missing correlation/request ID, thin log context, naming nit.
+
+Verdict: **soft EXPLICIT** — affirms the design as correct "for a global fallback handler" (implicitly endorsing the catch-all), without explicitly naming why a generic catch is the right call the way the case's Expected text does. Consistent with seed3's near-explicit baseline result on this same case.
+
+### Specific Exceptions Case B — with-skill
+> "On the checklist's rule 8 — does NOT apply here... exactly the case the 'When NOT to apply it' section calls out: a generic, application-wide entry point whose job is to be the last safety net... If this were narrowed to, say, `DataAccessException`, any exception type not explicitly caught elsewhere... would propagate unhandled." Also: "Keep it generic, but only if this is truly the outermost fallback... add `@ExceptionHandler` methods for the exceptions you *can* anticipate."
+
+Verdict: **HIT** — clean, explicit, mirrors the case's own reasoning almost verbatim, second seed in a row.
+
+**Tally (seed4): Strategy Case A 0/2 (both arms missed — baseline via a different fix, with-skill via an explicit, wrong application of the "when NOT to apply it" clause), Case B 1/2 explicit (with-skill clean, baseline silent). Specific Exceptions Case A 2/2 clean, Case B 1/2 explicit (with-skill clean, baseline soft).**
+
+**Combined seed3+seed4: Strategy Case A recall now 1/4 baseline, 1/2 with-skill (was 1/2 vs 2/2 on seed3 alone) — the with-skill miss is the headline result of this batch, since it reverses a clean single-seed read. Specific Exceptions holds at 4/4 Case A clean across both seeds, with-skill 2/2 explicit on Case B both seeds.**
+
 ## DDD tactical, Hexagonal, Composition over Inheritance, Shared state — seed3 only (N=3)
 
 ### DDD Tactical Case A — baseline
