@@ -119,9 +119,18 @@ read as a pattern-match instinct that resists in-context correction, not
 a wording gap. All three edits stay (each correct on its own merits) but
 none is shown to work — documented as a genuinely open limitation, not a
 false "fixed." See the report for the full, three-times-reversed chase.
-The other 17 principles remain at N=2. A worthwhile checklist audit came
-out of this too — reread the other 17 case files for the same confound
-shape Fail Fast/CQS had; found none serious enough to fix.
+A worthwhile checklist audit came out of this too — reread the other 17
+case files for the same confound shape Fail Fast/CQS had; found none
+serious enough to fix at the time.
+
+Extended same day to 2 more principles, SOLID and Readability, picked in
+order rather than for cause. SOLID came back clean (7/8). Readability
+Case A was strong (4/4); Case B turned out to be a **fourth case with the
+same confound shape** — fixed the two dominant distractions, reverified
+1 run per arm: both confirmed closed by name in the responses, but two
+different, previously-secondary issues took their place. Reported as
+"measurably improved, not clean" rather than rounded up — see the report.
+15 principles remain at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48

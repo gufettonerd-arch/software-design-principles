@@ -322,3 +322,101 @@ Verdict: **HIT** — names the shared-DTO reasoning as the correct call.
 Verdict: **HIT** — "the comment's reasoning holds... not a violation of DRY."
 
 **4/4 clean — the fix held on direct reverification, unlike any of the three DRY fix attempts.**
+
+## SOLID and Readability, seed3/seed4 (2 more principles added to the N=4 batch)
+
+### SOLID Case A — baseline — seed3
+> Flag: Hard-coded repository instantiation — prevents mocking in tests and violates dependency injection; pass the repository via constructor. Flag: No null check on invoice parameter. Flag: No error handling — repository.save() exceptions propagate uncaught. I considered whether transaction management should be explicit here, but that's reasonable to delegate to the repository layer.
+
+Verdict: **HIT**.
+
+### SOLID Case A — with-skill — seed3
+> Flag: Hard-coded concrete dependency on PostgresInvoiceRepository instead of accepting an injected interface — violates Dependency Inversion and makes the service untestable without a real database. Flag: No error handling for validate() or save(). Considered and declined: Tell Don't Ask pattern — delegating validation to the domain object is correct here.
+
+Verdict: **HIT** — names Dependency Inversion.
+
+### SOLID Case B — baseline — seed3
+> Verdict: reasonable as a stateless formatter, but two things I'd flag before merge. 1. String.format uses the JVM default locale — can render non-ASCII digit glyphs. 2. No validation on sequence/year. I considered thread-safety of the shared numberGenerator instance... and it's fine. I also considered the hardcoded "INV-" prefix and 5-digit padding width but didn't flag them — no evidence they need to vary, so hardcoding is fine per YAGNI.
+
+Verdict: **MISS** — never engages whether an interface/DI is needed at all; silent on the calibration point.
+
+### SOLID Case B — with-skill — seed3
+> Verdict: acceptable as-is, one minor nit. InvoiceNumberGenerator is stateless with no dependencies, so private final ... = new InvoiceNumberGenerator() is fine — no interface/DI needed for a single pure implementation (YAGNI/Dependency Inversion don't apply when there's nothing to substitute or invert). Considered flagging the hardcoded instantiation as a testability smell, but decided against it.
+
+Verdict: **HIT** — explicit.
+
+### SOLID Case A — baseline — seed4
+> Flag: Hard dependency on PostgresInvoiceRepository — this should be injected. Flag: No transaction handling — validate() then save() is not atomic. Flag: No exception handling. I considered the method's simplicity fine and the issue name clear; not flagging moving validation into the Invoice constructor.
+
+Verdict: **HIT**.
+
+### SOLID Case A — with-skill — seed4
+> Flag: Hard-coded repository dependency. Flag: No transaction handling — validate() then save() is not atomic. Flag: No exception handling. I considered the method's simplicity fine and the issue name clear.
+
+Verdict: **HIT**.
+
+### SOLID Case B — baseline — seed4
+> Verdict: reasonable as a small stateless formatter, but two real gaps — no validation that sequence >= 0, and no bound/overflow check when sequence > 99999. I considered flagging the direct new InvoiceNumberGenerator() field instantiation instead of constructor injection, but it's a stateless pure function with no config or side effects, so hardcoding it is fine and adding a DI seam here would be speculative.
+
+Verdict: **HIT** — explicit, unlike seed3's baseline.
+
+### SOLID Case B — with-skill — seed4
+> Verdict: acceptable as-is, no blocking issues. InvoiceNumberGenerator formats a string with no branching, state, or reuse elsewhere — an interface here would be an unrequested abstraction (YAGNI); I considered it and it's fine because there's exactly one implementation and no signal a second is coming.
+
+Verdict: **HIT** — explicit.
+
+**SOLID tally: Case A 4/4 clean. Case B 3/4 clean, 1 miss (baseline seed3, silent on the calibration point).**
+
+### Readability Case A — baseline — seed3
+> Flag: Cryptic naming (s, t, f, r, chk). Flag: Magic numbers 18 and 21. Flag: Deeply nested if-else. Flag: Useless comment "return the result". I considered the null-then-length check and it's fine.
+
+Verdict: **HIT**.
+
+### Readability Case A — with-skill — seed3
+> Flags: Single-letter identifiers; rename to isAgeEligible(...). Pyramid of doom (5 levels of nesting) — flatten. Logic is compressible to one line: `return s != null && !s.isEmpty() && (f ? t >= 18 : t >= 21);`. Redundant comment — delete it. Deferred: not flagging missing Javadoc separately, renaming fixes 90% of that.
+
+Verdict: **HIT**.
+
+### Readability Case B — baseline — seed3
+> Verdict: needs a small fix before merge — LocalDate.now() should be injected via Clock, otherwise this method is untestable... datesUntil(target) throws IllegalArgumentException if target is before "now"... worth confirming callers never pass a past/equal date. I considered holiday exclusion and won't flag it — the ticket explicitly scopes the rule to weekends only. Minor: the name daysUntil no longer matches its behavior — rename to businessDaysUntil.
+
+Verdict: **AMBIGUOUS** — never says the comment/readability itself is fine; reframes around testability and naming instead.
+
+### Readability Case B — with-skill — seed3
+> Verdict: mostly fine, one real flag, one minor. Flag: LocalDate.now() called directly instead of injected via Clock. Minor flag: (int) ... .count() truncates silently. Considered extracting an isWeekend(DayOfWeek) helper — decided not to flag, premature abstraction. Considered flagging missing null/date-order validation on target — decided not to flag; datesUntil already fails fast with a clear IllegalArgumentException.
+
+Verdict: **AMBIGUOUS** — same pattern, doesn't explicitly praise the comment.
+
+### Readability Case A — baseline — seed4
+> Flags: Cryptic variable names (s, t, f, r). Deep nesting (5 levels) — flatten with early returns or `return s != null && !s.isEmpty() && t >= 18 && (f ? t >= 18 : t >= 21);`. Redundant comment. I considered the defensive null-check-then-length-check pattern and it's reasonable, not redundant.
+
+Verdict: **HIT**.
+
+### Readability Case A — with-skill — seed4
+> Flag: Cryptic naming. Flag: Excessive nesting — flatten to a single boolean expression. Flag: Magic numbers (18, 21). Considered: null-check order — fine, no flag. Verdict: Not production-ready. Readability violation outweighs correctness here.
+
+Verdict: **HIT**.
+
+### Readability Case B — baseline — seed4
+> Verdict: mostly fine, but flag two things before merge. First, LocalDate.now() uses the system default zone with no injected clock. Second, the comment says "business days" but the filter only excludes weekends, not holidays — worth confirming with the ticket. I considered the long→int cast and target-before-now exception but didn't flag them as blockers.
+
+Verdict: **AMBIGUOUS** — raises a real semantic-scope question but never affirms the comment is good as-is.
+
+### Readability Case B — with-skill — seed4
+> Verdict: needs one change before merge — the untestable LocalDate.now() call. Flag: no guard for target before LocalDate.now() — datesUntil throws DateTimeException. Considered extracting a BusinessDayCalendar/Value Object — decided not to flag it, premature (YAGNI). Considered the (int) cast — not flagging, non-issue in practice. Minor nit: consider naming the method businessDaysUntil so the weekend exclusion is obvious from the signature.
+
+Verdict: **AMBIGUOUS** — same shape as the other 3.
+
+**Readability tally: Case A 4/4 clean. Case B 0/4 clean explicit passes — all 4 found other real issues (Clock injection, past-date exception, weekend-vs-holiday naming/scope) without ever explicitly engaging the actual calibration point. Fourth case file today with this confound shape.**
+
+## Readability Case B, fix verification (Clock injected, holiday-scope comment added)
+
+### baseline
+> Flag: today.datesUntil(target) throws IllegalArgumentException when target is before today, and the method has no guard or documented contract for that case... Overall the weekend-filter logic itself is correct and the holiday-scope comment is good, but the unhandled past-date case is a real gap that should be fixed or explicitly documented before merge.
+
+Verdict: **partial improvement** — explicitly says "the holiday-scope comment is good" (first time any response engaged this point positively), but hard-flags a new issue (past-date exception) at blocking severity.
+
+### with-skill
+> Flag: method name daysUntil misleads callers... rename to businessDaysUntil. Flag: no guard on target being before today — datesUntil throws IllegalArgumentException... Flag: the exclusive-end semantics of datesUntil(target) isn't stated anywhere. I considered suggesting a BusinessDayCounter/Value Object abstraction but decided against it... the Clock parameter already gives it good testability. I considered the (int) cast... left it alone.
+
+Verdict: **partial improvement** — explicitly confirms "the Clock parameter already gives it good testability" (the testability tangent is closed), but raises 2 new issues (past-date exception, exclusive-end semantics) plus a naming complaint not neutralized by the fix.

@@ -31,10 +31,13 @@ anything non-obvious.
 ## Case B — should NOT flag (calibration)
 
 ```java
-public int daysUntil(LocalDate target) {
+public int daysUntil(LocalDate target, Clock clock) {
     // Business rule (ticket PROJ-482): weekends don't count toward the
-    // countdown shown to customers, only business days do.
-    return (int) LocalDate.now().datesUntil(target)
+    // countdown shown to customers, only business days do. Public
+    // holidays are out of scope here — HolidayCalendarService applies
+    // that adjustment separately, on top of this method's result.
+    LocalDate today = LocalDate.now(clock);
+    return (int) today.datesUntil(target)
         .filter(d -> d.getDayOfWeek() != DayOfWeek.SATURDAY && d.getDayOfWeek() != DayOfWeek.SUNDAY)
         .count();
 }
@@ -43,6 +46,11 @@ public int daysUntil(LocalDate target) {
 **Expected**: do NOT flag. Why: the method is short and linear (no nesting
 to flatten), the name and variable names are already clear, and the
 comment explains a *non-obvious constraint* (a business rule from a
-specific ticket that isn't visible from the code itself) rather than
-restating what the code does — exactly what the principle says comments
-are for.
+specific ticket that isn't visible from the code itself, and an explicit
+note on why it doesn't also handle holidays) rather than restating what
+the code does — exactly what the principle says comments are for. (The
+`Clock` parameter is deliberate, not an oversight to flag: it's what
+makes "today" testable without touching the system clock — if you find
+yourself wanting to flag `LocalDate.now()` for untestability, that's
+already been addressed here, look at the actual readability question
+instead.)
