@@ -575,3 +575,47 @@ Verdict: **AMBIGUOUS on Law of Demeter, but a real, out-of-scope finding on curr
 Verdict: **AMBIGUOUS on Law of Demeter specifically** (frames the issue as Tell Don't Ask, not LoD) — independently reaches the same "not worth chasing" conclusion on the Long.MIN_VALUE edge case as this report did.
 
 **Combined seed3+seed4 tally: Case A recall 8/12 clean (4 baseline misses — Tell Don't Ask 2/2, Law of Demeter 2/2 — with-skill 6/6 clean). Case B: the ambiguity pattern holds across both seeds on all three principles, no new hard misses at seed4.**
+
+## Strategy, Specific Exceptions — seed3 only (N=3)
+
+### Strategy Case A — baseline
+> Flag these three issues: 1. Null paymentMethod throws NPE. 2. double for money is a precision hazard — use BigDecimal. 3. No validation that amount >= 0. Considered but won't flag: Hardcoded fee values are fine—they're isolated business constants, not scattered magic numbers. String matching works; an enum would be nice-to-have but this is readable.
+
+Verdict: **MISS** — explicitly dismisses the real issue ("hardcoded fee values are fine") rather than staying silent on it.
+
+### Strategy Case A — with-skill
+> Flags: 1. String-based payment method should be an enum. 2. Growing if-else chain violates Open/Closed Principle; use Strategy pattern or a Map<PaymentMethod, FeeCalculator> to avoid modifying this method each time a payment type is added. 3. Violates SRP—fee rule determination is entangled with fee calculation. 4. Magic numbers lack context. Considered but not flagged: the IllegalArgumentException is appropriately specific.
+
+Verdict: **HIT** — explicit, names Strategy directly.
+
+### Strategy Case B — baseline
+> Verdict: mostly fine, but flag the NPE risk — customerType.equals("VIP") throws NullPointerException if customerType is null. Minor: the 200 threshold is an unexplained magic number. I considered flagging String for customerType in favor of an enum, but didn't — it's a legitimate design choice, not a bug.
+
+Verdict: **SILENT** on whether Strategy is warranted — never frames the two-branch shape as a Strategy question at all, only as a possible-future-enum nit.
+
+### Strategy Case B — with-skill
+> Verdict: functionally fine but has a real bug and a magic number. customerType.equals("VIP") NPEs on null input. 200 is an unexplained magic number. Considered flagging String customerType as a stringly-typed enum candidate, but with only one compared value and no other logic branching on it, an enum is speculative — skipping is correct here. Considered SRP/class-size concerns — none apply.
+
+Verdict: **SILENT** on Strategy specifically — the "enum candidate" consideration is adjacent (typing, not pattern choice) and doesn't address whether Strategy itself is warranted.
+
+### Specific Exceptions Case A — baseline
+> Flag: Catches Exception instead of NumberFormatException. Flag: Silent failure — no indication to caller whether 0.0 means "parse error" or "discount really is 0%". Flag: Using double for discount calculations invites floating-point precision bugs. Considered but OK: the division by 100 assumes percentage input.
+
+Verdict: **HIT** — explicit, names the specific exception type.
+
+### Specific Exceptions Case A — with-skill
+> Flag: Catch NumberFormatException specifically, not Exception — overly broad catch masks unrelated errors and violates Fail Fast. Silent return of 0.0 hides parse failures. Consider null-check before parsing. The percentage-to-decimal math itself is correct; discount parsing belongs in a domain Value Object if this repeats.
+
+Verdict: **HIT** — explicit.
+
+### Specific Exceptions Case B — baseline
+> Verdict: acceptable as a last-resort catch-all, but two things worth flagging. First, Exception.class will swallow InterruptedException too... Second, if there's no @ExceptionHandler elsewhere for security exceptions..., this handler will mask them as 500 instead of the correct 401/403/400. I considered flagging the hardcoded 500 vs HttpStatus.INTERNAL_SERVER_ERROR but it's cosmetic.
+
+Verdict: **near-EXPLICIT** — "acceptable as a last-resort catch-all" directly affirms the calibration point before pivoting to other findings; the closest baseline has come to explicit engagement with a Case B point all day.
+
+### Specific Exceptions Case B — with-skill
+> Verdict: acceptable as-is, with one minor nit. I considered the broad catch(Exception.class) and it's fine — this is a global @ExceptionHandler fallback (a legitimate generic entry point per Fail Fast guidance), not a handler swallowing exceptions mid-flow where a specific type should be caught instead. I considered exposing exception details to the client and it's fine.
+
+Verdict: **HIT** — clean, explicit, names the exact reasoning from the case's own Expected text.
+
+**Tally: Strategy Case A 1/2 (baseline missed and dismissed the real issue), Case B 0/2 explicit (both silent on the Strategy question specifically). Specific Exceptions Case A 2/2 clean. Case B: with-skill clean explicit, baseline near-explicit — the strongest baseline Case B engagement seen all day on either principle tested today.**

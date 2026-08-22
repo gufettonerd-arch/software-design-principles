@@ -146,8 +146,18 @@ attempt introduced a new bug (broken on negative cents), caught by the
 first verification run and corrected before moving on; seed4's baseline
 then caught a real but out-of-scope gap in the fix (fixed 2-decimal
 formatting is wrong for non-2-decimal currencies) — not chased further,
-same treatment as other far-edge cases noted today. 12 principles remain
-at N=2.
+same treatment as other far-edge cases noted today.
+
+The Case B rubric fix (two axes instead of one) was validated blind on
+5 principles same day — not just proposed, tested: a clean arm-correlated
+split on 2 clean case files, no correlation on 2 known-confounded ones,
+and a genuinely different (less flattering) result on the fifth —
+see [the blind-grading report](regressions/results/2026-08-22-blind-grading.md).
+
+Extended once more to Strategy and Specific Exceptions, seed3 only
+(N=3). Strategy Case A baseline missed and explicitly dismissed the
+real issue as fine; Specific Exceptions Case A went 2/2 clean. 10
+principles remain untouched at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
