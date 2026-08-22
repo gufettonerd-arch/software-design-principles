@@ -511,3 +511,67 @@ Verdict: **negative-cents bug confirmed gone**; independently finds the same rem
 > Verdict: mostly fine, one real bug and one design smell worth flagging. Math.abs(price.cents()) on Long.MIN_VALUE overflows back to a negative number (silently)... worth a guard. Tell Don't Ask: priceOf reaches into Money's fields and reimplements formatting... I considered flagging currency as a bare String instead of a Currency/enum type, but didn't — YAGNI until another use appears.
 
 Verdict: **negative-cents bug confirmed gone**; same `Long.MIN_VALUE` observation as baseline, same call not to chase it further.
+
+## Value Object, Tell Don't Ask, Law of Demeter — seed4 (completing N=4)
+
+### Value Object Case A — baseline
+> Flag: Duplicated email validation. Extract to a shared EmailValidator or utility. Flag: Null reference crash. Flag: Weak email validation — "a@b." passes but isn't valid. Considered but not flagging: unused parameter, incomplete sendPromo.
+
+Verdict: **HIT**.
+
+### Value Object Case A — with-skill
+> Flag: Duplicate email validation. Extract to a shared EmailValidator utility or an Email Value Object. Flag: Inadequate validation logic. Flag: Validation at the wrong layer — should be at the trust boundary. Flag: SRP violation.
+
+Verdict: **HIT** — explicit.
+
+### Value Object Case B — baseline
+> Verdict: reasonable as a minimal formatter, two things before merging. No null-checks on recipientName/trackingNumber. The em-dash is non-ASCII, risks garbling on some printers. I considered flagging printer-command injection but decided it's not warranted. I also considered the class-per-method design but that's fine.
+
+Verdict: **AMBIGUOUS** — silent on whether a Value Object is needed.
+
+### Value Object Case B — with-skill
+> Reviewed against the skill's Fail Fast and Value Object principles. Flag: no null/blank check — trust boundary. Minor: ShippingLabelPrinter doesn't print, it formats — misleading name. I considered a TrackingNumber Value Object but deliberately didn't flag it — used once, no duplicated logic, YAGNI.
+
+Verdict: **HIT** — explicit.
+
+### Tell Don't Ask Case A — baseline
+> Flag: Missing payment amount validation. Flag: Undefended null dereference on getItems(). Not flagging: == for enum comparison — correct. Not flagging: void return type.
+
+Verdict: **MISS** — never names the actual Tell Don't Ask violation.
+
+### Tell Don't Ask Case A — with-skill
+> Flag: Tell Don't Ask violation. The controller asks the order for internal state, then decides to mutate it. Flag: Business logic in wrong layer. Considered: getItems().size() > 0 vs isEmpty() — not flagging, stylistic.
+
+Verdict: **HIT** — explicit.
+
+### Tell Don't Ask Case B — baseline
+> Verdict: needs work before merge. Flag: no defensive copy on itemIds list. Flag: no validation for blank customerId/empty itemIds before invoking the service. Flag: error handling hidden entirely. I considered flagging couponCode as Optional<String> but that's fine as a nullable String.
+
+Verdict: **AMBIGUOUS** — silent on whether the DTO is correctly anemic.
+
+### Tell Don't Ask Case B — with-skill
+> Verdict: acceptable as a thin adapter, one real gap — no validation on CreateOrderRequest fields before mapping. I considered making couponCode/itemIds Value Objects but decided against flagging it. I considered whether handle() doing map→call→map violates SRP but it's fine as long as each mapping is a one-liner.
+
+Verdict: **AMBIGUOUS** — more hedged than seed3's clean "that's exactly what Tell Don't Ask wants" pass; touches adjacent points without the same explicit affirmation.
+
+### Law of Demeter Case A — baseline
+> Flag: NPE risk from chained null-unchecked calls. Flag: Incomplete for method name — buildLabel suggests a full label but returns only city. Considered and skipped: toUpperCase() appropriateness, unused city variable.
+
+Verdict: **MISS** — never names Law of Demeter.
+
+### Law of Demeter Case A — with-skill
+> Flag: Null pointer chain vulnerability. Flag: Law of Demeter violation — four-level getter chain couples this service tightly to Order's internal structure; extract a value object. Flag: Semantics mismatch — buildLabel() returns a city, not a label. I considered but did not flag the uppercase conversion.
+
+Verdict: **HIT** — explicit.
+
+### Law of Demeter Case B — baseline
+> Verdict: reasonable for a quick receipt formatter, but the fixed /100/%02d assumption is a real bug: Money claims to support arbitrary currency strings, yet the code hardcodes 2 decimal places, wrong for currencies like JPY (0 decimals) or BHD (3 decimals). Math.abs(price.cents()) on Long.MIN_VALUE overflows... worth a one-line comment even though real money values will never approach that magnitude. I considered flagging the lack of null checks but decided not to.
+
+Verdict: **AMBIGUOUS on Law of Demeter, but a real, out-of-scope finding on currency-decimal formatting** — not chased further, same treatment as other far-edge cases today.
+
+### Law of Demeter Case B — with-skill
+> Verdict: solid Value Objects, but priceOf violates Tell Don't Ask by reaching into Money's fields to reformat it — Money.format() should own the sign/cents math. Considered flagging currency as a bare String instead of Currency/enum, left it — YAGNI. Math.abs(Long.MIN_VALUE) still returns a negative number... not worth guarding given cents realistically never approach Long.MIN_VALUE.
+
+Verdict: **AMBIGUOUS on Law of Demeter specifically** (frames the issue as Tell Don't Ask, not LoD) — independently reaches the same "not worth chasing" conclusion on the Long.MIN_VALUE edge case as this report did.
+
+**Combined seed3+seed4 tally: Case A recall 8/12 clean (4 baseline misses — Tell Don't Ask 2/2, Law of Demeter 2/2 — with-skill 6/6 clean). Case B: the ambiguity pattern holds across both seeds on all three principles, no new hard misses at seed4.**

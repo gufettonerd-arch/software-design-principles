@@ -132,7 +132,9 @@ different, previously-secondary issues took their place. Reported as
 "measurably improved, not clean" rather than rounded up — see the report.
 
 Extended once more to Value Object, Tell Don't Ask, and Law of Demeter —
-seed3 only (N=3, not N=4 yet). The result that matters isn't about any
+now full N=4 (seed3, then seed4). Case A recall 8/12 clean, all 4
+baseline misses concentrated on 2 principles (Tell Don't Ask, Law of
+Demeter), with-skill 6/6 clean. The result that matters isn't about any
 one of these: the "finds real secondary issues, stays silent on the
 calibration point" Case B pattern has now shown up on **7 principles
 today**. Past the point of hand-fixing each case file — read as a
@@ -141,9 +143,11 @@ and unrelated findings separately, not folded into one MATCH/MISS) —
 see the report for the full reasoning. The `04-law-of-demeter.md`
 formatting bug found in passing is fixed and reverified same day — first
 attempt introduced a new bug (broken on negative cents), caught by the
-first verification run and corrected before moving on; 2 more runs
-clean, one giving the cleanest calibration pass of the day. 12
-principles remain at N=2.
+first verification run and corrected before moving on; seed4's baseline
+then caught a real but out-of-scope gap in the fix (fixed 2-decimal
+formatting is wrong for non-2-decimal currencies) — not chased further,
+same treatment as other far-edge cases noted today. 12 principles remain
+at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
