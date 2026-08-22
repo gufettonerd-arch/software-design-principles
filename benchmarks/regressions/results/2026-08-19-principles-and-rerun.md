@@ -1,0 +1,250 @@
+# Clean god-class rerun (all four axes) + first principles-benchmark run (2026-08-19)
+
+Two things in one report because they ran the same session: the clean
+rerun of the three contaminated axes plus quality's first-ever N=4, and
+the first run of the separate 14-principle benchmark (56 cases). See
+[`benchmarks/README.md`](../../README.md) for how these fit together.
+
+## Part 1 — God-class playbook, clean rerun (N=4, all four axes)
+
+### Why this run exists
+
+The three published 2026-08-17 reports (regressions, notests, process)
+were run against a fixture whose class comment leaked the playbook by
+step number, visible to both arms — see the correction notes at the top
+of each. This session reran all three against the cleaned fixture (fresh
+seeds, not the same runs re-scored) and ran quality at N=4 for the first
+time (previously only a contaminated, discarded pilot existed).
+
+### Method notes specific to this run
+
+- **Session-limit interruption, mid-batch.** The account's usage limit
+  was hit partway through the first launch wave; 13 of ~40 in-flight
+  agents failed. Before relaunching, checked each failed run's actual git
+  state instead of assuming a clean restart was needed: 5 of the 13
+  (`process/with-skill-seed1-4`, `quality/with-skill-seed1`) already had
+  real, committed, verified-good partial work — 3-4 real commits each for
+  process, uncommitted-but-complete files for quality. These were
+  **resumed, not restarted**: a fresh agent read the existing git history
+  and finished from there. This is strictly better than a clean restart
+  for the process axis specifically, since restarting would have thrown
+  away real checkpoint commits that axis exists to measure.
+- **One agent at a time**, not up to 20 concurrent, after the interruption
+  — slower, but avoids losing many partial completions at once if the
+  limit is hit again.
+- **`VerifyQuality.java` scorer bug found and fixed mid-run**: it only
+  checked `GodClass.chkShipElig` via reflection. A with-skill run that
+  fully removed the method from `GodClass` (no delegate left, correctly
+  the target class now owns it entirely) scored `UNVERIFIABLE` even
+  though behavior was fine — confirmed by hand-injecting a one-off check
+  against `ShippingEligibilityService` directly before fixing the scorer
+  to fall back to the new class automatically.
+
+### Results
+
+**Regressions** — 8/8 PASS, zero regressions in either arm. Identical
+outcome to the contaminated run; this axis's finding (task too easy to
+show a gap) is now confirmed independent of the leak.
+
+**Zero-pre-existing-tests** — 4/4 with-skill PASS (test written + behavior
+preserved). 0/4 baseline wrote a test for the untested flow (2 PARTIAL:
+behavior preserved, no test; 2 UNVERIFIABLE: method moved off `GodClass`
+entirely, a legitimate choice the reflection check couldn't follow). Gap
+is sharper than the original contaminated run (which had 1/4 baseline
+clean, not 0/4).
+
+**Process adherence** — 8/8 checkpoints clean, both arms.
+`REFACTOR_NOTE_PRESENT`: 0/4 baseline, 3/4 with-skill — same split as the
+contaminated run, now confirmed clean. One with-skill run (seed 3) again
+chose "push resolution to the caller" over duplicating, matching the
+~1-in-4 divergence rate seen in every prior run of this design.
+
+**Quality** (first-ever clean N=4; the only prior attempt was a
+contaminated, discarded pilot) — 8/8 SCORED, behavior preserved, zero
+regressions.
+
+| | nesting depth | magic numbers | magic strings |
+|---|---|---|---|
+| baseline (seed 1-4) | 1, 2, 1, 2 | 0, 0, 2, 0 | 0, **3**, 0, 0 |
+| with-skill (seed 1-4) | 1, 1, 1, 1 | 1, 1, 1, 1 | 0, 0, 0, 0 |
+
+Not a clean "with-skill wins on every number" result — baseline sometimes
+reaches 0 magic numbers where with-skill leaves 1. What's real:
+**with-skill is far more consistent.** Every with-skill seed lands at the
+same depth/magic-number/magic-string profile; baseline varies seed to
+seed, including one run (seed 2) that leaves 3 magic strings completely
+untouched. The skill doesn't guarantee the single best cleanup, it
+guarantees a cleanup happens and happens the same way every time.
+
+`REFACTOR_NOTE_PRESENT` for quality: 3/4 with-skill (seed 3 diverged, same
+as process — pushed resolution to caller instead of duplicating). Not
+scored by `score-quality.sh` directly (that script checks regression /
+behavior / readability only) but visible in the transcripts, consistent
+with the other three axes.
+
+### Interpretation, updated across all four axes
+
+The god-class playbook's real, repeated, now-four-times-confirmed effect
+isn't "prevents breakage" (regressions stays saturated at 0/8 across
+every axis and every run this project has done) — it's **discipline that
+has no built-in penalty for skipping**: writing a test for untested code,
+documenting a duplicate's removal criterion, cleaning up consistently
+instead of some-seeds-yes-some-seeds-no. A capable baseline does the
+underlying engineering correctly; what it skips is the paperwork that
+makes the choice legible to whoever reads the code next.
+
+The Step 5 "push to caller vs. duplicate" divergence (~1 run in 4,
+with-skill, across three separate axes now: notests, process, quality)
+is stable enough to call a real, bounded rate rather than noise — the
+sharpened two-condition rule (see [`principles.md`](../../../skills/software-design-principles/references/god-class-extraction-playbook.md))
+reduces but doesn't eliminate the judgment call when the fixture gives
+two contradictory signals (an explicit single-flow task vs. a leftover
+comment implying more extractions are coming).
+
+## Part 2 — Principles benchmark, first run (56 cases)
+
+### What this measures
+
+14 of the skill's 20 principles, each with a should-flag case (Case A)
+and a should-NOT-flag calibration case (Case B) — see
+[`principles/README.md`](../../principles/README.md) for which 6
+principles are out of scope for this single-snippet methodology and why.
+Two questions per principle: does the arm catch the real issue (Case A,
+a recall question), and does it avoid inventing an issue where the
+principle's own "when NOT to apply it" says there isn't one (Case B, a
+precision/calibration question).
+
+### Method
+
+56 independent `Agent` calls (14 principles × 2 cases × 2 arms), each a
+cold read of one snippet with no memory of any other case. Baseline told
+not to consult any skill; with-skill told to use it (or read the
+reference files directly if the skill isn't invocable in a fresh
+subagent context). Cost-reduction measures applied mid-run (see
+`usage-log.csv` for full per-run token/time data):
+
+- Case A runs on `haiku` for both arms (recall question, no calibration
+  nuance at stake) — same model both sides keeps the baseline/with-skill
+  comparison valid.
+- Case B **started** on haiku too, but was moved back to the default
+  model partway through after haiku's with-skill arm false-positived on
+  two calibration cases in a row (`05-dry`/caseB, `07-cqs`/caseB) —
+  breaking a pattern the same cases showed reliably on the default model.
+  Risk: haiku may be too weak to apply the skill's "when NOT to apply it"
+  nuance, meaning caseB results on haiku would measure a model-capability
+  ceiling, not the skill. The 3 already-collected haiku caseB results
+  (04 correct, 05 and 07 both false-positive) are kept in the data but
+  flagged `completed-haiku` in the log rather than pooled with the
+  sonnet caseB numbers below without that caveat.
+- Grading was done inline, case by case, during the run — each Case B
+  result was checked directly against its case file's "Expected" section
+  as it came in, rather than deferred to a separate batch-grading pass.
+  This turned out to be self-verifying: an actual fixture bug was caught
+  this way (see below), which a naive batch grader reading only the
+  transcripts (not re-deriving the expected values independently) might
+  have missed.
+
+### Fixture bug found and fixed mid-run
+
+`09-readability`'s Case B (`daysUntil`) called
+`target.datesUntil(LocalDate.now())` — backwards from what the method
+promises. `LocalDate.datesUntil` requires the receiver to be before the
+argument; for a future `target` (the normal case), this throws
+`IllegalArgumentException` at runtime. Not a readability issue (what the
+case was designed to test) but a genuine defect in the example itself,
+caught when a baseline reviewer correctly flagged the real bug — off
+target for what the case measures, but not wrong. Fixed to
+`LocalDate.now().datesUntil(target)` in both the source case file and the
+two already-generated `Snippet.java` copies; the case was rerun clean
+against the fix before being counted.
+
+### Results
+
+**Recall (Case A, should flag) — 14/14 both arms.** Every principle's
+real issue was caught by both baseline and with-skill, no exceptions.
+Some hits used an adjacent name instead of the exact principle
+(`06-strategy`→"Open/Closed Principle", `11-hexagonal`
+baseline→"Dependency Injection", `14-fail-fast` baseline→"redundant
+validation" instead of "Fail Fast") — the verdict (flag it, correctly)
+was right in all 14/14 cases on both arms regardless of naming precision.
+
+**Precision (Case B, should NOT flag) — the headline number:**
+
+| | false positives | correct (didn't flag) |
+|---|---|---|
+| baseline | 8/14 | **6/14 (43%)** |
+| with-skill | 3/14 | **11/14 (79%)** |
+
+Baseline false-positived on: `01-solid`, `02-value-object`,
+`04-law-of-demeter`, `05-dry`, `07-cqs`, `08-specific-exceptions`,
+`10-ddd-tactical`, `14-fail-fast`. With-skill false-positived on only 3
+of those same 8 (`05-dry`, `07-cqs`, `14-fail-fast`) — no *new* false
+positives introduced by the skill anywhere baseline got it right.
+
+**The skill roughly doubles calibration precision (43%→79%) at zero cost
+to recall (100%→100%).** This is the principles benchmark's core finding:
+the skill's main measurable effect isn't teaching agents to find more
+problems — both arms already find the real ones — it's teaching them
+when *not* to invent one.
+
+### What the false positives look like
+
+Every baseline false positive followed the same shape: correctly
+recognizing a pattern that's a violation in the general case (a getter
+chain, a duplicated-looking block, a broad `catch`, an anemic-looking
+class, a repeated validation call) without checking the principle's own
+stated exception for it (Value Object composition, coincidental
+similarity vs. shared knowledge, a framework-mandated global handler, a
+JPA entity, a real trust boundary already validated once). The skill's
+"when NOT to apply it" section for each principle is, empirically, doing
+real work — when with-skill runs got a Case B right, they consistently
+cited that section's specific reasoning rather than a general "this
+seems fine" judgment.
+
+The 3 with-skill misses (`05-dry`, `07-cqs`, `14-fail-fast` Case B) don't
+share the earlier axes' pattern of "the skill always corrects the
+baseline's mistake" — worth a closer read before the next round, since
+two of the three were on haiku (see the model-switch note above) and the
+third (`14-fail-fast`, sonnet) was a genuine with-skill miss that
+deserves its own look rather than being folded into the model-capability
+explanation.
+
+### Cost (see `usage-log.csv` for the full per-run breakdown)
+
+Consistent with the god-class axes: with-skill runs cost noticeably more
+than baseline, on both benchmarks, on both models tried.
+
+| | baseline avg tokens | with-skill avg tokens | baseline avg duration | with-skill avg duration |
+|---|---|---|---|---|
+| god-class axes (sonnet) | ~62,500 | ~80,600 (+29%) | ~169s | ~310s (+83%) |
+| principles, sonnet subset | ~43,100 | ~57,100 (+32%) | ~23s | ~44s (+92%) |
+| principles, haiku subset | ~31,900 | ~38,900 (+22%) | ~10s | ~18s (+80%) |
+
+The skill roughly doubles wall-clock time and adds 20-30% tokens,
+independent of which model runs it. This is the direct cost of the
+precision gain above — worth stating plainly rather than reporting only
+the upside.
+
+### Limitations
+
+- N=1 per case, not N=4 — a single cold read per (principle, case, arm)
+  combination, unlike the god-class axes' 4 independent seeds. A false
+  positive or a miss could be that specific run's variance, not a stable
+  rate. The god-class axes' repeated ~1-in-4 divergence rate (Step 5)
+  only became trustworthy after N=4; this benchmark doesn't have that
+  yet for any single case, only in aggregate across the 14 principles.
+- Case B ran on two different models (haiku for 3 principles, the
+  default model for the rest) after a mid-run correction — the 43%/79%
+  headline numbers pool both, which is defensible (same model within
+  each baseline/with-skill pair, so the comparison stays valid
+  case-by-case) but means the two subsets aren't directly comparable to
+  each other in absolute terms.
+- 6 of the skill's 20 principles aren't covered by this methodology at
+  all (DDD strategic, package-by-feature, Anti-Corruption Layer,
+  Strangler Fig, Modular Monolith, Characterization Test) — see
+  `principles/README.md` for why single-snippet review can't test them.
+- Grading was done inline by the same session running the benchmark, not
+  by an independent grader blind to which arm produced which review —
+  some risk of confirmation bias in borderline PRINCIPLE_NAMED calls,
+  though the clean-cut VERDICT_MATCH numbers (flag/don't-flag) above
+  don't depend on that judgment.

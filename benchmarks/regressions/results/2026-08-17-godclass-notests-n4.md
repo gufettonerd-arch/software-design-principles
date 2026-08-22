@@ -28,6 +28,15 @@
 > or whether its behavior matched the reference values after extraction —
 > neither was hinted at anywhere in the leaked comment.
 
+> **Clean rerun added 2026-08-19.** Fresh N=4 both arms, cleaned fixture,
+> new seeds. Result: **4/4 with-skill PASS** (tests written + behavior
+> preserved, all four); **0/4 baseline wrote a test** for the untested
+> flow (2 PARTIAL — behavior preserved but no test — and 2 UNVERIFIABLE,
+> both because the method was moved off `GodClass` entirely, a legitimate
+> design choice the scorer's reflection check couldn't follow). The gap is
+> if anything sharper than the original run's 4/4-vs-1/4 split. See
+> [`2026-08-19-principles-and-rerun.md`](2026-08-19-principles-and-rerun.md).
+
 ## What this measures
 
 A follow-up to the regressions-axis run the same day (`2026-08-17-godclass-n4.md`). That run's fixture had the target flow already fully covered by tests, so it could never exercise Step 3 ("if the old flow had no dedicated tests, write them now") or principle 19 (Characterization Test). This run adds a sixth flow, `calculateLatePaymentPenalty`, with **zero dedicated tests and no comment flagging anything about it** — including one deliberately ambiguous rule (a GOLD-tier discount that only applies when `daysLate <= 5`, debatable as intentional or backwards, not an obvious typo). Two questions, scored independently: does the extraction get a test written for it, and does the flow's actual output stay identical to what it was before anyone touched it?

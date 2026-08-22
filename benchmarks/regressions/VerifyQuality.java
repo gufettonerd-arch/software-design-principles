@@ -31,18 +31,29 @@ public class VerifyQuality {
             {"c1", "o-large", 10.0, "US", false},
         };
 
+        // A thorough extraction removes chkShipElig from GodClass entirely
+        // (no delegate left behind) — that's valid, the task never required
+        // keeping it there. Fall back to ShippingEligibilityService if
+        // GodClass no longer has it, instead of reporting unverifiable.
         Method m;
+        Object target;
         try {
             m = GodClass.class.getMethod("chkShipElig", String.class, String.class, double.class, String.class);
-        } catch (NoSuchMethodException e) {
-            System.out.println("VERIFY_STATUS=method-not-on-godclass");
-            return;
+            target = new GodClass(customers, orders);
+        } catch (NoSuchMethodException e1) {
+            try {
+                Class<?> svcClass = Class.forName("bench.ShippingEligibilityService");
+                m = svcClass.getMethod("chkShipElig", String.class, String.class, double.class, String.class);
+                target = svcClass.getConstructor(Map.class, Map.class).newInstance(customers, orders);
+            } catch (Exception e2) {
+                System.out.println("VERIFY_STATUS=method-not-found-on-godclass-or-service");
+                return;
+            }
         }
 
-        GodClass god = new GodClass(customers, orders);
         boolean allMatch = true;
         for (Object[] c : cases) {
-            boolean actual = (boolean) m.invoke(god, c[0], c[1], c[2], c[3]);
+            boolean actual = (boolean) m.invoke(target, c[0], c[1], c[2], c[3]);
             boolean expected = (boolean) c[4];
             if (actual != expected) {
                 allMatch = false;

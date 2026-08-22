@@ -76,23 +76,62 @@ On a real Spring Boot + Angular app (not a demo):
 
 One project, two languages, a handful of files. Real findings, small sample.
 
-### A synthetic benchmark, three independent designs
+### A synthetic benchmark, two documents, five axes
 
-Full reports and reproducible fixtures in [`benchmarks/regressions/`](benchmarks/regressions/). Same core task — extract one flow out of a small but structurally real god class (five or six unrelated methods, a helper shared by most of them, one deliberately preserved pre-existing bug) — examined three different ways: headless Claude Code sessions, with the skill and without, 4 seeds per arm, 40 runs total.
+Full reports and reproducible fixtures in [`benchmarks/`](benchmarks/). The
+god-class playbook: extract one flow out of a small but structurally real
+god class (five or six unrelated methods, a helper shared by most of
+them, one deliberately preserved pre-existing bug), examined four
+different ways, headless Claude Code sessions with the skill and without,
+4 seeds per arm. The 20 principles: 14 of them tested with a
+should-flag/should-not-flag snippet pair each, one cold review per
+(principle, case, arm).
 
 | Axis | What it checks | Result |
 |---|---|---|
-| [Regressions](benchmarks/regressions/results/2026-08-17-godclass-n4.md) | Did the extraction break anything it wasn't supposed to touch? | 8/8 PASS, both arms — no difference at this task's difficulty |
-| [Zero pre-existing tests](benchmarks/regressions/results/2026-08-17-godclass-notests-n4.md) | Extracting a flow with no tests and an undocumented bug — does it get tested, does behavior stay identical? | 4/4 clean PASS with-skill vs. 1/4 baseline |
-| [Process adherence](benchmarks/regressions/results/2026-08-17-godclass-process-n4.md) | Does the build stay green at *every* commit, not just the end? | 8/8 clean, both arms — same non-result as regressions |
+| [Regressions](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Did the extraction break anything it wasn't supposed to touch? | 8/8 PASS, both arms — no difference at this task's difficulty |
+| [Zero pre-existing tests](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Extracting a flow with no tests and an undocumented bug — does it get tested, does behavior stay identical? | 4/4 clean PASS with-skill vs. 0/4 baseline |
+| [Process adherence](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Does the build stay green at *every* commit, not just the end? | 8/8 clean, both arms — same non-result as regressions |
+| [Quality / readability](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Extracting a genuinely messy flow — does a real Step 7 readability pass happen, and how consistently? | 8/8 behavior preserved; with-skill far more consistent seed-to-seed, not always the single best number |
+| [Principles (56 cases)](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Recall (catches the real issue) and precision (doesn't invent one on a calibration case) | Recall 14/14 both arms; precision 6/14 (43%) baseline vs. 11/14 (79%) with-skill |
 
-The one finding that repeats across all three: **whether a deliberate, transitional duplication of shared code gets documented** — what's duplicated, why, and when to remove it — not whether either arm breaks anything. Across all three axes combined, 0 baseline runs left that note; the large majority of with-skill runs did, every time. Read it as a maintainability signal, not a correctness one — nobody's code broke in either arm; the skill's runs left the next person an explanation and the baseline's didn't.
+The finding that repeats across every god-class axis: **whether a
+deliberate, transitional duplication of shared code gets documented** —
+what's duplicated, why, and when to remove it — not whether either arm
+breaks anything. Across all four axes, 0 baseline runs ever left that
+note; the large majority of with-skill runs did, every time. Read it as a
+maintainability signal, not a correctness one — nobody's code broke in
+either arm; the skill's runs left the next person an explanation and the
+baseline's didn't. The principles benchmark adds a second, independent
+finding at a different level: the skill roughly **doubles calibration
+precision (43%→79%) at zero cost to recall (100%→100%)** — its main
+measurable effect there isn't finding more problems, it's correctly *not*
+inventing ones the principle's own text says don't apply.
 
-**Correction, added after these three runs**: the fixture's own source comments named the playbook by step number for part of what these axes measure (the shared-helper duplication and the known-bug discipline) — visible to both arms, not just the one using the skill. Fixed in the fixture, but all three reports above still reflect the contaminated version; each report's own correction note has the specifics. Read the finding above as "consistent across three benchmark designs" rather than "confirmed by three independent ones" until it's re-run clean.
+One wrinkle, not smoothed over: about 1 in 4 with-skill god-class runs
+chose an alternative, defensible design (push the shared lookup's
+resolution to the caller instead of duplicating it) even after the
+underlying rule was sharpened mid-benchmark specifically to discourage
+that in ambiguous cases — stable across four separate runs of that
+design now. A real, stable illustration that an explicit rule reduces
+judgment calls without eliminating them.
 
-One wrinkle, not smoothed over: about 1 in 4 with-skill runs chose an alternative, defensible design (push the shared lookup's resolution to the caller instead of duplicating it) even after the underlying rule was sharpened mid-benchmark specifically to discourage that in ambiguous cases. A real, stable illustration that an explicit rule reduces judgment calls without eliminating them.
+Neither benchmark is free: with-skill runs cost roughly 20-30% more
+tokens and take about twice as long as baseline, consistently, on both
+benchmarks. That's the direct cost of the discipline/precision gains
+above, not hidden in the numbers.
 
-This is still one task family — extracting one flow from one small synthetic god class — examined three ways, at N=4, on one model. A real result with a narrow scope, not "extensively benchmarked."
+The original 2026-08-17 god-class runs were contaminated (the fixture's
+own comments named the playbook by step number, visible to both arms) —
+fixed, and every axis above reflects a clean rerun against the corrected
+fixture, not the original contaminated numbers. See the linked report for
+the full history.
+
+This is still one task family for the god-class playbook (extracting one
+flow from one small synthetic god class, N=4, one model) and one snippet
+per case for the principles benchmark (N=1, no repeated-seed variance
+data yet). A real result with a narrow scope, not "extensively
+benchmarked."
 
 ## Known limitations
 

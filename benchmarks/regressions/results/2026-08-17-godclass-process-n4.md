@@ -25,6 +25,15 @@
 > the independence between them was weaker than stated, since all three
 > shared the same leaked hint.
 
+> **Clean rerun added 2026-08-19.** Fresh N=4 both arms, cleaned fixture,
+> new seeds. Result: **8/8 checkpoints clean** in both arms, same as
+> before. `REFACTOR_NOTE_PRESENT`: **0/4 baseline, 3/4 with-skill** — the
+> exact split from the contaminated run, now confirmed independent of the
+> leak. The one with-skill divergence (seed 3 this time) again chose
+> "push resolution to the caller" over duplicating — same ~1-in-4 rate as
+> every prior run of this design. See
+> [`2026-08-19-principles-and-rerun.md`](2026-08-19-principles-and-rerun.md).
+
 ## What this measures
 
 The third axis of the three planned for the playbook (after regressions and zero-pre-existing-tests, both run the same day). Those two only ever checked the *final* state of a run. This one checks the playbook's actual guiding rule — "every step must leave the build green" — literally, by replaying each run's own commit history and running `mvn test` at every checkpoint, not just at the end. A single big commit that happens to be green at the finish line can still represent a risky, non-incremental process; this axis is built to catch that difference, which the other two structurally can't see.

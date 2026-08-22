@@ -34,7 +34,7 @@ anything non-obvious.
 public int daysUntil(LocalDate target) {
     // Business rule (ticket PROJ-482): weekends don't count toward the
     // countdown shown to customers, only business days do.
-    return (int) target.datesUntil(LocalDate.now())
+    return (int) LocalDate.now().datesUntil(target)
         .filter(d -> d.getDayOfWeek() != DayOfWeek.SATURDAY && d.getDayOfWeek() != DayOfWeek.SUNDAY)
         .count();
 }
