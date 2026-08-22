@@ -168,7 +168,7 @@ baseline→"Dependency Injection", `14-fail-fast` baseline→"redundant
 validation" instead of "Fail Fast") — the verdict (flag it, correctly)
 was right in all 14/14 cases on both arms regardless of naming precision.
 
-**Precision (Case B, should NOT flag) — the headline number:**
+**Precision (Case B, should NOT flag) — the headline number, N=1:**
 
 | | false positives | correct (didn't flag) |
 |---|---|---|
@@ -180,6 +180,13 @@ Baseline false-positived on: `01-solid`, `02-value-object`,
 `10-ddd-tactical`, `14-fail-fast`. With-skill false-positived on only 3
 of those same 8 (`05-dry`, `07-cqs`, `14-fail-fast`) — no *new* false
 positives introduced by the skill anywhere baseline got it right.
+
+**Update — see Part 4 below**: every case got a second independent seed
+the same day. The N=2 combined numbers (54%/82%) confirm this gap rather
+than revise it, but two of the three with-skill misses above turned out
+to be a haiku-specific limitation, not a skill-content gap, and the
+third (`14-fail-fast`) turned out to be a real, repeatable one. Read this
+N=1 table as the first data point, Part 4 as the trustworthy one.
 
 **The skill roughly doubles calibration precision (43%→79%) at zero cost
 to recall (100%→100%).** This is the principles benchmark's core finding:
@@ -371,26 +378,64 @@ Worth treating as a hypothesis, not a conclusion: N=2 per scenario case is
 thin, and the two methodologies were never designed to be compared to
 each other directly.
 
+### Part 4 — Snippet benchmark scaled to N=2
+
+All 56 original cases got a second independent seed (112 more runs: 56
+cases × 2 arms). Case A stayed 28/28 clean on both arms across both
+seeds — recall holds at 100% with a second data point. Case B (the
+number that matters) combined across both seeds:
+
+| | correct (of 28) | rate |
+|---|---|---|
+| baseline | 15/28 | 54% |
+| with-skill | 23/28 | 82% |
+
+Consistent with the N=1 headline (43%/79%) — the ~28-30 point gap holds
+at N=2, not an N=1 artifact.
+
+**What the second seed actually changed, case by case:**
+
+- **Real variance, both directions.** `01-solid`, `02-value-object`,
+  `04-law-of-demeter` (baseline): seed 1 false-positived, seed 2 was
+  correct — the model genuinely gets these right sometimes and wrong
+  other times, not a fixed miss. `03-tell-dont-ask` (baseline) went the
+  other way: correct on seed 1, false-positived on seed 2. Treat any
+  single-seed result on this benchmark as a sample, not a verdict.
+- **Two with-skill misses confirmed as haiku-specific, not skill gaps.**
+  `05-dry` and `07-cqs` with-skill false-positived on seed 1 (haiku,
+  from the mid-run model switch) — reran clean on seed 2 (sonnet, the
+  now-default model for Case B). Same skill, same case, different
+  result by model capability alone.
+- **One with-skill miss confirmed as a real gap, not noise or model
+  capability.** `14-fail-fast`/Case B false-positived on **both** seeds,
+  **both on the default model** — the with-skill arm keeps reinterpreting
+  "validate once, at the real trust boundary, then trust downstream" as
+  "this validation isn't thorough enough," even with the skill's own
+  text stating the opposite. This is now the strongest single finding
+  for what to fix next: not a benchmark artifact, not a haiku limitation,
+  a genuine gap in how principle 20's exception is currently worded.
+  Worth revisiting `principles.md`'s Fail Fast section directly, next.
+
 ### Limitations
 
-- N=1 per case, not N=4 — a single cold read per (principle, case, arm)
-  combination, unlike the god-class axes' 4 independent seeds. A false
-  positive or a miss could be that specific run's variance, not a stable
-  rate. The god-class axes' repeated ~1-in-4 divergence rate (Step 5)
-  only became trustworthy after N=4; this benchmark doesn't have that
-  yet for any single case, only in aggregate across the 14 principles.
-- Case B ran on two different models (haiku for 3 principles, the
-  default model for the rest) after a mid-run correction — the 43%/79%
-  headline numbers pool both, which is defensible (same model within
-  each baseline/with-skill pair, so the comparison stays valid
-  case-by-case) but means the two subsets aren't directly comparable to
-  each other in absolute terms.
-- 6 of the skill's 20 principles aren't covered by this methodology at
-  all (DDD strategic, package-by-feature, Anti-Corruption Layer,
-  Strangler Fig, Modular Monolith, Characterization Test) — see
-  `principles/README.md` for why single-snippet review can't test them.
+- Both benchmarks are now N=2 per case, not N=4 — better than the
+  single-seed read this report started with, but the god-class axes'
+  repeated ~1-in-4 divergence rate (Step 5) only became trustworthy at
+  N=4; N=2 catches real variance (see above) but a rate like "3/4 of the
+  time" isn't distinguishable from "1/2" yet at this sample size.
+- Case B ran on two different models (haiku for a subset early in the
+  run, the default model for the rest after the mid-run correction) —
+  the pooled 54%/82% headline numbers are still defensible (same model
+  within each baseline/with-skill pair, so the paired comparison stays
+  valid case-by-case) but the two model subsets aren't directly
+  comparable to each other in absolute terms.
+- The 6 principles outside the snippet methodology now have their own
+  scenario-based coverage (Part 3, N=2) — no longer an uncovered gap,
+  but a separately-run, differently-shaped benchmark not pooled into
+  this section's numbers.
 - Grading was done inline by the same session running the benchmark, not
   by an independent grader blind to which arm produced which review —
   some risk of confirmation bias in borderline PRINCIPLE_NAMED calls,
   though the clean-cut VERDICT_MATCH numbers (flag/don't-flag) above
-  don't depend on that judgment.
+  don't depend on that judgment. `grade-principles.md` now documents how
+  to make the next run's grading actually blind.

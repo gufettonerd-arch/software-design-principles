@@ -93,7 +93,8 @@ should-flag/should-not-flag snippet pair each, one cold review per
 | [Zero pre-existing tests](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Extracting a flow with no tests and an undocumented bug — does it get tested, does behavior stay identical? | 4/4 clean PASS with-skill vs. 0/4 baseline |
 | [Process adherence](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Does the build stay green at *every* commit, not just the end? | 8/8 clean, both arms — same non-result as regressions |
 | [Quality / readability](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Extracting a genuinely messy flow — does a real Step 7 readability pass happen, and how consistently? | 8/8 behavior preserved; with-skill far more consistent seed-to-seed, not always the single best number |
-| [Principles (56 cases)](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Recall (catches the real issue) and precision (doesn't invent one on a calibration case) | Recall 14/14 both arms; precision 6/14 (43%) baseline vs. 11/14 (79%) with-skill |
+| [Principles (56 cases, N=2)](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Recall (catches the real issue) and precision (doesn't invent one on a calibration case) | Recall 28/28 both arms; precision 15/28 (54%) baseline vs. 23/28 (82%) with-skill |
+| [Scenario principles (6 principles, N=2)](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md) | Same recall/precision, for structural/process decisions a code snippet can't show | 46/48 clean matches, both arms |
 
 The finding that repeats across every god-class axis: **whether a
 deliberate, transitional duplication of shared code gets documented** —
@@ -104,9 +105,12 @@ maintainability signal, not a correctness one — nobody's code broke in
 either arm; the skill's runs left the next person an explanation and the
 baseline's didn't. The principles benchmark adds a second, independent
 finding at a different level: the skill roughly **doubles calibration
-precision (43%→79%) at zero cost to recall (100%→100%)** — its main
-measurable effect there isn't finding more problems, it's correctly *not*
-inventing ones the principle's own text says don't apply.
+precision (54%→82% at N=2) at zero cost to recall (100%→100%)** — its
+main measurable effect there isn't finding more problems, it's correctly
+*not* inventing ones the principle's own text says don't apply. One
+specific miss (Fail Fast's "validate once, trust downstream" case)
+repeated on both seeds even with the skill loaded — a real, identified
+gap to fix, not smoothed over here.
 
 One wrinkle, not smoothed over: about 1 in 4 with-skill god-class runs
 chose an alternative, defensible design (push the shared lookup's
@@ -128,10 +132,11 @@ fixture, not the original contaminated numbers. See the linked report for
 the full history.
 
 This is still one task family for the god-class playbook (extracting one
-flow from one small synthetic god class, N=4, one model) and one snippet
-per case for the principles benchmark (N=1, no repeated-seed variance
-data yet). A real result with a narrow scope, not "extensively
-benchmarked."
+flow from one small synthetic god class, N=4, one model) and a narrower
+seed count for the principles benchmark (N=2, not the god-class axes'
+N=4) — real variance is visible at N=2, but a rate like "3 times out of
+4" isn't distinguishable from "half the time" yet at this sample size. A
+real result with a narrow scope, not "extensively benchmarked."
 
 ## Known limitations
 

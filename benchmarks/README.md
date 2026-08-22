@@ -59,13 +59,15 @@ single-snippet methodology and which aren't). First full run: 56/56 cases
 complete, see
 [the 2026-08-19 report](regressions/results/2026-08-19-principles-and-rerun.md).
 
-**Headline result**: recall (catching the real issue) was 14/14 on both
-arms — no difference there. Precision (correctly *not* flagging a
-calibration case) was 6/14 (43%) baseline vs 11/14 (79%) with-skill —
-the skill roughly doubles calibration accuracy at zero cost to recall.
-Every with-skill false positive was on a case baseline also got wrong;
-the skill introduced no new mistakes anywhere baseline was already
-correct.
+**Headline result, now at N=2** (56 cases × 2 seeds, 112 runs): recall
+(catching the real issue) held at 28/28 on both arms across both seeds —
+no difference there. Precision (correctly *not* flagging a calibration
+case), combined across both seeds: **15/28 (54%) baseline vs 23/28 (82%)
+with-skill**. Two of the three with-skill misses found on the first seed
+turned out to be a haiku-specific limitation (clean on the default model
+the second time); the third (`14-fail-fast`) missed on **both** seeds, on
+the default model both times — a real, repeatable gap, not noise or a
+weaker model. See the report for the full case-by-case breakdown.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
