@@ -28,6 +28,8 @@ decide when and how to react to a failed check.
 ```java
 public class ProductCatalog {
     private final Cache<String, Product> cache;
+    private final ProductRepository repository;
+    private final Metrics metrics;
 
     public Product findById(String id) {
         Product cached = cache.get(id);
@@ -36,6 +38,10 @@ public class ProductCatalog {
             return cached;
         }
         metrics.increment("catalog.cache.miss");
+        // repository.load throws ProductNotFoundException for an unknown id
+        // (never returns null), and a concurrent miss on the same id hitting
+        // the repository twice is an accepted cost for a read-through cache
+        // at this traffic level — neither is what this method needs review for.
         Product loaded = repository.load(id);
         cache.put(id, loaded);
         return loaded;
