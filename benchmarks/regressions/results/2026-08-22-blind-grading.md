@@ -120,3 +120,48 @@ next time a case file gets written: the "Expected" text is a claim about
 the world (Java's validation API, in this instance), not just a design
 choice, and claims about the world are the kind of thing that can simply
 be wrong in a way "does the code look right" review doesn't catch.
+
+## Testing the new two-axis Case B rubric, blind, on real data
+
+The Case B ambiguity pattern found repeatedly today led to a proposed
+fix in `grade-principles.md`: split the old single MATCH/MISS question
+into 1a (did the response actively CONTRADICT the calibration point —
+the only real miss) and 1b (did it EXPLICITLY engage the point and
+affirm it, or was it SILENT — a quality signal, not pass/fail). Proposed
+but not run against real data until this check: the 4 Tell Don't Ask
+Case B responses (seed3+seed4, both arms), blind-labeled R1–R4, graded
+against the new rubric by an independent agent with no arm/seed
+information.
+
+Result: **all 4 responses landed on "not contradicted" (1a)** — none
+argued the DTO should be a rich domain object, so the old single-axis
+score would have called all 4 identical. The 1b split didn't: **R1 and
+R3 were SILENT** (found other real issues — an IDOR/trust-boundary
+concern, missing defensive copy on the list field — and never addressed
+whether the anemic DTO shape is itself correct); **R2 and R4 were
+EXPLICIT**, each directly reasoning through the point and affirming it
+("this is a boundary DTO, not domain logic, so Value Objects here would
+be premature," "that's exactly what Tell Don't Ask wants from a
+controller").
+
+Decoded against the (still-private) arm mapping after grading:
+**R1/R3 (SILENT) are both baseline; R2/R4 (EXPLICIT) are both
+with-skill** — a clean split exactly along the arm boundary, both
+seeds. The old MATCH/MISS rubric would have scored baseline and
+with-skill identically on this case, because both arms land on the
+correct top-line verdict. The new axis shows a real, consistent
+difference the old one couldn't see: with-skill isn't just landing in
+the same place, it's demonstrably reasoning *through* the principle's
+own calibration carve-out to get there, while baseline reaches the same
+answer without ever raising the question. That's a genuine capability
+difference invisible to the benchmark until today.
+
+The grading agent's own honest caveat, worth keeping: on this
+particular batch, axis 1a did no discriminating work at all (constant
+across all 4) — the real signal came entirely from 1b. That's expected,
+not a flaw: 1a exists to catch a different failure mode (active
+contradiction) that this batch simply didn't have. A batch that does
+contain a real miss would need both axes to tell the full story. One
+principle, N=2 per arm — not enough to claim this split generalizes
+before it's run on a broader set, but it did exactly what it was
+proposed to do on the first real test.

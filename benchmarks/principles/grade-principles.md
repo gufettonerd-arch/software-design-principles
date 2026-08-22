@@ -100,9 +100,18 @@ useful to know for a different reason (fix the case file, the same way
 `07-cqs.md` and `14-fail-fast.md` were fixed this session) than a
 response that actively argues the wrong thing (fix the principle's
 wording, or investigate the model's reasoning, the way `05-dry.md`'s
-rule-of-three trap was this session). Proposed and documented here;
-**not yet run** — the next principles pass should use this version of
-the rubric rather than the original single-question one.
+rule-of-three trap was this session). Proposed and documented here, then
+spot-checked blind on one principle same day (Tell Don't Ask Case B, 4
+responses) — see
+[the blind-grading report](../regressions/results/2026-08-22-blind-grading.md)'s
+"Testing the new two-axis Case B rubric" section: it found a clean,
+arm-correlated split (baseline SILENT both seeds, with-skill EXPLICIT
+both seeds) the old single question couldn't see, since all 4 landed on
+the same top-line verdict. One principle, N=2 per arm — not run broadly
+enough yet to claim it generalizes, but it did what it was proposed to
+do on the first real test. The next full principles pass should use
+this version of the rubric rather than the original single-question
+one.
 
 ## Aggregation
 
