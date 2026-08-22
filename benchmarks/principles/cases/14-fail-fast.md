@@ -33,8 +33,12 @@ second place to keep in sync if the rule ever changes.
 @PostMapping("/checkout")
 public ResponseEntity<?> checkout(@Valid @RequestBody CheckoutRequest request) {
     // @Valid already enforces customerId/paymentMethod/shippingAddress via
-    // bean-validation annotations on CheckoutRequest; "at least one item"
-    // isn't expressible there, so it's the one manual check still needed here.
+    // bean-validation annotations on CheckoutRequest. items *could* carry
+    // @NotEmpty too, but CheckoutRequest is also the body for the
+    // save-for-later draft endpoint, which legitimately allows an empty
+    // cart — a DTO-level annotation would break that endpoint, so the
+    // non-empty rule stays local to this handler, which is the only place
+    // it actually applies.
     if (request.items().isEmpty()) {
         return ResponseEntity.badRequest().body("No items");
     }
@@ -47,7 +51,12 @@ public ResponseEntity<?> checkout(@Valid @RequestBody CheckoutRequest request) {
 trust boundary (an HTTP request from an external caller), and everything
 downstream trusts that guarantee instead of re-checking it — this is the
 principle applied correctly, not a violation to find. The boundary isn't
-incomplete: `@Valid` already covers every field bean-validation annotations
-can express, and the one manual check handles the one rule that can't be
-expressed that way (a non-empty collection) — not a gap, two complementary
-mechanisms at the same boundary.
+incomplete: `@Valid` covers every field the shared DTO can safely
+constrain for *every* endpoint that uses it, and the one manual check
+handles the one rule that's specific to *this* endpoint and would be
+wrong to bake into the DTO itself — not a gap, two complementary
+mechanisms at the same boundary. (A reviewer suggesting `@NotEmpty` on
+`items` isn't wrong about the annotation existing — it's missing that the
+DTO is shared with an endpoint that needs the opposite rule; that's the
+actual point being tested, not whether the annotation is technically
+available.)

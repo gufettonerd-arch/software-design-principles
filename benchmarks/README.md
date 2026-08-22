@@ -84,7 +84,17 @@ weaker model. See the report for the full case-by-case breakdown.
 **Partial N=4 on the 3 highest-signal principles** (DRY, CQS, Fail Fast —
 the ones with real N=2 misses): see
 [the 2026-08-22 report](regressions/results/2026-08-22-n4-partial.md).
-Confirms the Fail Fast case-file fix is stable (not a fluke). Investigates
+Confirms the Fail Fast case-file fix generalizes for the most part — but
+a same-day [blind grading pass](regressions/results/2026-08-22-blind-grading.md)
+(the first time this project ran one for real, on newly-saved raw
+transcripts) caught a genuine factual error in Case B's premise that
+same-session grading had passed cleanly: the case claimed a validation
+rule "isn't expressible" via bean-validation annotations, and that's
+simply wrong — 2 independent with-skill responses correctly noticed.
+Fixed the case file same day, not yet reverified. First real evidence
+this project's own same-session grading has a blind spot, exactly the
+kind `grade-principles.md` warned about — see the blind-grading report
+before trusting "stable" at face value. Also investigates
 a CQS Case A baseline recall wobble that looked repeatable at 2 seeds but
 turned out to be ~50% variance across 6 (3/6 baseline vs. 4/4 with-skill)
 — read as a real, not-yet-proven hypothesis about semantic vs. syntactic
