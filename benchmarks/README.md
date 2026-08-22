@@ -91,10 +91,13 @@ transcripts) caught a genuine factual error in Case B's premise that
 same-session grading had passed cleanly: the case claimed a validation
 rule "isn't expressible" via bean-validation annotations, and that's
 simply wrong — 2 independent with-skill responses correctly noticed.
-Fixed the case file same day, not yet reverified. First real evidence
-this project's own same-session grading has a blind spot, exactly the
-kind `grade-principles.md` warned about — see the blind-grading report
-before trusting "stable" at face value. Also investigates
+Fixed the case file same day, **reverified with 4 fresh with-skill runs:
+4/4 clean**. First real evidence this project's own same-session grading
+has a blind spot, exactly the kind `grade-principles.md` warned about —
+and, unlike DRY's three failed attempts below, proof that when the
+underlying issue really is a wording/factual defect (not a judgment call
+the model keeps landing on differently), one fix genuinely closes it. See
+the blind-grading report for the full story. Also investigates
 a CQS Case A baseline recall wobble that looked repeatable at 2 seeds but
 turned out to be ~50% variance across 6 (3/6 baseline vs. 4/4 with-skill)
 — read as a real, not-yet-proven hypothesis about semantic vs. syntactic
