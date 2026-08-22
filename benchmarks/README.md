@@ -90,29 +90,25 @@ turned out to be ~50% variance across 6 (3/6 baseline vs. 4/4 with-skill)
 — read as a real, not-yet-proven hypothesis about semantic vs. syntactic
 smells, not a settled finding (see the report). Also finds and fixes the
 same case-file confound in CQS Case B that Fail Fast had, verified with
-one run per arm. One more finding, different in kind, investigated twice: the DRY Case B
-with-skill hit/miss tally (4/6, then 6/6 after a same-day wording fix)
-turned out to be measuring the wrong thing. Rereading all 6 post-fix
-transcripts for *why*, not just *what*, found none of them using the
-fix's new reasoning — all 6 reason via rule-of-three timing, which
-happens to give the right surface answer only because the snippet shows
-exactly 2 instances. That reasoning wouldn't survive a third
-similarly-shaped-but-unrelated variant being added. Tested that
-prediction directly with a 4-run exploratory check adding a third,
-still-unrelated builder — **confirmed 4/4**: every response reasoned
-about instance count against a moving threshold, none recognized three
-unrelated business rules sharing a shape. Rule-of-three itself, not the
-wording, is the mechanism — so restructured `principles.md`'s DRY section
-same day to demote rule of three below the knowledge question, and
-reverified against the same 3-instance scenario: **0/4 improved**, all
-four hard-flagged, worse than the pre-fix batch on the surface. A wording
-fix — even a structural one, not just an added sentence — doesn't touch
-this failure mode. Left as a documented, open limitation rather than a
-false "fixed" — see the report for the full chase, including where
-today's own earlier hit/miss counts were too shallow twice over. The
-other 17 principles remain at N=2. A worthwhile checklist audit came out
-of this too — reread the other 17 case files for the same confound shape
-Fail Fast/CQS had; found none serious enough to fix.
+one run per arm. One more finding, different in kind, investigated three
+times over: the DRY Case B with-skill hit/miss tally (4/6, then 6/6 after
+a same-day wording fix) turned out to be measuring the wrong thing —
+nearly every run reasons via rule-of-three timing, not recognizing
+coincidental similarity, which happens to give the right surface answer
+only because the snippet shows exactly 2 instances. Confirmed with a
+4-run check adding a third, still-unrelated variant (4/4 reasoned about
+instance count, none about meaning), then tried two different fixes in
+`principles.md` and reverified both against that same 3-instance scene:
+restructuring the section (0/4 improved) and adding a concrete worked
+counter-example in a different domain (2/4, no better than the unedited
+baseline). **Three distinct fix approaches, three clean failures** —
+read as a pattern-match instinct that resists in-context correction, not
+a wording gap. All three edits stay (each correct on its own merits) but
+none is shown to work — documented as a genuinely open limitation, not a
+false "fixed." See the report for the full, three-times-reversed chase.
+The other 17 principles remain at N=2. A worthwhile checklist audit came
+out of this too — reread the other 17 case files for the same confound
+shape Fail Fast/CQS had; found none serious enough to fix.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
