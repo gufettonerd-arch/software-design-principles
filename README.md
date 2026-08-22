@@ -109,8 +109,11 @@ precision (54%→82% at N=2) at zero cost to recall (100%→100%)** — its
 main measurable effect there isn't finding more problems, it's correctly
 *not* inventing ones the principle's own text says don't apply. One
 specific miss (Fail Fast's "validate once, trust downstream" case)
-repeated on both seeds even with the skill loaded — a real, identified
-gap to fix, not smoothed over here.
+repeated on both seeds even with the skill loaded — root-caused after a
+wording fix that didn't work: the real problem was the test case, which
+looked genuinely incomplete out of context, not the skill. Fixed the
+case, reran, correct immediately. See the report for the full chase —
+not smoothed over here, including the first fix that missed.
 
 One wrinkle, not smoothed over: about 1 in 4 with-skill god-class runs
 chose an alternative, defensible design (push the shared lookup's
