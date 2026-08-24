@@ -6,7 +6,8 @@ on different axes, plus a third, non-synthetic one:
 [`real-world-validation/`](real-world-validation/) — a template for
 running baseline-vs-with-skill on one real flow in a real project, filled
 in as people actually run it (see `TEMPLATE.md`), not scored
-automatically like the two below. Everything here is real infrastructure
+automatically like the two below. Two rounds filled in as of 2026-08-24
+— see the dedicated section near the bottom of this file. Everything here is real infrastructure
 — fixtures that compile and run, scorers that were self-tested against
 synthetic pass/fail cases before being trusted on real agent output — not
 a plan.
@@ -221,3 +222,57 @@ file. Only the code block gets shown to a reviewing agent — never the
 file as a whole. Getting this backwards would repeat the exact mistake
 the fixture contamination above describes, at a more direct level
 (handing over the answer, not just a structural hint toward it).
+
+## `real-world-validation/` — two rounds on a real legacy codebase, 2026-08-24
+
+First real (non-synthetic) runs, on the target codebase — a real Java 7/8 Struts 1.x
+legacy travel-document app, not a fixture. Each round is baseline (A) vs
+with-skill (B) vs a trigger check (C, told nothing about skills either
+way) extracting one real flow out of a god class, in isolated git
+worktrees. See
+[round 1](real-world-validation/2026-08-24-real-world-round1.md) and
+[round 2](real-world-validation/2026-08-24-real-world-round2.md) for the full
+write-ups.
+
+**Round 1** (`GiftFlowProcessor`, 2413 lines, a ticket-picked mid-size
+class): A and B converged almost exactly — same service shape, same
+duplicated-with-note handling of shared code, same two real pre-existing
+bugs found and preserved by both independently. B's one visible edge was
+a separate, playbook-step-7 readability pass (a `notFound()` helper, a
+named constant) done and reverified *after* the faithful copy was
+confirmed green. The bigger finding was C, not B: C self-invoked the
+skill but read "everything reachable from the PROV branch" far more
+aggressively than A/B did (1400+ lines moved vs. 36), a scope reading
+neither wrong — the divergence between two skill-using sessions (B vs C)
+was bigger than the divergence between skill-on and skill-off (A vs B).
+
+**Round 2** (`CommonUtils.sendNotificationEmail`, the single biggest class in
+the repo, 14719 lines) deliberately pinned the exact method list up front
+to close round 1's scope ambiguity — it worked, all three sessions agreed
+on scope. A **new** ambiguity took its place instead: how many of the
+flow's real external callers actually get rewired to the extraction. C
+rewired all 3, A rewired 1 of 2, B rewired 0 — despite identical scope
+and all three satisfying "preserve exact behavior" (nothing broke,
+because the old methods were also left in place). B's one clear edge:
+catching a second real shared caller (`sendSimpleEmail()`) that A/C's
+reports don't mention checking for. The headline finding is C: this
+round it did **not** self-invoke the skill (opposite of round 1's C on a
+similar task) — read the project's own memory/precedent files instead —
+and still produced the most complete extraction of the three (full
+caller rewiring, new characterization tests, a false-positive shared-name
+catch neither A nor B found). Read together with round 1: the skill's
+marginal value looks smaller on a codebase that has already accumulated
+its own concrete, discoverable conventions, and the trigger check itself
+isn't yet consistent run-to-run on near-identical tasks — both flagged as
+open questions, not conclusions, pending more rounds.
+
+**Neither round found the skill catching a bug baseline missed**, and
+neither found it adding ceremony baseline correctly skipped — its
+measured effect so far is entirely about process (an explicit, checkable
+readability pass; documenting shared-dependency decisions via REFACTOR
+NOTE) and about scope/integration completeness varying more between
+sessions than expected, not about catching or avoiding anything baseline
+got wrong. Both rounds' own verdicts recommend pinning task-sentence
+ambiguity tighter next time (round 1: how much code moves; round 2: how
+many callers get switched over) rather than treating either round as
+closing the question.
