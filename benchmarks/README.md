@@ -238,6 +238,14 @@ that's a hypothesis (scenario prompts spell out the situation; snippet
 prompts require noticing what to look for first) rather than a settled
 conclusion.
 
+**First scenario-principle data beyond N=2** (2026-08-26): DDD strategic
+(Bounded Context), picked arbitrarily, brought to N=3. Clean 4/4 — both
+arms correctly recommend the 3-team merge-conflict case and correctly
+decline the single-team no-friction one, with-skill explicitly checking
+the exemption clause both times rather than pattern-matching the shape
+alone. Consistent with the hypothesis above, still just one principle —
+the other 5 remain at N=2.
+
 **Trigger accuracy** (does the skill actually fire on the right requests,
 unprompted): first test, 8/8 correct — 4 prompts designed to plausibly
 need it (god-class extraction, a pre-PR review, a generic-catch call, an

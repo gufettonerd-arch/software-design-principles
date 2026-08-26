@@ -862,3 +862,29 @@ Verdict: **EXPLICIT, correct** — a flip from seed3, where with-skill was SILEN
 **Tally (seed4): Composition Case A 2/2, Case B 1 SILENT (baseline) + 1 EXPLICIT (with-skill, own framing this time). Shared state Case A 2/2, Case B 1 SILENT (baseline) + 1 EXPLICIT (with-skill, flipped from seed3's SILENT).**
 
 **All 14 snippet-based principles now have full N=4 data — this milestone completes the scale-up that started 2026-08-22.**
+
+## DDD strategic (Bounded Context) — first scenario principle beyond N=2, seed3, 2026-08-26
+
+Arbitrary first pick among the 6 scenario-based principles, not chosen for cause.
+
+### Case A — baseline
+> "Reorganize by feature/domain, not by technical layer... every layer folder is a shared namespace, so any two teams editing *anything* land in the same directory... That's your merge-conflict root cause." Gives a 5-step migration plan: move by feature, extract a reviewed `shared/` module, decouple cross-area calls via events, no big-bang.
+
+Verdict: **HIT** — full diagnosis and fix match, doesn't name "Bounded Context" but the underlying reasoning is the same.
+
+### Case A — with-skill
+> "The gap matches checklist item 11 exactly... But check the 'when NOT to apply' clause first... This project fails that test on both counts: three teams, and the symptom is already showing." Recommends the same feature-repackage, explicitly checks the scenario against the exemption clause before recommending.
+
+Verdict: **HIT** — explicit, and explicitly reasons through the exemption clause rather than pattern-matching the shape alone.
+
+### Case B — baseline
+> "Leave it alone. Nothing you described is a problem — it's a description of a healthy small codebase... None of that pressure exists here." Lists the case's own reasoning (one team, no growth, no reported friction) point by point.
+
+Verdict: **EXPLICIT, correct** — matches the case's Expected reasoning closely without naming the principle.
+
+### Case B — with-skill
+> "Here's my advice: leave it as-is. Nothing in this description asks for the split. The checklist itself says the trigger for Bounded Context is either project growth or multiple teams working on different areas — neither is present." Explicitly notes splitting would go "against explicit 'when NOT to apply' guidance."
+
+Verdict: **EXPLICIT, correct** — cites the checklist clause directly.
+
+**Tally: 4/4 clean — both cases, both arms.** First data point beyond N=2 on any scenario-based principle; matches the 2026-08-19 finding that scenario prompts (situation spelled out) get cleaner results than snippet prompts (has to notice what to look for first). One principle, one extra seed — not broad enough to generalize to the other 5.
