@@ -200,7 +200,14 @@ recommending the exact `Money.format()` extraction the case says is
 unnecessary. Post-fix tally on that case: 2 clean, 1 contradicted out of
 3. The original bug (not knowing the exemption existed) is closed; a
 subtler one (litigating the exemption's boundary once the model knows
-it) is not. See
+it) is not. **Closed with a second, targeted fix on 2026-08-26**: the
+clause now explicitly names "generic vs. specific formatting" as the
+wrong axis and points at the right one (does a second real caller
+exist — a DRY/rule-of-three question, not a Tell Don't Ask one).
+Reverified with 3 fresh runs against the identical snippet: **3/3
+clean**, all three explicitly using the new reasoning ("one caller,"
+"rule of three") rather than reaching for the generic-vs-specific
+framing that caused the original miss. See
 [the report](regressions/results/2026-08-23-contradiction-pattern-investigation.md)
 for the full reasoning and all transcripts.
 

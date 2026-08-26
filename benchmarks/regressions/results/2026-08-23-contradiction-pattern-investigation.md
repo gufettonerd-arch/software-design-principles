@@ -187,3 +187,44 @@ Not attempted further this session — a next step would be tightening the
 exception's own wording (e.g. explicitly stating that "generic" vs.
 "context-specific" formatting isn't the relevant distinction) and
 reverifying the same way, but that's future work, not done here.
+
+## Second, targeted fix (2026-08-26): 3/3 clean
+
+Followed through on the next step above. The exact escape hatch found
+in rerun #2 — "the exception carves out a *different* consumer's
+representation as legitimate, but this is generic money-printing, not
+receipt-specific" — got closed directly. Tell Don't Ask's clause now
+reads (plugin 1.2.5 → 1.2.6):
+
+> This holds whether the formatting is specific to that one consumer or
+> generic enough that another consumer could reuse it as-is — "this
+> could be reused" is a DRY/rule-of-three question about this call site
+> versus a second one that actually exists, not a Tell Don't Ask
+> violation on its own; a single caller reading a Value Object's fields
+> to format them is normal either way, until a second real caller shows
+> up.
+
+This reframes the exact axis the CONTRADICTED response was arguing
+along ("generic vs. specific") as the wrong question, and points at the
+right one instead (does a second caller actually exist — a DRY
+question, not a Tell Don't Ask one).
+
+Reverified with 3 fresh with-skill runs against the identical Law of
+Demeter Case B snippet. **3/3 clean EXPLICIT**, all three explicitly
+declining to extract `Money.format()`/`toDisplayString()` and citing
+"one caller" / "rule of three" / "DRY question to revisit then, not
+now" — i.e. all three used the *new* reasoning path directly, not just
+happened to land on the right answer. None reached for the
+generic-vs-specific framing that caused the original miss.
+
+**Updated status: the fix is working as intended after the second,
+targeted pass.** Combined tally across both fix attempts on this case:
+first pass 2/3 clean (1 CONTRADICTED via the generic-formatting
+loophole); second, targeted pass 3/3 clean. Read together with this
+session's DRY findings, this is more evidence for the pattern already
+established: a real wording/framing gap — even a subtle second-order
+one only visible after the first fix — closes cleanly once correctly
+identified and targeted, unlike DRY's rule-of-three trap, which is a
+genuine reasoning-pattern limit that resisted three differently-shaped
+fixes. N=3 post-tightening is still a small sample; holding this as
+"fixed, well-verified" rather than "proven at scale."
