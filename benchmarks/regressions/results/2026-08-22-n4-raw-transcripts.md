@@ -888,3 +888,109 @@ Verdict: **EXPLICIT, correct** — matches the case's Expected reasoning closely
 Verdict: **EXPLICIT, correct** — cites the checklist clause directly.
 
 **Tally: 4/4 clean — both cases, both arms.** First data point beyond N=2 on any scenario-based principle; matches the 2026-08-19 finding that scenario prompts (situation spelled out) get cleaner results than snippet prompts (has to notice what to look for first). One principle, one extra seed — not broad enough to generalize to the other 5.
+
+## Remaining 5 scenario-based principles — seed3, 2026-08-26
+
+### Package by feature Case A — baseline
+> "Reorganize by feature, not by layer... every one of those folders is a knife that slices a feature into four pieces and scatters them." Full migration plan given.
+
+Verdict: **HIT**.
+
+### Package by feature Case A — with-skill
+> "Restructure by feature, not by layer... a dozen features and growing is exactly the size where the layer split stops paying for itself." Explicitly checks the size threshold against the "when NOT to apply it" clause.
+
+Verdict: **HIT** — explicit.
+
+### Package by feature Case B — baseline
+> "Skip the guided tour. Sit them down for 30 minutes and have them trace one full request by hand..." Full onboarding plan, never mentions restructuring the package layout at all, in either direction.
+
+Verdict: **SILENT, but a real sidestep** — doesn't just decline quietly, it answers a different question (how to onboard) than the one being tested (should the packaging change).
+
+### Package by feature Case B — with-skill
+> "Since this is a small internal admin tool... I'd advise keeping it organized 'by layer'... applying principle #13's 'when NOT to apply it' clause directly." Three numbered reasons, all tied to the checklist.
+
+Verdict: **EXPLICIT, correct**.
+
+### Anti-Corruption Layer Case A — baseline
+> "Introduce a single translation layer between the mainframe wire format and your domain model — classic Anti-Corruption Layer / Adapter pattern." Full converter design given.
+
+Verdict: **HIT** — names the principle, unprompted.
+
+### Anti-Corruption Layer Case A — with-skill
+> "This is a textbook case for an ACL... Build one class... the only code in the entire system allowed to know the fixed-width layout exists."
+
+Verdict: **HIT** — explicit.
+
+### Anti-Corruption Layer Case B — baseline
+> "Add a thin translation layer at the boundary — deserialize into a vendor-shaped DTO, then map that DTO into the domain object explicitly. Don't deserialize vendor JSON straight into the domain type, even though the shapes match today... the YAGNI instinct says skip it, but the boundary here is real, not speculative."
+
+Verdict: **CONTRADICTED** — recommends exactly the translation layer the case's Expected text calls unnecessary bureaucracy, and explicitly argues past the case's own justification for skipping it (schema-drift risk trumping "aligned today"). First scenario-principle case of baseline over-recommending rather than staying silent.
+
+### Anti-Corruption Layer Case B — with-skill
+> "This is a case where the ACL principle argues *against* applying itself... I'd tell your colleague to leave it alone... Adding a translation layer here would be bureaucracy, exactly as the checklist's own exception says."
+
+Verdict: **EXPLICIT, correct** — direct contrast with the baseline response above on the identical scenario.
+
+### Strangler Fig Case A — baseline
+> "Stop guessing about the 12 call sites — instrument them... Write the completion criterion down before you start, not after." Full instrumentation + triage + deadline plan.
+
+Verdict: **HIT**.
+
+### Strangler Fig Case A — with-skill
+> Same instrumentation/criterion/triage plan, closing line: "That's the strangler fig pattern actually being governed instead of just named."
+
+Verdict: **HIT** — explicit, names the principle.
+
+### Strangler Fig Case B — baseline
+> "Ship it as one PR — that's the right size for this change, not a shortcut... That ceremony is for things other code depends on across module/team boundaries; this isn't that."
+
+Verdict: **EXPLICIT, correct** — doesn't name the principle but the reasoning matches the case's own Expected text closely.
+
+### Strangler Fig Case B — with-skill
+> "Nothing to change here — ship it as is. This is the 'when NOT to apply it' case the checklist itself calls out... Applying strangler fig here... would add process weight with no corresponding risk reduction."
+
+Verdict: **EXPLICIT, correct**.
+
+### Modular Monolith Case A — baseline
+> "Two separate problems here... Fix the actual violation now [narrow the access]... Fix why nobody caught it [add an ArchUnit-style enforcement rule]." Concrete rule given per language/stack.
+
+Verdict: **HIT**.
+
+### Modular Monolith Case A — with-skill
+> Same two-part fix, with a concrete ArchUnit rule snippet. "You already have the right structure; you're missing the check, not the architecture."
+
+Verdict: **HIT** — explicit.
+
+### Modular Monolith Case B — baseline
+> "My advice: leave it alone... Two years, zero leaks, three people who already enforce the boundary in review. That's not a system working despite the structure — that's evidence the structure plus team discipline is sufficient."
+
+Verdict: **EXPLICIT, correct**.
+
+### Modular Monolith Case B — with-skill
+> "Skip the automated enforcement tool. This is the textbook case the checklist itself calls out as the exception."
+
+Verdict: **EXPLICIT, correct**.
+
+### Characterization Test Case A — baseline
+> "This is a genuinely useful bug find, not a broken test... Write a characterization test that asserts what the code currently does... Don't fix the bug as part of the refactor."
+
+Verdict: **HIT** — names the principle, unprompted.
+
+### Characterization Test Case A — with-skill
+> "Don't touch the test. Instead, add a comment above it explaining the assumption is wrong, then split it into two: 1. Characterization test..."
+
+Verdict: **HIT** — explicit.
+
+### Characterization Test Case B — baseline
+> "This is the right move, and I'd tell them to just keep doing it — don't overthink it into a 'process.'... Nothing exotic here — this is just TDD done straightforwardly on a well-scoped unit."
+
+Verdict: **EXPLICIT, correct** — doesn't name the principle, correctly identifies why it doesn't apply (no legacy black box).
+
+### Characterization Test Case B — with-skill
+> "Characterization tests are for code you don't understand yet... this situation... doesn't exist yet [no current behavior to characterize]."
+
+Verdict: **EXPLICIT, correct**.
+
+**Tally: Case A 10/10 clean across all 5 principles, both arms. Case B: with-skill 5/5 EXPLICIT correct, baseline 3/5 correct (Strangler Fig, Modular Monolith, Characterization Test) + 1 SILENT-sidestep (Package by feature) + 1 CONTRADICTED (Anti-Corruption Layer).**
+
+**All 6 scenario-based principles now have data beyond the 2026-08-19 N=2 pass.** The Anti-Corruption Layer Case B finding is the one worth carrying forward: the first scenario-principle instance of the calibration gap showing up as baseline *over*-recommending (plausible-sounding defensive engineering reasoning overriding a specific "this is fine as-is" case) rather than the snippet benchmark's more common shape of baseline staying silent or with-skill over-flagging.
