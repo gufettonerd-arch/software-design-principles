@@ -994,3 +994,31 @@ Verdict: **EXPLICIT, correct**.
 **Tally: Case A 10/10 clean across all 5 principles, both arms. Case B: with-skill 5/5 EXPLICIT correct, baseline 3/5 correct (Strangler Fig, Modular Monolith, Characterization Test) + 1 SILENT-sidestep (Package by feature) + 1 CONTRADICTED (Anti-Corruption Layer).**
 
 **All 6 scenario-based principles now have data beyond the 2026-08-19 N=2 pass.** The Anti-Corruption Layer Case B finding is the one worth carrying forward: the first scenario-principle instance of the calibration gap showing up as baseline *over*-recommending (plausible-sounding defensive engineering reasoning overriding a specific "this is fine as-is" case) rather than the snippet benchmark's more common shape of baseline staying silent or with-skill over-flagging.
+
+## All 6 scenario principles — seed4 (N=4 complete), 2026-08-26
+
+Case A: 12/12 clean, all 6 principles, both arms — no misses, matching
+seed3. Case B with-skill: 6/6 EXPLICIT correct, also matching seed3.
+Details below are only for Case B baseline, where seed4 diverges from
+seed3 in two different directions.
+
+### DDD strategic, Strangler Fig, Modular Monolith, Characterization Test Case B — baseline
+All 4 landed EXPLICIT and correct, same as seed3 — e.g. Modular
+Monolith: "Keep the folders, skip any enforcement tooling... you have
+24 months of data showing the current process holds." Characterization
+Test: "Good instinct on their part — test-first works best exactly
+here." No new findings on these 4; consistent both seeds.
+
+### Package by feature Case B — baseline (seed4)
+> "Have the new engineer trace one complete flow end-to-end before they touch anything else... A restructure into feature folders... might genuinely be the right long-term fix for a tool this size, but that's a real decision the team should make on its own merits, not something you rush through as onboarding prep for one person."
+
+Verdict: **soft sidestep, same shape as seed3** — more hedged this time (acknowledges a restructure *might* be right, unlike seed3's pure onboarding-only answer) but still never affirms the case's actual reasoning (by-layer being *easier*, not just lower-risk-to-change-right-now, for someone unfamiliar with the domain). Two seeds, same avoidance pattern — reads like a property of the case's framing (an onboarding scenario invites onboarding advice) rather than noise.
+
+### Anti-Corruption Layer Case B — baseline (seed4)
+> "Short answer: don't build a translation layer for its own sake, but don't call what you have 'done' either... Confirm the deserialization happens in exactly one place... Add one contract test... The trigger for introducing an actual mapping function isn't 'the APIs might diverge someday' — it's the first time they actually do."
+
+Verdict: **EXPLICIT, correct — does not repeat seed3's CONTRADICTED result.** Unlike seed3 ("Add a thin translation layer at the boundary... map that DTO into the domain object explicitly"), seed4's baseline explicitly declines to add a mapper/DTO layer, recommending only a contract test and call-site consolidation — real engineering suggestions, but not the ACL the case tests against. The seed3 CONTRADICTED transcript is real and unedited, but this result shows it doesn't generalize to a systematic baseline bias on this case at N=1 — corrected from "finding" to "one data point" in the summary sections above and in `benchmarks/README.md`.
+
+**Tally (seed4): Case B baseline 5/6 EXPLICIT correct, 1/6 soft sidestep (Package by feature, repeating seed3). Combined with seed3: Package by feature sidesteps on both seeds (2/2) — the more durable finding of the two; Anti-Corruption Layer contradicts on 1 of 2 seeds — not durable at N=2, downgraded accordingly.**
+
+**All 20 principles in this benchmark (14 snippet-based, 6 scenario-based) are now at full N=4.**

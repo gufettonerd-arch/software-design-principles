@@ -261,10 +261,25 @@ exemption on the identical scenario. This is a new shape for this
 benchmark: not with-skill over-flagging or baseline staying silent, but
 **baseline over-recommending** via generically sound defensive-
 engineering instinct that the calibration case specifically tests
-against — a small but genuine data point for the skill's precision value
-on a case type outside where it was previously demonstrated. See
+against.
+
+**Brought all 6 to full N=4 the same day.** Case A stayed perfect —
+12/12 this seed, 22/22 combined, no misses anywhere. Case B with-skill:
+6/6 EXPLICIT correct. Case B baseline gave two corrections to the seed3
+read, not confirmations: the Anti-Corruption Layer CONTRADICTED result
+above **doesn't repeat** at seed4 — baseline recommends a contract test
+and call-site consolidation, not the DTO/mapper layer, so that finding
+is downgraded from "a real pattern" to "one data point that didn't
+generalize," an honest correction rather than a confirmation. Package by
+feature's sidestep (baseline answers "how to onboard" instead of
+"should we restructure") **does repeat both seeds** — the more durable
+of the two findings, and a candidate for rewording that case's Case B
+scenario in a future session, the same way `07-cqs.md`/`14-fail-fast.md`
+were reworded once a case-file shape was shown to consistently pull
+attention away from what's being tested. See
 [the report](regressions/results/2026-08-22-n4-partial.md) for the full
-breakdown and all 20 transcripts.
+breakdown and all transcripts. **All 20 principles in this benchmark
+(14 snippet-based, 6 scenario-based) are now at full N=4.**
 
 **Trigger accuracy** (does the skill actually fire on the right requests,
 unprompted): first test, 8/8 correct — 4 prompts designed to plausibly
