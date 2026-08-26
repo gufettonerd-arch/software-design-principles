@@ -814,3 +814,51 @@ Verdict: **CONTRADICTED** — a new failure shape. Not "doesn't know the excepti
 Verdict: **EXPLICIT, correct** — clean pass, correctly rejects the same extraction rerun #2 recommended.
 
 **Post-fix tally, Law of Demeter Case B with-skill, N=3: 2 clean EXPLICIT, 1 CONTRADICTED.** The original bug (not knowing the exception existed at all) is closed — none of the 3 post-fix runs miss the exception itself. But a second-order failure survives: a careful-enough response can accept the exception's premise and then argue the specific snippet is an exception *to* the exception. Read as **partially effective, not closed** — a real improvement (0/1 pre-fix vs. 2/3 post-fix on this exact case) but not the "fixed, unqualified" result a single clean run suggested on 2026-08-23.
+
+## Composition over Inheritance, Shared state — seed4 (N=4 complete), 2026-08-26
+
+Last 2 of the 14 snippet-based principles brought to full N=4.
+
+### Composition Case A — baseline
+> "Inheritance from `DecimalFormat` is the core problem (composition over inheritance)... makes every public method of `DecimalFormat`... part of `ReportFormatter`'s public API." Proposes constructor-injected `DecimalFormat` field.
+
+Verdict: **HIT** — explicit, names the principle. Matches seed3's unusually clean baseline result.
+
+### Composition Case A — with-skill
+> "Composition over inheritance violation. `ReportFormatter extends DecimalFormat` is a textbook case of using inheritance for reuse rather than a genuine 'is-a' relationship."
+
+Verdict: **HIT** — explicit.
+
+### Composition Case B — baseline
+> Flags missing `serialVersionUID`, missing cause-chaining constructor, unstructured `reason` string. No mention of inheritance/composition either way.
+
+Verdict: **SILENT** — no affirming sentence this seed (seed3's baseline had a soft "acceptable as a minimal exception type" line; this one doesn't).
+
+### Composition Case B — with-skill
+> "Composition vs. Inheritance (checklist #17): not a violation. This is exactly the case the checklist carves out as acceptable — a custom exception extending the language's base exception is a genuine 'is-a' relationship... No change needed here."
+
+Verdict: **EXPLICIT, correct** — uses Composition's own reasoning directly, unlike seed3's with-skill response which passed via borrowed Specific Exceptions framing ("exactly what the 'specific exceptions' principle asks for"). Direct evidence the "borrows a neighboring principle" pattern from the 2026-08-23 investigation isn't universal — the same principle correctly reached for its own name on an independent rerun.
+
+### Shared state Case A — baseline
+> "`SimpleDateFormat` is not thread-safe — this is the critical bug... `DATE_FORMAT` is `static final`, so it's shared across every thread." Proposes `DateTimeFormatter` replacement.
+
+Verdict: **HIT** — explicit.
+
+### Shared state Case A — with-skill
+> "Bug: unsafe shared mutable state across concurrent calls (checklist #18)." Same `DateTimeFormatter` fix, cites the checklist number directly.
+
+Verdict: **HIT** — explicit.
+
+### Shared state Case B — baseline
+> Flags `double` for VAT rates (precision), missing private constructor, hardcoded rates vs. legislated values. No mention of the shared-state/immutability question either way.
+
+Verdict: **SILENT** — same as seed3.
+
+### Shared state Case B — with-skill
+> "Checklist item 18 (shared state across boundaries) — does not apply here. These fields are `static final` primitives, never reassigned... That's exactly the 'immutable / configuration valid the same way for everyone' exclusion the checklist calls out."
+
+Verdict: **EXPLICIT, correct** — a flip from seed3, where with-skill was SILENT on this same case (flagged `double` instead, same as baseline). Case B with-skill engagement now shown to vary seed to seed on 3 different principles this week (Strategy, Composition, Shared state), not just Case A.
+
+**Tally (seed4): Composition Case A 2/2, Case B 1 SILENT (baseline) + 1 EXPLICIT (with-skill, own framing this time). Shared state Case A 2/2, Case B 1 SILENT (baseline) + 1 EXPLICIT (with-skill, flipped from seed3's SILENT).**
+
+**All 14 snippet-based principles now have full N=4 data — this milestone completes the scale-up that started 2026-08-22.**
