@@ -208,10 +208,23 @@ Also on 2026-08-24: DDD tactical and Hexagonal brought to full N=4. Both
 principles' Case A baseline flipped from a seed3 miss/soft-miss to a
 clean seed4 hit — the second and third instance of real single-seed Case
 A variance this week (after Strategy's with-skill flip the other way).
-**12 of 14 snippet-based principles are now at full N=4** (DRY, CQS,
-Fail Fast, SOLID, Readability, Value Object, Tell Don't Ask, Law of
-Demeter, Strategy, Specific Exceptions, DDD tactical, Hexagonal), 2 at
-N=3 (Composition over Inheritance, Shared state). The 6 scenario-based
+On 2026-08-26, the last 2 principles — Composition over Inheritance and
+Shared state — reached full N=4 too. Composition over Inheritance's
+Case A stayed clean 4/4 across both seeds, including baseline; its
+with-skill Case B response used Composition's own "is-a" reasoning
+directly at seed4, unlike seed3's pass which borrowed Specific
+Exceptions' framing — direct evidence the "borrows a neighboring
+principle" pattern isn't universal. Shared state's Case A also stayed
+clean 4/4; its with-skill Case B flipped from SILENT (seed3) to clean
+EXPLICIT (seed4) — a third principle this week (after Strategy and
+Composition) where Case B with-skill engagement varied seed to seed on
+the same case file.
+
+**All 14 snippet-based principles are now at full N=4** (DRY, CQS, Fail
+Fast, SOLID, Readability, Value Object, Tell Don't Ask, Law of Demeter,
+Strategy, Specific Exceptions, DDD tactical, Hexagonal, Composition over
+Inheritance, Shared state) — the scale-up that started 2026-08-22 as
+"3 principles with the most N=2 signal" is complete. The 6 scenario-based
 principles remain untouched at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
