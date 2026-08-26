@@ -145,3 +145,45 @@ N=1 per case here — the same next step as every other single-run
 reverification this session: hold as "fixed, lightly verified" until a
 future N=3+ pass confirms it generalizes, not yet claimed as fully
 proven at scale.
+
+## N=3 reverification (2026-08-24): the fix is real but not fully closed
+
+The N=1 result above held for exactly one more principle (DDD tactical
+Case B, seed4: a second clean EXPLICIT pass, see
+[the raw transcripts](2026-08-22-n4-raw-transcripts.md)) — but 2
+additional dedicated reruns against the original Law of Demeter Case B
+snippet found a **new failure shape** the N=1 check couldn't have caught:
+
+> "Tell, Don't Ask — this is the real issue, and it's borderline in the
+> checklist's favor of *not* applying the principle, but I'd push back.
+> The exception carves out 'building a different consumer's
+> representation' as legitimate... But what's happening here... isn't
+> receipt-specific at all. It's the generic definition of 'how do you
+> print a Money value'... I'd move this onto `Money` itself."
+
+This response correctly recalls the new exception clause — the original
+bug (not knowing the exemption existed) is genuinely gone, 0/3 post-fix
+runs miss it. But it then argues the specific snippet doesn't qualify
+for the exception, drawing a "receipt-specific formatting" vs. "generic
+money-printing" distinction the case file never makes, and recommends
+extracting `Money.format()` — exactly the change the case's Expected
+reasoning calls unnecessary. A third rerun landed clean again, correctly
+declining that same extraction on YAGNI grounds ("one call site today").
+
+**Post-fix tally for Law of Demeter Case B with-skill, N=3: 2 clean, 1
+CONTRADICTED via the new route.** Read honestly, this is not the
+"fixed, first try, unqualified" story the N=1 check told on 2026-08-23 —
+that framing was accurate to what N=1 could show and is superseded here,
+not retracted as wrong. The corrected picture: the fix closed the
+original, coarse failure mode (missing the exemption) but left a subtler
+one open (litigating whether a given snippet is inside or outside the
+exemption's boundary once the model knows it exists). This is a
+different *kind* of gap than DRY's rule-of-three trap — it's not "the
+model never engages the right frame," it's "the model engages the right
+frame and then reasons past it" — and it means the cross-reference fix,
+while a real improvement (0/1 pre-fix vs. 2/3 post-fix on this exact
+case), should be described as **partially effective, not closed**.
+Not attempted further this session — a next step would be tightening the
+exception's own wording (e.g. explicitly stating that "generic" vs.
+"context-specific" formatting isn't the relevant distinction) and
+reverifying the same way, but that's future work, not done here.

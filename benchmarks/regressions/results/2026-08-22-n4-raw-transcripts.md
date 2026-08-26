@@ -749,3 +749,68 @@ Verdict: **SILENT** on the immutability/shared-state point.
 Verdict: **SILENT** on the immutability/shared-state point.
 
 **Tally: DDD tactical Case A 1/2 (baseline miss), Case B 1 SILENT + 1 CONTRADICTED (with-skill). Hexagonal Case A 1/2 (baseline soft-miss), Case B both soft/silent, real bug caught by both. Composition Case A 2/2 clean (unusually including baseline), Case B 2/2 soft-explicit. Shared state Case A 2/2 clean, Case B 2/2 silent.**
+
+## DDD tactical, Hexagonal — seed4 (N=4 complete), 2026-08-24
+
+Both principles' with-skill Case B response in this batch uses the fixed
+Tell Don't Ask clause (2026-08-23) — doubles as fix reverification.
+
+### DDD Tactical Case A — baseline
+> "Anemic domain model / broken encapsulation... Move the transition into the object itself (Tell, Don't Ask)." Proposes a `cancel(LocalDate today)` method replacing the external setter calls. Also flags raw-String status, NPE risk, silent failure, no null check, untestable `LocalDate.now()`.
+
+Verdict: **HIT** — explicit, names Tell Don't Ask directly. Reversal from seed3's baseline miss.
+
+### DDD Tactical Case A — with-skill
+> "Tell, Don't Ask violation (the textbook case)... pulling two fields out with getters and deciding externally what the object's own state means." Proposes `isActive()` + `cancel()` on the domain object, removing public setters.
+
+Verdict: **HIT** — explicit.
+
+### DDD Tactical Case B — baseline
+> "Anemic entity with bare setters. If there's business logic anywhere near this... prefer intention-revealing methods... Skip this if the class is genuinely just a persistence record and logic lives elsewhere — don't add it speculatively." Also flags `@GeneratedValue`, `equals`/`hashCode`, `@Version`, naming.
+
+Verdict: **hedged, not clean either way** — engages the anemic-entity question directly but conditions the answer on unknowable context ("if... skip this if...") rather than affirming or contradicting. Not SILENT (it names the actual question), not a clean EXPLICIT pass either.
+
+### DDD Tactical Case B — with-skill
+> "As a `@Entity` persistence class, staying anemic here is correct — it's the documented exception under DDD tactical (JPA needs mutable getters/setters to hydrate rows)." Redirects the real Tell Don't Ask question to "where does the business logic live" rather than the entity itself.
+
+Verdict: **EXPLICIT, correct** — clean pass, second post-fix confirmation in a row.
+
+### Hexagonal Case A — baseline
+> "Infrastructure hardwired into a domain class... Extract an interface (`PayslipUploader`) and inject it via constructor... This is the standard port/adapter split." Also flags untestability, hardcoded config, no per-item error handling.
+
+Verdict: **HIT** — full port/adapter fix proposed, even without naming "Hexagonal." Reversal from seed3's soft-miss.
+
+### Hexagonal Case A — with-skill
+> "Main issue — hexagonal architecture violation (checklist #12)... payroll distribution is real domain behavior... so isolating it behind a port is justified, not overkill."
+
+Verdict: **HIT** — explicit, names the principle and its own threshold reasoning (real behavior to isolate vs. simple CRUD).
+
+### Hexagonal Case B — baseline
+> "Missing line separators — likely produces invalid CSV (bug, not style)." Also flags escaping contract, no header row, class-shape (should be a static utility). No mention of ports/adapters either way.
+
+Verdict: **SILENT** — same missing-line-terminator bug baseline caught at seed3, same silence on the calibration point.
+
+### Hexagonal Case B — with-skill
+> "Hexagonal architecture — does not apply, and that's correct. Per the checklist's 'when NOT to apply' clause: this class has no domain logic to protect, it's pure mechanical I/O... Wrapping it in a `ReportExporter` port... would be pure ceremony — skip it."
+
+Verdict: **EXPLICIT, correct** — clean pass, matches the case's own reasoning almost verbatim. Doesn't touch Tell Don't Ask at all — an unaffected control point, confirms the fix didn't disturb this principle's own unrelated calibration.
+
+**Tally (seed4): DDD tactical Case A 2/2 (baseline flipped to hit), Case B 1 hedged + 1 EXPLICIT. Hexagonal Case A 2/2 (baseline flipped to hit), Case B 1 SILENT + 1 EXPLICIT.**
+
+## Law of Demeter Case B with-skill — 2 more post-fix reruns, 2026-08-24
+
+The original 2026-08-23 fix reverification was N=1 (one with-skill run,
+clean). These 2 more runs bring post-fix N to 3 total — and find the fix
+is not fully reliable.
+
+### Rerun #2 — with-skill (post-fix)
+> "Tell, Don't Ask — this is the real issue, and it's borderline in the checklist's favor of *not* applying the principle, but I'd push back. The exception carves out 'building a different consumer's representation (formatting, display, logging)' as legitimate... But what's happening here... isn't receipt-specific at all. It's the generic definition of 'how do you print a Money value'... I'd move this onto `Money` itself." Proposes a `Money.format()` method, exactly the extraction the case's Expected reasoning says is unnecessary.
+
+Verdict: **CONTRADICTED** — a new failure shape. Not "doesn't know the exception" (the original bug) but "knows the exception, argues this instance doesn't qualify for it" by drawing a receipt-specific-vs-generic line the case file doesn't draw.
+
+### Rerun #3 — with-skill (post-fix)
+> "Tell Don't Ask / Law of Demeter — not actually a violation here... matches the documented exception directly... Forcing this formatting into `Money` itself would be the overreach the checklist warns about — don't 'fix' this by blindly moving code into the VO just to eliminate the chain." Explicitly declines to extract `Money.format()`, citing YAGNI (one call site today).
+
+Verdict: **EXPLICIT, correct** — clean pass, correctly rejects the same extraction rerun #2 recommended.
+
+**Post-fix tally, Law of Demeter Case B with-skill, N=3: 2 clean EXPLICIT, 1 CONTRADICTED.** The original bug (not knowing the exception existed at all) is closed — none of the 3 post-fix runs miss the exception itself. But a second-order failure survives: a careful-enough response can accept the exception's premise and then argue the specific snippet is an exception *to* the exception. Read as **partially effective, not closed** — a real improvement (0/1 pre-fix vs. 2/3 post-fix on this exact case) but not the "fixed, unqualified" result a single clean run suggested on 2026-08-23.

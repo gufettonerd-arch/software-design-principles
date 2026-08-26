@@ -191,11 +191,28 @@ persistence-entity carve-out), not under Tell Don't Ask's. **Fixed the
 same day**: added both exemptions directly to Tell Don't Ask's own
 clause (plugin 1.2.4 → 1.2.5), reverified against exactly the two named
 case files — 1 with-skill run each, both clean EXPLICIT passes on the
-first attempt. See
+first attempt. **N=3 reverification on 2026-08-24 found the fix is real
+but not fully closed**: 2 more Law of Demeter Case B with-skill reruns
+found 1 CONTRADICTED via a new route — the response correctly recalls
+the exception exists, then argues this specific snippet's formatting is
+"generic money-printing, not receipt-specific" and therefore outside it,
+recommending the exact `Money.format()` extraction the case says is
+unnecessary. Post-fix tally on that case: 2 clean, 1 contradicted out of
+3. The original bug (not knowing the exemption existed) is closed; a
+subtler one (litigating the exemption's boundary once the model knows
+it) is not. See
 [the report](regressions/results/2026-08-23-contradiction-pattern-investigation.md)
-for the full reasoning and both transcripts; N=1 per case, not yet
-confirmed at scale. The 6 scenario-based principles remain untouched at
-N=2.
+for the full reasoning and all transcripts.
+
+Also on 2026-08-24: DDD tactical and Hexagonal brought to full N=4. Both
+principles' Case A baseline flipped from a seed3 miss/soft-miss to a
+clean seed4 hit — the second and third instance of real single-seed Case
+A variance this week (after Strategy's with-skill flip the other way).
+**12 of 14 snippet-based principles are now at full N=4** (DRY, CQS,
+Fail Fast, SOLID, Readability, Value Object, Tell Don't Ask, Law of
+Demeter, Strategy, Specific Exceptions, DDD tactical, Hexagonal), 2 at
+N=3 (Composition over Inheritance, Shared state). The 6 scenario-based
+principles remain untouched at N=2.
 
 **The 6 scenario-based principles** (structural/process decisions, not
 single-file smells — see `principles/scenario-cases/`): first run, 46/48
