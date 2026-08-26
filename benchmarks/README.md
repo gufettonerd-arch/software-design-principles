@@ -246,6 +246,26 @@ the exemption clause both times rather than pattern-matching the shape
 alone. Consistent with the hypothesis above, still just one principle —
 the other 5 remain at N=2.
 
+Extended the same day to the remaining 5 scenario principles (Package by
+feature, Anti-Corruption Layer, Strangler Fig, Modular Monolith,
+Characterization Test) — **all 6 scenario-based principles now have
+data beyond N=2.** Case A recall stayed perfect: 10/10 across all 5,
+both arms. Case B: with-skill 5/5 EXPLICIT correct; baseline split 3/5
+correct, 1 silent, and **1 CONTRADICTED** — Anti-Corruption Layer's
+baseline recommended adding a translation layer for a vendor API the
+case explicitly says is already aligned and needs no isolating,
+reasoning that schema-drift risk justified it despite today's alignment
+("the YAGNI instinct says skip it, but the boundary here is real, not
+speculative"). With-skill correctly declined via the checklist's own
+exemption on the identical scenario. This is a new shape for this
+benchmark: not with-skill over-flagging or baseline staying silent, but
+**baseline over-recommending** via generically sound defensive-
+engineering instinct that the calibration case specifically tests
+against — a small but genuine data point for the skill's precision value
+on a case type outside where it was previously demonstrated. See
+[the report](regressions/results/2026-08-22-n4-partial.md) for the full
+breakdown and all 20 transcripts.
+
 **Trigger accuracy** (does the skill actually fire on the right requests,
 unprompted): first test, 8/8 correct — 4 prompts designed to plausibly
 need it (god-class extraction, a pre-PR review, a generic-catch call, an
