@@ -356,3 +356,12 @@ got wrong. Both rounds' own verdicts recommend pinning task-sentence
 ambiguity tighter next time (round 1: how much code moves; round 2: how
 many callers get switched over) rather than treating either round as
 closing the question.
+
+**Round 3 is prepared, not yet run**: see
+[`ROUND-3-INSTRUCTIONS.md`](real-world-validation/ROUND-3-INSTRUCTIONS.md)
+— a self-contained runbook, written so a fresh Claude Code session (on
+any machine, no memory of this one) can pick a target, set up the three
+worktrees, run all three sessions, and write the report end to end from
+a single instruction. Pins round 2's caller-rewiring gap into the task
+sentence template and carries forward the `-a` grep gotcha round 2
+found.
