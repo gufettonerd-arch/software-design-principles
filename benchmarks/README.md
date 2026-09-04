@@ -392,3 +392,38 @@ is the original runbook this round started from, written for a
 hand-written-app shape like rounds 1–2 — worth keeping for that case,
 but note it doesn't anticipate the generated-code, name-based-calling
 architecture round 3 actually ran into.
+
+**Round 4 stayed on the same second codebase** (2026-09-04) but picked a
+bigger, more self-contained flow — see
+[the report](real-world-validation/2026-09-04-real-world-round4.md).
+Round 3's target was too small and too globally-coupled to show much
+variance; this round found a real, ~570-line date-arithmetic subsystem
+that (unusually for this codebase) reads and writes only its own narrow
+corner of the shared working-storage object, making a genuinely
+parameterized extraction possible for once. On the way to picking it,
+the round hit a second, subtler version of round 3's false-positive-caller
+trap: a literal, syntactically valid Java `import` statement that turned
+out to be dead code, shadowed in every one of its 9 apparent call sites
+by a locally-redeclared class of the same name — harder to catch than a
+bad grep, since an `import` looks like real evidence until you check
+whether anything actually resolves to it. On the task that did run, all
+three sessions (A/B/C) independently converged on the same real
+extraction shape — a small dependency-free class, no shared mutable
+state, an explicit typed result — which round 3's target structurally
+couldn't support. The orchestrating session didn't just take the three
+reports at face value: it independently re-read the original source for
+the error-handling behavior and independently re-compiled all three
+sessions' code against the real dependency classpath, catching two bugs
+in its own verification script along the way (a too-broad file glob, then
+a classpath-construction mistake) before confirming all three were
+genuinely clean — a reminder that a failed *reproduction* of a
+verification claim isn't the same as a *refuted* one. No correctness
+differences were found between the three on close inspection; the real
+differences were in thoroughness — one session flagged a genuine,
+unresolved technical question (a possible overflow/truncation risk)
+instead of guessing, another did a real behavior-preserving
+consolidation pass beyond a 1:1 port, a third had the most complete test
+coverage — matching this project's standing finding across all four
+real-world rounds now: the skill's most consistent effect is making
+already-good judgment legible and checkable, not correcting judgment a
+careful baseline gets wrong.
