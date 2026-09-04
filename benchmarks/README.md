@@ -2,12 +2,13 @@
 
 Two synthetic benchmarks, testing the two documents this skill ships
 (`references/god-class-extraction-playbook.md` and `references/principles.md`)
-on different axes, plus a third, non-synthetic one:
+on different axes, plus a non-synthetic one:
 [`real-world-validation/`](real-world-validation/) — a template for
 running baseline-vs-with-skill on one real flow in a real project, filled
 in as people actually run it (see `TEMPLATE.md`), not scored
-automatically like the two below. Two rounds filled in as of 2026-08-24
-— see the dedicated section near the bottom of this file. Everything here is real infrastructure
+automatically like the two below. Four rounds filled in as of 2026-09-04,
+on two different real codebases — see the dedicated section near the
+bottom of this file. Everything here is real infrastructure
 — fixtures that compile and run, scorers that were self-tested against
 synthetic pass/fail cases before being trusted on real agent output — not
 a plan.

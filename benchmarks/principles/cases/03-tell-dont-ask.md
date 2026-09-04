@@ -1,4 +1,4 @@
-# Principle 3 — Tell, Don't Ask
+# Principle 3 — Tell Don't Ask
 
 ## Case A — should flag
 
@@ -14,7 +14,7 @@ public class CheckoutController {
 }
 ```
 
-**Expected**: flag it. Principle: Tell, Don't Ask. Why: the controller
+**Expected**: flag it. Principle: Tell Don't Ask. Why: the controller
 pulls three raw fields out of `Order` with getters and makes a business
 decision ("is this order confirmable") outside the object — that
 condition belongs on `Order` itself as a named method, e.g.
