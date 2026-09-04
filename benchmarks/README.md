@@ -305,14 +305,14 @@ the fixture contamination above describes, at a more direct level
 
 ## `real-world-validation/` — two rounds on a real legacy codebase, 2026-08-24
 
-First real (non-synthetic) runs, on the target codebase — a real Java 7/8 Struts 1.x
-legacy travel-document app, not a fixture. Each round is baseline (A) vs
-with-skill (B) vs a trigger check (C, told nothing about skills either
-way) extracting one real flow out of a god class, in isolated git
-worktrees. See
+First real (non-synthetic) runs, on the target codebase — a real Java 7/8
+Struts 1.x legacy travel-document app, not a fixture. Each round is
+baseline (A) vs with-skill (B) vs a trigger check (C, told nothing about
+skills either way) extracting one real flow out of a god class, in
+isolated git worktrees. See
 [round 1](real-world-validation/2026-08-24-real-world-round1.md) and
-[round 2](real-world-validation/2026-08-24-real-world-round2.md) for the full
-write-ups.
+[round 2](real-world-validation/2026-08-24-real-world-round2.md) for the
+full write-ups.
 
 **Round 1** (`GiftFlowProcessor`, 2413 lines, a ticket-picked mid-size
 class): A and B converged almost exactly — same service shape, same
