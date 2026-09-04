@@ -357,11 +357,38 @@ ambiguity tighter next time (round 1: how much code moves; round 2: how
 many callers get switched over) rather than treating either round as
 closing the question.
 
-**Round 3 is prepared, not yet run**: see
+**Round 3 ran on a second, unrelated real codebase** (2026-09-04) — see
+[the report](real-world-validation/2026-09-04-real-world-round3.md).
+Not the same system as rounds 1–2: a legacy booking system whose Java was
+auto-generated from COBOL years ago, COBOL source now gone, one giant
+class (~43,700 lines) where every method shares one mutable
+working-storage object instead of using parameters, and cross-program
+calls happen by name string (CICS-style) rather than Java method calls.
+That last point broke the round's planned test — round 2's "how many
+real callers get rewired" axis doesn't exist on this codebase, since
+there's no such thing as a Java-level external caller to rewire. The
+round adapted on the fly: same duplication-removal shape (two paragraph
+methods sharing a byte-for-byte-identical 30-line block), but the
+question became whether the playbook's Service/Repository extraction
+pattern survives contact with globally-coupled generated code, not
+hand-written OO code. All three sessions (A/B/C) converged on the same
+answer independently — a plain, unregistered private helper method, no
+new class, no Service/Repository split — which on this data point reads
+as "a careful baseline and a skill-guided session agree once the code
+itself makes the over-engineered option obviously wrong," rather than
+evidence the skill doesn't matter. The real differences were smaller:
+2 of 3 sessions added an explanatory comment unprompted (one with the
+skill, one without), and only one session (C, the trigger-check, skill
+not invoked) went and found a real dependency-complete compile path
+instead of settling for a syntax-only check — confirmed after the fact
+by re-running that same compile against all three sessions' code: all
+three compiled clean, so the gap was about verification thoroughness,
+not code correctness. Full writeup, including why the intended axis
+didn't transfer and what a future round on this kind of codebase should
+test instead, is in the report.
+
 [`ROUND-3-INSTRUCTIONS.md`](real-world-validation/ROUND-3-INSTRUCTIONS.md)
-— a self-contained runbook, written so a fresh Claude Code session (on
-any machine, no memory of this one) can pick a target, set up the three
-worktrees, run all three sessions, and write the report end to end from
-a single instruction. Pins round 2's caller-rewiring gap into the task
-sentence template and carries forward the `-a` grep gotcha round 2
-found.
+is the original runbook this round started from, written for a
+hand-written-app shape like rounds 1–2 — worth keeping for that case,
+but note it doesn't anticipate the generated-code, name-based-calling
+architecture round 3 actually ran into.
