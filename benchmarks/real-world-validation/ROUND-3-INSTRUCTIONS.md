@@ -1,7 +1,7 @@
 # Real-world validation, round 3 — ready-to-run instructions
 
-Self-contained runbook. To execute: open Claude Code in the the target codebase
-repo (or whichever real project you're validating against — see "Not on
+Self-contained runbook. To execute: open Claude Code in the target
+codebase's repo (or whichever real project you're validating against — see "Not on
 the target codebase?" below) and say something like:
 
 > Follow `benchmarks/real-world-validation/ROUND-3-INSTRUCTIONS.md`
@@ -14,10 +14,10 @@ of this conversation required.
 
 ## Why round 3, and what it must fix
 
-Two rounds already done on the target codebase (`2026-08-24-real-world-round1.md`,
-`2026-08-24-real-world-round2.md`). Read both before starting — they're short —
-because round 3 exists specifically to close a gap round 2 found and
-flagged in its own Verdict:
+Two rounds already done on the target codebase
+(`2026-08-24-real-world-round1.md`, `2026-08-24-real-world-round2.md`).
+Read both before starting — they're short — because round 3 exists
+specifically to close a gap round 2 found and flagged in its own Verdict:
 
 - **Round 1** found the task sentence was ambiguous about *how much
   code* should move. Round 2 fixed that by pinning an exact method list
@@ -36,10 +36,10 @@ baked in as a fill-in-the-blank, so this isn't something to remember to
 do by hand.
 
 One more thing to carry forward: round 2 found that a plain `grep`
-silently misreads the target codebase's ISO-8859-1 source files as binary and produces
-false negatives on caller searches — always use `grep -a` (or your
-platform's equivalent for forcing text-mode search) when hunting for
-real callers in this codebase, and say so explicitly in the task
+silently misreads the target codebase's ISO-8859-1 source files as binary
+and produces false negatives on caller searches — always use `grep -a`
+(or your platform's equivalent for forcing text-mode search) when hunting
+for real callers in this codebase, and say so explicitly in the task
 sentence like round 2 did, so a session that would otherwise hit the
 same trap gets warned up front instead of rediscovering it mid-round.
 
@@ -135,10 +135,11 @@ and — for B — whether it followed the playbook's actual numbered steps
 ## Step 5 — Write the report
 
 Copy `benchmarks/real-world-validation/TEMPLATE.md` to
-`benchmarks/real-world-validation/YYYY-MM-DD-real-world-round3.md` (today's date)
-and fill it in with what Step 4 produced. Structure to match rounds 1–2
-(session-by-session findings, then a "Comparison" section, then
-"Verdict"). Specifically address in the Comparison section:
+`benchmarks/real-world-validation/YYYY-MM-DD-real-world-round3.md`
+(today's date) and fill it in with what Step 4 produced. Structure to
+match rounds 1–2 (session-by-session findings, then a "Comparison"
+section, then "Verdict"). Specifically address in the Comparison
+section:
 
 - Did pinning the caller-rewiring clause actually produce consistent
   behavior this time, the way pinning scope did in round 2? Or is there
@@ -157,9 +158,10 @@ and fill it in with what Step 4 produced. Structure to match rounds 1–2
    matching the style already there, not a rewrite of the existing text.
 2. Commit the new report file and the README update **from the main
    repo clone**, not from inside any of the three worktrees.
-3. Push. **Nothing from worktrees A/B/C gets merged to the target codebase's own
-   `main`** — those stay as local branches for reference; only the
-   report and README update go to the software-design-principles repo.
+3. Push. **Nothing from worktrees A/B/C gets merged to the target
+   codebase's own `main`** — those stay as local branches for reference;
+   only the report and README update go to the software-design-principles
+   repo.
 4. Clean up the three worktrees once the report is written
    (`git worktree remove` ×3) unless you want to keep poking at the
    diffs.
@@ -168,8 +170,8 @@ and fill it in with what Step 4 produced. Structure to match rounds 1–2
 
 If tomorrow's real work happens to be on a different project entirely,
 this runbook still applies — just substitute that project's repo for
-every mention of the target codebase above, note its stack in Step 1, and name the
-report file after it instead (`YYYY-MM-DD-<project-slug>.md`). The
-caller-rewiring fix from round 2 is a property of the *methodology*, not
-of the target codebase specifically, so it's worth carrying into a fresh project too,
-not just a third the target codebase round.
+every mention of the target codebase above, note its stack in Step 1,
+and name the report file after it instead (`YYYY-MM-DD-<project-slug>.md`).
+The caller-rewiring fix from round 2 is a property of the *methodology*,
+not of any specific project, so it's worth carrying into a fresh project
+too, not just a third round on the same one.

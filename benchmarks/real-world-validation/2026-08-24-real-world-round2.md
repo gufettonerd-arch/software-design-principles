@@ -1,4 +1,4 @@
-# Real-world validation — the target codebase (round 2: biggest class), 2026-08-24
+# Real-world validation — round 2 (biggest class), 2026-08-24
 
 ## Before starting
 
@@ -11,14 +11,14 @@
 **Stack**: Java 7/8, Apache Struts 1.x, IBM WebSphere 8.5, Ant build, ISO-8859-1 source encoding, JUnit 4
 
 This is a second, independent round on the same project (see
-`2026-08-24-real-world-round1.md` for round 1). Round 1 picked a mid-size class from a
-real ticket; this round targets the single biggest class in the repo instead
+`2026-08-24-real-world-round1.md` for round 1). Round 1 picked a mid-size
+class from a real ticket; this round targets the single biggest class in the repo instead
 — `legacy.app.common.CommonUtils`, **14719 lines**, confirmed via
 `find . -name "*.java" | xargs wc -l | sort -rn`. Round 1's Verdict flagged
 scope ambiguity as the biggest source of divergence between sessions, so
 this round's task sentence pins the exact method list up front.
 
-**Branch/worktree**: three isolated git worktrees off `master` (<base-commit>), one per session:
+**Branch/worktree**: three isolated git worktrees off `master`, one per session:
 - A (baseline): `worktree-a`
 - B (with-skill): `worktree-b`
 - C (trigger check): `worktree-c`
@@ -29,9 +29,8 @@ resolution, marketing-cloud routing, a DB-backed param lookup). Real external
 callers (confirmed by repo-wide `grep -a`, required since a plain `grep`
 silently misreads these ISO-8859-1 files as binary and produces false
 negatives — a gotcha discovered mid-round and folded into this round's own
-task prompt): `PreviewActionA.java:180`, `DocumentPreviewAction.java:1019`
-call `sendNotificationEmail`; `ConsentAction.java:108` calls the sibling
-`sendNotificationEmailNoMktCloud`.
+task prompt): two preview-action classes call `sendNotificationEmail`; a
+consent-action class calls the sibling `sendNotificationEmailNoMktCloud`.
 
 ## The task
 
@@ -64,10 +63,9 @@ in place byte-for-byte — after an earlier pass had incorrectly deleted
 `sendNotificationEmailNoMktCloud` believing it dead (a stale, `-a`-less grep
 had missed its one real caller), A caught its own mistake on a second,
 corrected grep pass, reverted `CommonUtils.java` to `HEAD`, and redid the
-edit as comment-only. Rewired **one** of the flow's real callers
-(`DocumentPreviewAction.java`) to the new service; left `PreviewActionA.java`
-and `ConsentAction.java` still calling the (unchanged, still-working)
-`CommonUtils` methods directly.
+edit as comment-only. Rewired **one** of the flow's real callers to the new
+service; left the other two callers still calling the (unchanged,
+still-working) `CommonUtils` methods directly.
 
 **Anything notable**: The self-caught grep mistake is the most interesting
 thing A did — it's a direct instance of the exact pitfall this round's task
@@ -85,9 +83,8 @@ god-class-extraction playbook.
 methods) + `service/MktCloudParamRepository.java`. `CommonUtils.java`: purely
 additive — a `REFACTOR NOTE` above each of the 10 moved methods, `git diff
 --stat` confirms 30 insertions / 0 deletions, nothing removed. **Rewired
-zero callers** — `PreviewActionA`, `DocumentPreviewAction`, and
-`ConsentAction` all still call `CommonUtils` directly; the new service
-exists but nothing in the codebase uses it yet.
+zero callers** — all three real callers still call `CommonUtils` directly;
+the new service exists but nothing in the codebase uses it yet.
 
 **Anything notable**: Found and correctly handled a real shared-code case A
 and C didn't flag as explicitly: `setAttachmentFileName` is also called from
@@ -95,7 +92,7 @@ and C didn't flag as explicitly: `setAttachmentFileName` is also called from
 its own `REFACTOR NOTE` naming the remaining caller (playbook Step 5), rather
 than silently taking it or leaving a dangling shared dependency. Also
 independently found and preserved three mutable shared static fields
-(`attachmentNameAgency`/`Cliente`/`Preventivo`) that are runtime-reloaded
+(attachment-name fields for agency/client/quote) that are runtime-reloaded
 from DB elsewhere in `CommonUtils` — read them via `CommonUtils.fieldName`
 at call sites instead of duplicating, specifically to avoid a silent-breakage
 bug where a duplicated copy would never receive the reload. Dropped dead
@@ -113,7 +110,7 @@ parameter instead of string-concatenated SQL, try-with-resources replacing
 a leaked `PreparedStatement`/`ResultSet`); Step 13 (fresh-eyes re-review,
 explicitly reported). Steps 3/11 (dedicated tests) explicitly skipped and
 called out as a known gap rather than silently omitted — no existing
-JavaMail/JNDI mocking infrastructure in this repo, out of the stated time
+mail/JNDI mocking infrastructure in this repo, out of the stated time
 budget.
 
 ## Session C — trigger check
@@ -129,32 +126,31 @@ verified passing in isolated-JVM-per-test mode (matching Ant's actual
 `forkmode="perTest"`, not just a bulk run). `CommonUtils.java`: REFACTOR NOTE
 above `sendNotificationEmailNoMktCloud` only (not all 10 methods — narrower
 documentation than B, though the same "leave originals in place" choice).
-**Rewired all three real external callers** (`PreviewActionA`,
-`DocumentPreviewAction`, `ConsentAction`) to the new service — the only one
-of the three sessions to fully cut the codebase over.
+**Rewired all three real external callers** to the new service — the only
+one of the three sessions to fully cut the codebase over.
 
 **Anything notable**: Caught a false-positive lead the task's own grep
-instructions could have walked straight into — `MktCloudClient.java`
-has its own **unrelated** private methods with the identical names
-(`setAttachmentFileName`, `isMktCloudCallCenter`), confirmed via read that they
-don't call `CommonUtils`'s versions and are a coincidental naming collision,
-not a real shared caller. Same hardening instincts as B (try-with-resources,
-narrowed catch list including `NullPointerException` for the same
-`.trim()`-on-null risk, dead `Properties` object dropped) — arrived at
-independently, without the skill. Explicitly left two string-concatenated
-SQL clauses as-is, reasoning that `key` is always a hardcoded literal from
-the caller (never user input), so "fixing" it would be a scope-expanding
-security change rather than a same-behavior extraction — same judgment B
-made, same conclusion, different route.
+instructions could have walked straight into — the marketing-cloud client
+class has its own **unrelated** private methods with the identical names
+(`setAttachmentFileName`, `isMktCloudCallCenter`), confirmed via read that
+they don't call `CommonUtils`'s versions and are a coincidental naming
+collision, not a real shared caller. Same hardening instincts as B
+(try-with-resources, narrowed catch list including `NullPointerException`
+for the same `.trim()`-on-null risk, dead `Properties` object dropped) —
+arrived at independently, without the skill. Explicitly left two
+string-concatenated SQL clauses as-is, reasoning that `key` is always a
+hardcoded literal from the caller (never user input), so "fixing" it would
+be a scope-expanding security change rather than a same-behavior
+extraction — same judgment B made, same conclusion, different route.
 
 **Skill usage**: Did **not** self-invoke `software-design-principles`. Its
-own stated reasoning: the project's own memory file
-(`feedback_extraction_flow_convention.md`) already gave the exact
-extraction convention, and it cross-checked that convention directly against
-real precedent code already in the worktree (`VoucherService`/
-`Repository`, `DbConnectionProvider`) instead of loading the skill. This is
-the opposite trigger-check result from round 1, where Session C *did*
-self-invoke the skill on the same kind of task.
+own stated reasoning: the project's own memory file (a feedback-convention
+memory file) already gave the exact extraction convention, and it
+cross-checked that convention directly against real precedent code already
+in the worktree (an existing Service/Repository pair, plus
+`DbConnectionProvider`) instead of loading the skill. This is the opposite
+trigger-check result from round 1, where Session C *did* self-invoke the
+skill on the same kind of task.
 
 ## Comparison
 
@@ -178,8 +174,8 @@ self-invoke the skill on the same kind of task.
   both narrowed exceptions, both used try-with-resources, both preserved the
   same kind of latent bugs. B's one clear edge: it found and correctly
   handled a second real shared caller (`sendSimpleEmail()` also using
-  `setAttachmentFileName`) that neither A nor C's reports mention checking for —
-  though since both A and C also left the original `CommonUtils` methods
+  `setAttachmentFileName`) that neither A nor C's reports mention checking for
+  — though since both A and C also left the original `CommonUtils` methods
   physically in place, that caller keeps working regardless; B's REFACTOR
   NOTE just documents the dependency explicitly where A/C's don't. A's most
   interesting move (self-correcting a grep mistake mid-task) is a data point
