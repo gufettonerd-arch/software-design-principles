@@ -20,7 +20,7 @@ For each principle you'll find: **what it is**, **the problem it solves** (the c
 **Part 1 — Writing code**
 1. SOLID
 2. Value Object & Immutability
-3. Tell, Don't Ask
+3. Tell Don't Ask
 4. Law of Demeter
 5. DRY / KISS / YAGNI
 6. Named design patterns (Strategy, Factory, Builder, Specification)
@@ -86,7 +86,7 @@ For each principle you'll find: **what it is**, **the problem it solves** (the c
 
 ---
 
-## 3. Tell, Don't Ask
+## 3. Tell Don't Ask
 
 **What it is**: give behavior to objects instead of pulling their data out with getters and deciding outside.
 
@@ -147,7 +147,7 @@ For each principle you'll find: **what it is**, **the problem it solves** (the c
 
 ## 7. Command-Query Separation
 
-**What it is**: a method should *either* answer a question (query: returns a value, no side effects) *or* do something (command: produces an effect — writes, logs, mutates state), never both. It's a companion principle to Tell, Don't Ask: that one says "give behavior to objects", this one adds "but don't let method names lie about what that behavior involves".
+**What it is**: a method should *either* answer a question (query: returns a value, no side effects) *or* do something (command: produces an effect — writes, logs, mutates state), never both. It's a companion principle to Tell Don't Ask: that one says "give behavior to objects", this one adds "but don't let method names lie about what that behavior involves".
 
 **Problem it solves**: methods with a name that promises only an answer (typically `is*`/`has*`/`get*`) but that hide a side effect — whoever calls them to "just check a fact" ends up with unrequested consequences (a log written, state mutated), often without noticing, and calling them repeatedly or in a test becomes risky.
 
