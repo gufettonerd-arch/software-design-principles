@@ -19,6 +19,24 @@ shows up here regardless of which machine ran it.
       README's "Known limitations" already flags this skill as validated
       on exactly one stack (Spring Boot + Angular); every different stack
       this runs on is useful data.
+- [ ] Run `benchmarks/check-plugin-sync.sh` — if the installed plugin is
+      stale, a with-skill run silently reads an old version and the
+      whole round measures the wrong thing. (Added 2026-09-08, after
+      round 5 found this happening to the very session writing that
+      round's own report.)
+- [ ] If using worktrees, verify each one's actual base commit matches
+      the target branch's current tip — `git merge-base <default-branch>
+      <worktree-branch>` should equal the tip's sha. Round 5 found all
+      three worktrees silently branched from a stale base (missing
+      recent history the task sentence assumed was there), undetected
+      until after the round.
+- [ ] Any claim that something is unreachable/absent/unverifiable — in
+      the task sentence you're about to write, or in a session's own
+      scope reasoning once it starts — gets verified directly (try the
+      call, grep for the file, check the cache) before it's trusted.
+      Round 5 found all three sessions, skill-guided or not, build a
+      stub around a false version of exactly this claim; only checking
+      it from outside caught it.
 
 **Project**: _______
 **Stack**: _______
