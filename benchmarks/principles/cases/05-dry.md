@@ -76,9 +76,28 @@ means the same thing as the first two — a real, measured failure mode
 (see
 [2026-08-22-n4-partial.md](../../regressions/results/2026-08-22-n4-partial.md)'s
 "rule-of-three trap" section: with-skill hard-flagged or soft-deferred
-this exact snippet at roughly a 50% rate across three different attempts
-to fix the guidance in `principles.md`, none of which moved the number).
-If a response reasons "not yet, wait for a fourth" instead of "these are
-still unrelated regardless of count," that's the same miss as flagging it
-outright — the instance-count framing is the failure being tested here,
-not just the yes/no verdict.
+this exact snippet at roughly a 50% rate across two different attempts
+to fix the guidance in `principles.md` — restructuring the section, and
+adding a worked counter-example in a different domain (a numeric
+threshold) — neither of which moved the number). If a response reasons
+"not yet, wait for a fourth" instead of "these are still unrelated
+regardless of count," that's the same miss as flagging it outright — the
+instance-count framing is the failure being tested here, not just the
+yes/no verdict.
+
+**Update, 2026-09-08**: a third fix attempt targeted the actual gap the
+first two didn't control for — the existing worked counter-example used a
+numeric threshold (`o.getTotal() >= threshold`), a shape this snippet
+doesn't share at all (no numbers, just string concatenation). Added a new
+worked example in `principles.md` matching this snippet's *exact* surface
+shape (three one-line string-builders, same signature, no threshold to
+point at as "obviously different data"). Tested blind, N=4, fresh
+sessions given only the candidate guidance and this snippet (no answer
+key): **4/4 explicit, correct non-flags** — every response reasoned
+through the knowledge question by name and explicitly rejected the "no
+numbers = generic" framing, rather than falling back to instance
+counting. A real result, and a first for this case after two prior clean
+failures — but still one seed, not yet reverified against a second one
+the way every other N=4 finding in this project is before being called
+settled (see `principles/README.md`'s own standard for this). Treat as
+"a real result, not yet confirmed twice," not as closed.

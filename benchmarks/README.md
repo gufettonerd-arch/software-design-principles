@@ -101,34 +101,33 @@ simply wrong — 2 independent with-skill responses correctly noticed.
 Fixed the case file same day, **reverified with 4 fresh with-skill runs:
 4/4 clean**. First real evidence this project's own same-session grading
 has a blind spot, exactly the kind `grade-principles.md` warned about —
-and, unlike DRY's three failed attempts below, proof that when the
-underlying issue really is a wording/factual defect (not a judgment call
-the model keeps landing on differently), one fix genuinely closes it. See
-the blind-grading report for the full story. Also investigates
-a CQS Case A baseline recall wobble that looked repeatable at 2 seeds but
-turned out to be ~50% variance across 6 (3/6 baseline vs. 4/4 with-skill)
-— read as a real, not-yet-proven hypothesis about semantic vs. syntactic
-smells, not a settled finding (see the report). Also finds and fixes the
-same case-file confound in CQS Case B that Fail Fast had, verified with
-one run per arm. One more finding, different in kind, investigated three
-times over: the DRY Case B with-skill hit/miss tally (4/6, then 6/6 after
-a same-day wording fix) turned out to be measuring the wrong thing —
-nearly every run reasons via rule-of-three timing, not recognizing
-coincidental similarity, which happens to give the right surface answer
-only because the snippet shows exactly 2 instances. Confirmed with a
-4-run check adding a third, still-unrelated variant (4/4 reasoned about
-instance count, none about meaning), then tried two different fixes in
-`principles.md` and reverified both against that same 3-instance scene:
-restructuring the section (0/4 improved) and adding a concrete worked
-counter-example in a different domain (2/4, no better than the unedited
-baseline). **Three distinct fix approaches, three clean failures** —
-read as a pattern-match instinct that resists in-context correction, not
-a wording gap. All three edits stay (each correct on its own merits) but
-none is shown to work — documented as a genuinely open limitation, not a
-false "fixed." See the report for the full, three-times-reversed chase.
-A worthwhile checklist audit came out of this too — reread the other 17
-case files for the same confound shape Fail Fast/CQS had; found none
-serious enough to fix at the time.
+and, unlike DRY's fix attempts below, proof that when the underlying
+issue really is a wording/factual defect (not a judgment call the model
+keeps landing on differently), one fix genuinely closes it. See the
+blind-grading report for the full story. Also investigates a CQS Case A
+baseline recall wobble that looked repeatable at 2 seeds but turned out
+to be ~50% variance across 6 (3/6 baseline vs. 4/4 with-skill) — read as
+a real, not-yet-proven hypothesis about semantic vs. syntactic smells,
+not a settled finding (see the report). Also finds and fixes the same
+case-file confound in CQS Case B that Fail Fast had, verified with one
+run per arm. One more finding, different in kind, investigated three
+times over that day: the DRY Case B with-skill hit/miss tally (4/6, then
+6/6 after a same-day wording fix) turned out to be measuring the wrong
+thing — nearly every run reasons via rule-of-three timing, not
+recognizing coincidental similarity, which happens to give the right
+surface answer only because the snippet shows exactly 2 instances.
+Confirmed with a 4-run check adding a third, still-unrelated variant
+(4/4 reasoned about instance count, none about meaning), then tried two
+different fixes in `principles.md` and reverified both against that same
+3-instance scene: restructuring the section (0/4 improved) and adding a
+concrete worked counter-example — a numeric threshold, in a different
+domain (2/4, no better than the unedited baseline). **Two distinct fix
+approaches, two clean failures**, read at the time as a pattern-match
+instinct that resists in-context correction, not a wording gap — see
+[**2026-09-08 update**](#) below, which found a third approach that
+broke the streak. A worthwhile checklist audit came out of the original
+session too — reread the other 17 case files for the same confound shape
+Fail Fast/CQS had; found none serious enough to fix at the time.
 
 Extended same day to 2 more principles, SOLID and Readability, picked in
 order rather than for cause. SOLID came back clean (7/8). Readability
@@ -301,6 +300,27 @@ interface-or-not question) all triggered it with substantively correct
 content; 4 designed not to (JS syntax, a bash one-liner, timezone trivia,
 a CSS fix) all correctly didn't. Small, clear-cut sample — see the
 2026-08-19 report for the caveat about boundary cases not yet tested.
+
+**DRY Case C, revisited (2026-09-08)**: the "three clean failures" above
+weren't the end of the story. A third fix attempt targeted the actual gap
+the first two shared without either of them naming it — both prior
+attempts (the restructure, and the worked counter-example) reasoned about
+a *numeric threshold* shape; Case C's snippet has no numbers in it at all
+(three one-line string-concatenation methods). Added a new worked example
+to `principles.md`'s DRY section matching Case C's exact surface shape —
+same signature, string-building, nothing to point at as "obviously
+different data." Tested blind, N=4, fresh sessions given only the
+candidate guidance text and the bare snippet (no answer key, no skill
+invocation — just the excerpt pasted in): **4/4 explicit correct
+non-flags**, every response naming the knowledge question and explicitly
+rejecting "no numbers = generic" reasoning rather than falling back to
+instance counting. First clean result on this case after two prior clean
+failures — see `principles/cases/05-dry.md`'s own "Update, 2026-09-08"
+note for the exact wording and test setup. Held to the same bar as every
+other N=4 result here: real, not yet reverified against a second seed —
+a second seed clean would move this from "a real result" to "closed,"
+the same way other findings in this project have needed two seeds before
+being called settled.
 
 **Before running it again**: the case files under `principles/cases/`
 contain the snippet *and* the answer key ("Expected: ...") in the same
