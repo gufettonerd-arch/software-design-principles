@@ -25,6 +25,7 @@ You don't need to read both reference files in full every time. Typical flow:
 - Am I about to couple the domain directly to a technical detail (DB, HTTP, file), or does it already go through an interface? (Dependency Inversion / Ports & Adapters)
 - Does the task touch both modern and legacy code? Does it need an explicit translation boundary? (Anti-Corruption Layer)
 - Is the code to touch legacy and untested? The first test captures the *current* behavior (bugs included), not the "correct" one (Characterization Test).
+- Am I about to build around a claim that something is missing, unreachable, or unverifiable (a file, a dependency, an endpoint, an environment)? Verify it directly — grep for the file, try the call, check the cache — before accepting it as a starting fact. An unverified "this doesn't exist" is itself a premise to test, not something to design around. (Verify before you build around it)
 
 **While developing**
 - An `if/else`/`switch` that's likely to grow → consider Strategy.
