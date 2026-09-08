@@ -6,8 +6,8 @@ on different axes, plus a non-synthetic one:
 [`real-world-validation/`](real-world-validation/) — a template for
 running baseline-vs-with-skill on one real flow in a real project, filled
 in as people actually run it (see `TEMPLATE.md`), not scored
-automatically like the two below. Four rounds filled in as of 2026-09-04,
-on two different real codebases — see the dedicated section near the
+automatically like the two below. Five rounds filled in as of 2026-09-08,
+on three different real codebases — see the dedicated section near the
 bottom of this file. Everything here is real infrastructure
 — fixtures that compile and run, scorers that were self-tested against
 synthetic pass/fail cases before being trusted on real agent output — not
@@ -304,9 +304,9 @@ file as a whole. Getting this backwards would repeat the exact mistake
 the fixture contamination above describes, at a more direct level
 (handing over the answer, not just a structural hint toward it).
 
-## `real-world-validation/` — two rounds on a real legacy codebase, 2026-08-24
+## `real-world-validation/` — real legacy codebases, starting 2026-08-24
 
-First real (non-synthetic) runs, on the target codebase — a real Java 7/8
+First real (non-synthetic) runs, on a real codebase — a real Java 7/8
 Struts 1.x legacy travel-document app, not a fixture. Each round is
 baseline (A) vs with-skill (B) vs a trigger check (C, told nothing about
 skills either way) extracting one real flow out of a god class, in
@@ -315,27 +315,26 @@ isolated git worktrees. See
 [round 2](real-world-validation/2026-08-24-real-world-round2.md) for the
 full write-ups.
 
-**Round 1** (`GiftFlowProcessor`, 2413 lines, a ticket-picked mid-size
-class): A and B converged almost exactly — same service shape, same
+**Round 1** (a ticket-picked mid-size class, ~2400 lines): A and B converged almost exactly — same service shape, same
 duplicated-with-note handling of shared code, same two real pre-existing
 bugs found and preserved by both independently. B's one visible edge was
 a separate, playbook-step-7 readability pass (a `notFound()` helper, a
 named constant) done and reverified *after* the faithful copy was
 confirmed green. The bigger finding was C, not B: C self-invoked the
-skill but read "everything reachable from the PROV branch" far more
+skill but read "everything reachable from the branch" far more
 aggressively than A/B did (1400+ lines moved vs. 36), a scope reading
 neither wrong — the divergence between two skill-using sessions (B vs C)
 was bigger than the divergence between skill-on and skill-off (A vs B).
 
-**Round 2** (`CommonUtils.sendNotificationEmail`, the single biggest class in
-the repo, 14719 lines) deliberately pinned the exact method list up front
+**Round 2** (the single biggest class in
+the repo, ~14700 lines) deliberately pinned the exact method list up front
 to close round 1's scope ambiguity — it worked, all three sessions agreed
 on scope. A **new** ambiguity took its place instead: how many of the
 flow's real external callers actually get rewired to the extraction. C
 rewired all 3, A rewired 1 of 2, B rewired 0 — despite identical scope
 and all three satisfying "preserve exact behavior" (nothing broke,
 because the old methods were also left in place). B's one clear edge:
-catching a second real shared caller (`sendSimpleEmail()`) that A/C's
+catching a second real shared caller that A/C's
 reports don't mention checking for. The headline finding is C: this
 round it did **not** self-invoke the skill (opposite of round 1's C on a
 similar task) — read the project's own memory/precedent files instead —
@@ -428,3 +427,28 @@ coverage — matching this project's standing finding across all four
 real-world rounds now: the skill's most consistent effect is making
 already-good judgment legible and checkable, not correcting judgment a
 careful baseline gets wrong.
+
+**Round 5 shifted to a third, unrelated real codebase and a different
+task shape entirely** (2026-09-08) — see
+[the report](real-world-validation/2026-09-08-real-world-round5.md). Not
+an extraction: a real implementation/migration request (port a legacy
+flow into a modern sibling project, matching an already-migrated
+neighboring flow's async/parallel architecture). The headline finding
+isn't about the skill at all: all three sessions, in an initial pass,
+independently accepted the same false premise — that a deep integration
+step was unreachable/unverifiable in this environment — and none of
+them, skill-guided or not, challenged it before building a stub around
+it. The correction came only from the orchestrating session directly
+verifying that claim instead of trusting it, not from any of A/B/C. Fed
+the same correction, all three then replaced the stub with a real,
+working implementation and verified it against a live endpoint — two of
+the three independently hit and fixed the identical underlying technical
+bug with zero visibility into each other's work, a strong repeated
+signal that the bug is a property of the real legacy code, not one
+session's approach. The skill's measured effect, once again, was
+legibility (naming the pattern, citing steps) rather than catching the
+wrong premise itself — extending, not complicating, the standing finding
+above. Also reconfirms an open methodology gap from this round's own
+first pass (stale worktree base commits, not yet fixed) and the
+trigger-check session's skill self-invocation rate, still 1-for-3 across
+rounds.
