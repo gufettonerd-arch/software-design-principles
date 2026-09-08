@@ -124,7 +124,7 @@ concrete worked counter-example — a numeric threshold, in a different
 domain (2/4, no better than the unedited baseline). **Two distinct fix
 approaches, two clean failures**, read at the time as a pattern-match
 instinct that resists in-context correction, not a wording gap — see
-[**2026-09-08 update**](#) below, which found a third approach that
+**2026-09-08 update** below, which found a third approach that
 broke the streak. A worthwhile checklist audit came out of the original
 session too — reread the other 17 case files for the same confound shape
 Fail Fast/CQS had; found none serious enough to fix at the time.
