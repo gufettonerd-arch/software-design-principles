@@ -21,12 +21,17 @@ has run once across all 56 cases (14 principles × 2 cases × 2 arms). See
 for both — it's the current source of truth; the three 2026-08-17 reports
 are kept for history but each now links forward to the clean rerun.
 
-**Before trusting a with-skill run**: check that the installed plugin's
-`gitCommitSha` (in `~/.claude/plugins/installed_plugins.json`) matches
-the repo's latest commit. It doesn't auto-update silently — a run found
-this the hard way after every principles-benchmark with-skill run that
-day had read a version pinned to install time, missing two same-day
-fixes. See the correction note at the top of the 2026-08-19 report.
+**Before trusting a with-skill run**: run `benchmarks/check-plugin-sync.sh`
+first — it compares the installed plugin's `gitCommitSha` (in
+`~/.claude/plugins/installed_plugins.json`) against the repo's latest
+commit and warns if it's stale. The plugin doesn't auto-update silently —
+a run found this the hard way after every principles-benchmark with-skill
+run that day had read a version pinned to install time, missing two
+same-day fixes (see the correction note at the top of the 2026-08-19
+report); round 5 found the same problem again, the orchestrating
+session's own installed copy 18 commits stale while it was writing round
+5's own fix. This was a manual check from 2026-08-19 to 2026-09-08; it's
+a script now.
 
 ## `regressions/` — god-class extraction playbook
 
@@ -391,7 +396,9 @@ test instead, is in the report.
 is the original runbook this round started from, written for a
 hand-written-app shape like rounds 1–2 — worth keeping for that case,
 but note it doesn't anticipate the generated-code, name-based-calling
-architecture round 3 actually ran into.
+architecture round 3 actually ran into. Kept up to date since as a
+living runbook (worktree base-commit verification and the plugin-sync
+script were both folded into it after round 5), not a one-time snapshot.
 
 **Round 4 stayed on the same second codebase** (2026-09-04) but picked a
 bigger, more self-contained flow — see
@@ -451,4 +458,8 @@ wrong premise itself — extending, not complicating, the standing finding
 above. Also reconfirms an open methodology gap from this round's own
 first pass (stale worktree base commits, not yet fixed) and the
 trigger-check session's skill self-invocation rate, still 1-for-3 across
-rounds.
+rounds. Both process gaps (worktree base-commit verification, the
+unreachable-claim check) were folded into `TEMPLATE.md` and
+`ROUND-3-INSTRUCTIONS.md` the same day, alongside the skill's own new
+"verify before you build around it" checklist item — a round 6 is the
+next test of whether that actually changes a pass-1 outcome.

@@ -12,6 +12,25 @@ set up worktrees, run all three sessions, write the report, push — from
 that one instruction. This file carries everything it needs: no memory
 of this conversation required.
 
+**Kept up to date as a living runbook, not a one-time snapshot** — the
+title still says "round 3" (that's when it was first written) but every
+round since has folded its process lessons back in here rather than
+leaving them to be rediscovered. As of 2026-09-08 (after round 5): a
+plugin-sync preflight check and worktree base-commit verification, see
+Step 0 and Step 2 below.
+
+## Step 0 — Preflight (added after round 5)
+
+Before picking a target or touching any worktree:
+
+1. Run `benchmarks/check-plugin-sync.sh` from a clone of this repo. If
+   it reports stale, update/reinstall the plugin before dispatching any
+   with-skill session — otherwise session B silently reads an old
+   version and the round measures the wrong thing.
+2. Note the target branch's current tip commit (`git rev-parse HEAD` in
+   the target codebase) before creating any worktree. You'll compare
+   against this in Step 2.
+
 ## Why round 3, and what it must fix
 
 Two rounds already done on the target codebase
@@ -25,8 +44,8 @@ specifically to close a gap round 2 found and flagged in its own Verdict:
 - **Round 2** found a *new* ambiguity in its place: how many of the
   flow's real external callers actually get rewired to use the new
   service. Same task sentence, same scope, and the three sessions
-  produced wildly different answers — C rewired all 3 real callers, A
-  rewired 1 of 2, B rewired 0. Round 2's own Verdict says explicitly:
+  produced wildly different answers — C rewired all 3, A rewired 1 of 2,
+  B rewired 0. Round 2's own Verdict says explicitly:
   **pin that too next time** ("and update every real caller to use the
   new service").
 
@@ -42,6 +61,28 @@ and produces false negatives on caller searches — always use `grep -a`
 for real callers in this codebase, and say so explicitly in the task
 sentence like round 2 did, so a session that would otherwise hit the
 same trap gets warned up front instead of rediscovering it mid-round.
+
+**Two more things carried forward from round 5** (a different project,
+but both are properties of the methodology, not of any one codebase):
+
+- **Verify worktree base commits before dispatching sessions.** Round 5
+  found all three worktrees had silently branched from a commit several
+  behind the target branch's actual tip, missing recent history the task
+  sentence assumed was present — undetected until after the round, and
+  not fixed even after being found (rebasing mid-round risked more
+  conflict than it was worth by then). See Step 2 below for the concrete
+  check; do it *before* Step 4, not after.
+- **Verify any "unreachable/absent/unverifiable" claim before letting a
+  session build around it** — whether that claim is in the task sentence
+  you write, or in a session's own scope reasoning once it starts. Round
+  5 found all three sessions, with-skill or not, independently accept the
+  same false version of this claim and stub real work around it; the
+  correction only came from testing the claim directly from outside all
+  three sessions. If your task involves an external dependency, file, or
+  environment a session might reasonably call "unreachable," check that
+  yourself first (or say explicitly in the task sentence that it's been
+  checked and is real) rather than letting three sessions independently
+  guess the same wrong thing.
 
 ## Step 1 — Pick the target flow
 
@@ -82,6 +123,23 @@ git worktree add ../round3-c -b round3-agent-c
 (Adjust paths/branch names to taste — what matters is three separate
 working directories off the same base commit.)
 
+**Verify the base commit before going further** (added after round 5 —
+this step didn't exist when rounds 3–5 ran, and round 5 paid for it):
+
+```bash
+TIP=$(git rev-parse HEAD)   # the target branch's tip, noted in Step 0
+for b in round3-agent-a round3-agent-b round3-agent-c; do
+  BASE=$(git merge-base "$TIP" "$b")
+  if [ "$BASE" != "$TIP" ]; then
+    echo "⚠️  $b's base ($BASE) is behind tip ($TIP) — recreate it"
+  fi
+done
+```
+
+If any worktree fails this check, remove it and recreate from the actual
+current tip before running any session — don't discover this after the
+sessions have already committed work on top of a stale base.
+
 ## Step 3 — Write the task sentence
 
 Fill in this template — **both bracketed clauses are required**, that's
@@ -111,7 +169,12 @@ done but not push, and not to ask clarifying questions.
 Use the Task/Agent tool to run these as three genuinely independent
 sessions, each working only inside its own worktree directory — or open
 three separate terminal sessions if you'd rather watch them run. Either
-way, each session must have **no visibility into the other two**.
+way, each session must have **no visibility into the other two**, and
+must be told explicitly to do all its file reads and greps from inside
+its own worktree directory, not from any other checkout of the same
+repo — round 5 found a session read reference files from the main
+checkout by mistake and wrote a false claim into its own delivered code
+as a result.
 
 - **Session A — baseline**: told explicitly **not** to consult any
   skill. Give it the task sentence from Step 3, working in the `a`
@@ -122,8 +185,8 @@ way, each session must have **no visibility into the other two**.
 - **Session C — trigger check**: no mention of any skill either way —
   "do the task as you normally would." Same task sentence, working in
   the `c` worktree. Note afterward whether it self-invoked the skill —
-  round 1's C did, round 2's C didn't, on the same kind of task; a third
-  data point either way is useful.
+  round 1's C did, round 2's C didn't, round 5's C didn't either, on
+  variously-shaped tasks; a further data point either way is useful.
 
 For each session, capture: what it did (new files, diff shape on the
 god class, whether it duplicated-with-note vs. deleted vs. left
@@ -154,7 +217,7 @@ section:
 ## Step 6 — Index it and push
 
 1. Add a short section to `benchmarks/README.md`'s real-world-validation
-   part (below the existing round 1/round 2 summary) — a few sentences,
+   part (below the existing round summaries) — a few sentences,
    matching the style already there, not a rewrite of the existing text.
 2. Commit the new report file and the README update **from the main
    repo clone**, not from inside any of the three worktrees.
@@ -172,6 +235,7 @@ If tomorrow's real work happens to be on a different project entirely,
 this runbook still applies — just substitute that project's repo for
 every mention of the target codebase above, note its stack in Step 1,
 and name the report file after it instead (`YYYY-MM-DD-<project-slug>.md`).
-The caller-rewiring fix from round 2 is a property of the *methodology*,
-not of any specific project, so it's worth carrying into a fresh project
-too, not just a third round on the same one.
+The caller-rewiring fix from round 2, and the worktree/unreachable-claim
+fixes from round 5, are all properties of the *methodology*, not of any
+specific project, so they're worth carrying into a fresh project too,
+not just another round on the same one.
