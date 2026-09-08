@@ -76,18 +76,20 @@ On a real Spring Boot + Angular app (not a demo):
 
 One project, two languages, a handful of files. Real findings, small sample.
 
-### Four more real-world rounds, a second stack entirely
+### Five real-world rounds, three more stacks
 
-Four more baseline-vs-with-skill-vs-trigger-check rounds have been run
-since, in isolated git worktrees, on two more real, unrelated codebases
-neither the skill nor this benchmark was written against — see
-[`benchmarks/real-world-validation/`](benchmarks/real-world-validation/)
+Five baseline-vs-with-skill-vs-trigger-check rounds have been run
+since, in isolated git worktrees, on three more real, unrelated
+codebases neither the skill nor this benchmark was written against —
+see [`benchmarks/real-world-validation/`](benchmarks/real-world-validation/)
 for the full write-ups (rounds 1–2 on a hand-written Struts app, rounds
 3–4 on a COBOL-transpiled legacy system with a completely different
 coupling style — one shared mutable working-storage object per class
-instead of ordinary method calls).
+instead of ordinary method calls — and round 5 on a Spring Boot/DB2
+backend, a different *kind* of task entirely: a real implementation/
+migration request, not an extraction).
 
-**The standing finding across all four**: the skill's only consistent,
+**The standing finding across the first four**: the skill's only consistent,
 repeatable effect is making already-good judgment *explicit and
 checkable* — an honest `REFACTOR NOTE`, a step cited by number, an
 open question flagged instead of guessed at — not catching correctness
@@ -103,11 +105,29 @@ false-positive-caller trap in a different codebase each time (a plain
 dead `import`) — a reminder to verify what a signal actually resolves
 to, not just that it matches.
 
-Still real findings, still a small, opportunistic sample (2 stacks, 1
-person running it) — not a controlled study. A third stack, or the same
-kind of comparison run by someone other than the author, would do more
-to close that gap than a fifth round on either of the first two. There's
-a ready-to-fill template at
+**Round 5 added something genuinely different**, not just another data
+point for the same finding: all three sessions — with the skill, without
+it, and given no instruction either way — independently accepted the
+same false premise (that a deep integration step was unreachable and
+unverifiable in the environment) and built a stub around it without
+challenging it first. The skill didn't catch this any more than baseline
+did; the correction only came from the orchestrating session verifying
+the claim directly instead of trusting it. Fed the same correction, all
+three replaced the stub with a real, working, live-verified
+implementation — two of them independently hit and fixed the identical
+underlying bug with zero visibility into each other's work. Read
+together with the first four rounds: the skill still doesn't correct
+judgment a careful baseline gets wrong, and this round adds a first,
+concrete example of a miss *neither* arm catches on its own — verifying
+a claim before building around it, a gap the working checklist didn't
+cover until the same day (see
+[`benchmarks/real-world-validation/2026-09-08-real-world-round5.md`](benchmarks/real-world-validation/2026-09-08-real-world-round5.md)).
+
+Still real findings, still a small, opportunistic sample (4 stacks now,
+1 person running it) — not a controlled study. A fifth stack, or the
+same kind of comparison run by someone other than the author, would do
+more to close that gap than a sixth round on any of the first three.
+There's a ready-to-fill template at
 [`benchmarks/real-world-validation/TEMPLATE.md`](benchmarks/real-world-validation/TEMPLATE.md)
 for anyone running one.
 
@@ -182,8 +202,8 @@ real result with a narrow scope, not "extensively benchmarked."
 
 Nothing here blocks usage — it's MIT, plain markdown, zero runtime dependencies, zero config. But before you install it expecting it to behave exactly as it did for the author, know this:
 
-- **Trigger accuracy has one small test, not a real eval loop.** The `description` field is what an agent matches against your request to decide whether to consult the skill — written by hand, not run through a proper trigger-accuracy eval (large query variety, hit rate measured, description iterated against it). A first check (8 prompts, 4 that should trigger it and 4 that shouldn't, see [the report](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md)) went 8/8, but every prompt was written to be fairly clear-cut in one direction — it says the description isn't badly miscalibrated, not that it's tuned at the margin. It may still under- or over-trigger on phrasing closer to the boundary.
-- **Validated by one person, on a small number of stacks.** "Validated on" above now spans a Spring Boot + Angular codebase and two more real, unrelated ones (a hand-written Struts app, a COBOL-transpiled legacy system) — but every one of them was picked and run by the same person. Principle 18 already had a real gap (missed the client-side case entirely) that only surfaced once it was applied outside the context it was written in, and the extraction playbook itself has been patched twice from real usage on the COBOL-transpiled codebase (comment discipline, naming) — expect more gaps like that surfacing on a stack or a reviewer this hasn't seen yet.
+- **Trigger accuracy has two small tests, not a real eval loop.** The `description` field is what an agent matches against your request to decide whether to consult the skill — written by hand, not run through a proper trigger-accuracy eval (large query variety, hit rate measured, description iterated against it). A first check (8 prompts, 4 that should trigger it and 4 that shouldn't, see [the report](benchmarks/regressions/results/2026-08-19-principles-and-rerun.md)) went 8/8, but every prompt was written to be fairly clear-cut in one direction — it says the description isn't badly miscalibrated, not that it's tuned at the margin. A follow-up on 2026-09-08 tried exactly the boundary the first check flagged as untested: 6 deliberately ambiguous prompts, plain chat questions with no hint of a test. Triggered correctly on 3/6 — including one correct *decline*, citing its own "when NOT to apply it" clause by name — and stayed correctly silent on 2 more that were genuinely out of scope. The sixth is a real miss: a `static HashMap` used as a cache in a normal concurrent web app is close to a word-for-word match of principle 18's own documented example, and the skill didn't fire on it. The response still landed on the right fix from baseline reasoning alone, so nothing broke — but it's the first concrete case of the skill staying silent on a prompt matching its own subject matter. See [`benchmarks/README.md`](benchmarks/README.md) for the full breakdown.
+- **Validated by one person, on a small number of stacks.** "Validated on" above now spans a Spring Boot + Angular codebase and three more real, unrelated ones (a hand-written Struts app, a COBOL-transpiled legacy system, a Spring Boot/DB2 backend) — but every one of them was picked and run by the same person. Principle 18 already had a real gap (missed the client-side case entirely) that only surfaced once it was applied outside the context it was written in, and the extraction playbook itself has been patched twice from real usage on the COBOL-transpiled codebase (comment discipline, naming) — expect more gaps like that surfacing on a stack or a reviewer this hasn't seen yet.
 - **Examples still skew OOP.** The prose is written to be language-agnostic, but concepts like SOLID, Strategy, DDD, and Hexagonal are inherently object-oriented framings. On a functional or non-OOP-heavy codebase, several principles will need more translation than the text implies.
 - **No auto-update by default, on either install path.** A `git clone` install is always a snapshot. The plugin *can* stay current, but auto-update is off by default for third-party marketplaces — found this out firsthand mid-benchmark: an install left on default settings sat pinned to the commit it was installed at while the repo moved on, silently. Check `gitCommitSha` in `~/.claude/plugins/installed_plugins.json` if you want to know which commit you're actually running — see [Install](#install).
 - **Format-verified on two hosts, effectiveness verified on one.** Loads unchanged on Claude Code and [OpenJarvis](https://github.com/openjarvis) — same files, no edits, agentskills.io-compliant hosts should work the same way. Loading and *using it well* aren't the same claim, though: a single OpenJarvis test (a local `qwen3.5:9b`, the skill loaded) missed a violation both Claude arms caught every time, citing a real passage from the skill out of context — one data point, not a verdict on small local models generally, but real enough that "verified on two hosts" shouldn't be read as "works equally well on both." See the 2026-08-19 report.
