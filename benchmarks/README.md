@@ -301,6 +301,36 @@ content; 4 designed not to (JS syntax, a bash one-liner, timezone trivia,
 a CSS fix) all correctly didn't. Small, clear-cut sample — see the
 2026-08-19 report for the caveat about boundary cases not yet tested.
 
+**Boundary-case trigger test (2026-09-08)**: the first test's own caveat
+said boundary cases weren't tried. 6 deliberately ambiguous prompts this
+time — plain chat questions, no repo attached, no hint of a test — each
+run as a fresh, blind session: a method that's grown to 80 lines with 4
+nested ifs but "not causing bugs"; two classes with the exact same
+1000/500 discount thresholds duplicated; a "return null, Optional, or
+throw?" style question; a `static HashMap` used as a cache in a normal
+concurrent Spring app; mocking a final class in a JUnit test; and a
+small, read-only, 3-repository CRUD controller someone said "needs a
+service layer." **Triggered 3/6, correct every time it fired**: the
+long-method and duplicated-threshold questions got calibrated,
+YAGNI-aware advice; the CRUD-controller question got a correct
+**decline**, citing the tactical-DDD/Hexagonal "when NOT to apply it"
+exemption by name — direct evidence the skill isn't just flag-everything,
+it can talk itself out of firing on a case its own documentation says to
+skip. Of the 3 non-triggers, 2 were genuinely out of scope (a style
+convention, a pure Mockito/tooling question) — correctly silent. **The
+third is the real finding**: a static `HashMap` cache in a concurrent web
+app is exactly principle 18's own documented scenario (a non-thread-safe
+structure shared across concurrent requests) by name, and the skill
+didn't fire on it — the response still caught and fixed the thread-safety
+problem on baseline reasoning alone, so nothing broke, but this is the
+first concrete instance of the skill staying silent on a prompt that
+matches one of its own 20 principles' textbook example almost verbatim.
+Consistent with the standing finding across all five real-world rounds
+(baseline judgment is often already sound, so a missed trigger doesn't
+always cost anything) — but a small sample, and the first real crack in
+an otherwise clean trigger record. Worth a larger boundary sample before
+treating 3/6 as a stable rate rather than one data point.
+
 **DRY Case C, revisited (2026-09-08)**: the "three clean failures" above
 weren't the end of the story. A third fix attempt targeted the actual gap
 the first two shared without either of them naming it — both prior
