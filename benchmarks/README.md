@@ -347,11 +347,27 @@ but never concurrency, thread-safety, or shared/static state — principle
 18 had no keyword surface to match against, at all, regardless of how
 close a prompt came to its own example. **Fixed same day** (plugin
 1.2.9 → 1.3.0): added a concurrency/shared-state clause to the
-description. Not yet reverified against live routing — this session's
-own installed plugin copy was pinned to an older commit throughout
-testing (the exact staleness `check-plugin-sync.sh` exists to catch), so
-today's fix can't be confirmed to change anything until a synced install
-runs a fresh boundary round against principle 18 specifically.
+description.
+
+**Post-sync reverification (2026-09-09)**: the plugin was synced
+(`gitCommitSha` confirmed matching the repo's latest commit), and the
+same 4 principle-18 probes rerun — this time against real, live routing
+through the actual Skill tool, not fed the guidance text directly like
+the DRY reverification below. **2/4 now trigger** (the repeat of the
+static-cache scenario, and the `SimpleDateFormat` textbook case — both
+Java/server-shaped); **2/4 still don't** (the Angular client-side
+singleton variant, and the symptom-only prompt with no code or keywords
+at all). A real, measurable improvement — 0/4 pre-fix on these exact
+prompts to 2/4 post-fix — not full coverage, and not oversold as such:
+the clause added is server/Java-flavored (`static/shared field`,
+`singleton/service-scoped cache`, `concurrent requests`), so it closes
+the gap for the shape it was written against but doesn't reach
+principle 18's client-side half (no Angular/session-state cue in the
+description) or a prompt with no matching keyword at all, which a
+description-based match was never going to catch regardless of wording.
+Read as confirmation the root cause was diagnosed correctly (the fix
+moved a real number, in the predicted direction, on the predicted
+subset) — not as "trigger accuracy solved."
 
 **DRY Case C, closed (2026-09-08, reverified 2026-09-09)**: the "two
 clean failures" above weren't the end of the story. A third fix attempt
