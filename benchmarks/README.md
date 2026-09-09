@@ -387,34 +387,55 @@ this is the first day this project has closed two separate, independently
 diagnosed and fixed gaps with real before/after confirmation on the
 same principle.
 
-**Broader sample, 6 more principles (2026-09-09), left open — no clean
-fix story this time**: same shape as the principle-18 probes but spread
-across principles instead of repeated on one — Fail Fast, Tell Don't
-Ask, Composition over Inheritance, Anti-Corruption Layer,
-Characterization Test, and Package by feature, one blind live-routing
-probe each. **3/6 trigger** (Tell Don't Ask, Composition over
-Inheritance, Anti-Corruption Layer), **3/6 don't** (Fail Fast,
-Characterization Test, Package by feature). Deliberately *not* patched
-the way principle 18 was, because the causal story isn't there this
-time: two of the three hits (Composition over Inheritance,
+**Broader sample, 6 more principles (2026-09-09)**: same shape as the
+principle-18 probes but spread across principles instead of repeated on
+one — Fail Fast, Tell Don't Ask, Composition over Inheritance,
+Anti-Corruption Layer, Characterization Test, and Package by feature,
+one blind live-routing probe each. **3/6 trigger** (Tell Don't Ask,
+Composition over Inheritance, Anti-Corruption Layer), **3/6 don't**
+(Fail Fast, Characterization Test, Package by feature). The 3 hits had
+no clean keyword story — two of them (Composition over Inheritance,
 Anti-Corruption Layer) aren't literally named anywhere in the
-description — only "Tell Don't Ask" is, in the opening principle list
-— so whatever made those two fire isn't simple keyword presence, and a
-miss doesn't obviously trace to an absent keyword the way principle 18's
-did. More strikingly, one of the misses (Characterization Test) produced
-a textbook-perfect answer anyway — the exact term, a correct Michael
-Feathers citation, the right four-step procedure — entirely from
-baseline knowledge, with the skill never engaging. Fail Fast repeats the
-weakness this principle already had in the synthetic benchmark (the one
-case that missed on both seeds even with the skill loaded, see above),
-so at least that non-trigger isn't a total surprise. Read as a genuine
-open question rather than "5 more principles need a keyword patch":
-principle 18's fix worked because the miss had a clean, falsifiable
-cause (a concrete code shape with no matching word) that a fix could
-target and a before/after could confirm — this sample doesn't have
-that shape, so adding words to the description here would be a guess,
-not a diagnosis. Worth a larger, more systematic sample before touching
-anything, not a same-day patch like the last two.
+description, so whatever made them fire is semantic matching, not
+keyword presence, and left alone rather than chased.
+
+**The 3 misses got extended to N=3 each** (2 more probes per principle,
+varied phrasing) before touching anything, rather than patching blind
+off one data point. **Fail Fast: 1/3** — only the prompt with real code
+in it (`signum()`, `IllegalStateException`, a concrete payment-validation
+scenario) triggered; two abstract "where should I validate" questions
+with no code shown didn't. **Characterization Test: 1/3** — only a
+richer "refactor for a performance fix, what's the safest first move"
+framing triggered; two bare "should the first test assert should-output
+or actual-output" questions didn't, even though one of them still got a
+textbook-perfect Michael Feathers-cited answer from baseline knowledge
+alone. **Package by feature: 0/3** — never triggered, not even with
+concrete package names, a stated team size, and a real onboarding-pain
+story — this principle has no code-snippet shape to pattern-match
+against at all, unlike the other two.
+
+That pattern — code-rich prompts trigger, bare/abstract prompts of the
+same underlying question don't — is the same shape principle 18's gap
+had: **none of these three are named or keyworded in the description
+either.** Added one cue each (plugin 1.3.1 → 1.4.0): re-validating data
+already checked earlier in the flow (Fail Fast), touching untested
+legacy code and deciding what the first test should assert
+(Characterization Test), organizing packages by layer vs. by feature
+(Package by feature). Synced, reverified live against the exact 3 bare
+prompts that had missed originally (not the code-rich ones that had
+already worked): **all 3 now trigger** — Fail Fast correctly names the
+trust-boundary reasoning without being shown any code at all, the
+Characterization Test response is near-identical to the one bare probe
+that already worked (safety-net-first, don't blend refactor-and-fix),
+and the Package by feature answer explicitly weighs team size and
+growth trajectory rather than giving a generic yes. **0/3 → 3/3**, the
+second full clean before/after fix of the day, same method as principle
+18: sample first, diagnose the actual cause, fix only what has a
+falsifiable story, reverify live rather than trust the guidance-text
+simulation. The 2 principles that stayed unexplained (Composition over
+Inheritance, Anti-Corruption Layer both hit; nothing here needed fixing
+since they already worked) are left as-is — no changes made without a
+before/after to justify them.
 
 **DRY Case C, closed (2026-09-08, reverified 2026-09-09)**: the "two
 clean failures" above weren't the end of the story. A third fix attempt
