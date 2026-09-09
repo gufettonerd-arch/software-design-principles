@@ -365,9 +365,27 @@ the gap for the shape it was written against but doesn't reach
 principle 18's client-side half (no Angular/session-state cue in the
 description) or a prompt with no matching keyword at all, which a
 description-based match was never going to catch regardless of wording.
-Read as confirmation the root cause was diagnosed correctly (the fix
-moved a real number, in the predicted direction, on the predicted
-subset) — not as "trigger accuracy solved."
+
+**Second fix, same method, same day (plugin 1.3.0 → 1.3.1)**: added a
+client-side clause naming the other half of principle 18 explicitly (a
+client-side singleton/store — Angular service, React/Vue global store —
+that could keep one user's or session's data around for the next).
+Synced again, reverified live against the 2 remaining misses: **the
+Angular probe now triggers**, citing the checklist by name, and
+correctly identifies the real leak scenario (logout/user-switch without
+a full reload) rather than just the pattern name. **Final tally across
+all 4 dedicated probes: 3/4** — cache repeat, Angular singleton, and the
+`SimpleDateFormat` textbook case all trigger correctly; the symptom-only
+prompt (no code, no keywords, just an observed effect) still doesn't,
+and isn't expected to — a description-based match has nothing to match
+against there regardless of wording, a structural limit of the
+mechanism rather than a fixable gap the same way the other two were.
+Two real, live-verified fixes in one day, each confirmed by an actual
+before/after delta on real routing, not simulated against pasted
+guidance text — read together with the DRY Case C reverification below,
+this is the first day this project has closed two separate, independently
+diagnosed and fixed gaps with real before/after confirmation on the
+same principle.
 
 **DRY Case C, closed (2026-09-08, reverified 2026-09-09)**: the "two
 clean failures" above weren't the end of the story. A third fix attempt
