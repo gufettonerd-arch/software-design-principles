@@ -529,8 +529,8 @@ model doesn't experience them as needing a specialized skill at all,
 same category as the symptom-only principle-18 miss and the bare
 Characterization Test miss that both stayed open for the same reason.
 Not chased further this round — a fourth fix attempt without a new
-hypothesis about *why* would be the DRY Case A/B mistake repeating
-itself one principle string threin.
+hypothesis about *why* would just repeat the DRY Case A/B mistake on a
+different principle.
 
 ## `real-world-validation/` — real legacy codebases, starting 2026-08-24
 
