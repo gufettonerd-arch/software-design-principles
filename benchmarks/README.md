@@ -465,6 +465,73 @@ file as a whole. Getting this backwards would repeat the exact mistake
 the fixture contamination above describes, at a more direct level
 (handing over the answer, not just a structural hint toward it).
 
+**First trigger data on every remaining principle, 13 at once
+(2026-09-09)**: the trigger probes above had, by this point, covered
+7 of the 20 principles (the 6 boundary-case + broader-sample principles,
+plus principle 18). The other 13 — SOLID, Value Object, Law of Demeter,
+DRY, Strategy, CQS, Specific exceptions, Readability, DDD tactical, DDD
+strategic, Hexagonal, Strangler Fig, Modular Monolith — had never had a
+single live-routing data point. One blind probe each, same method as
+every trigger test above. **7/13 trigger** (SOLID, Value Object,
+Strategy, CQS, Specific exceptions, DDD tactical, Hexagonal), **6/13
+don't** (DRY, Law of Demeter, Readability, DDD strategic, Strangler Fig,
+Modular Monolith) — all 20 principles now have at least one real
+trigger data point, the first time that's been true.
+
+**The 6 misses extended to N=3 each** (2 more probes per principle)
+before touching anything, same discipline as the broader-sample misses
+above. **DRY: 0/3** — the most-tested, most-fixed principle in the whole
+snippet benchmark, silent on both a concrete numeric-threshold prompt
+and an abstract one. **Law of Demeter: 1/3** — triggered only on a
+concrete, named-variable prompt (`order.getCustomer().getAddress()
+.getCity()` repeated 3× in a real service), missed on an abstract
+`a.getB().getC().getD()` framing. **Modular Monolith: 0/3.** **DDD
+strategic: 0/3** — both extension probes were bare conceptual questions,
+no code. **Strangler Fig: 1/3** — hit on "replace piece by piece,"
+missed on "migrate a legacy billing engine, no downtime, no big-bang
+cutover" and the original miss; notable because Strangler Fig **is**
+named literally in the description string already, so this isn't a pure
+keyword-absence gap the way the other five are. **Readability: 0/3.**
+
+Checked against the description field: none of the 6 are keyworded
+there (Strangler Fig is named as an example principle in the opening
+clause, but not tied to any triggering scenario) — same root cause as
+principle 18 / Fail Fast / Characterization Test / Package by feature.
+**Added one cue each** (plugin 1.4.0 → 1.5.0): duplicated logic/validation
+for the same underlying concept (DRY), chaining more than two
+getters/accessors (Law of Demeter), a growing monolith's teams colliding
+and weighing modular restructuring vs. a full microservices split
+(Modular Monolith), the same term meaning something different across
+teams/modules — bounded context (DDD strategic), incrementally replacing
+a legacy module piece by piece instead of a big-bang cutover or
+no-downtime rewrite (Strangler Fig), a final self-review pass on code
+that already works but is hard to follow (Readability). Synced,
+reverified live against the exact prompts that had missed (all of them
+for the four 0/3s, the miss only for the two 1/3s that already had one
+hit): **a mixed result, the first one after four consecutive clean
+0/N → N/N fixes.** **Law of Demeter's miss now triggers** — clean fix,
+2/3 or better. **DDD strategic's both extension misses now trigger** —
+clean fix, 2/3 confirmed (2/2 dedicated reruns). **Modular Monolith**:
+1 of 2 reruns now triggers — a real but partial improvement, not a
+closed gap. **DRY, Strangler Fig, and Readability: unchanged** — every
+rerun, including the exact prompts that had missed pre-fix, still
+doesn't trigger, despite the added cue. Read together, not as three
+separate failures: these three are also the ones where baseline
+reasoning already gives a strong, calibrated answer without the skill
+(the DRY reruns correctly reasoned about rule-of-three and drift risk,
+the Strangler Fig rerun independently produced the pattern by name and
+a shadow-mode/gradual-cutover plan, the Readability reruns correctly
+distinguished the ask from bikeshedding) — consistent with the standing
+finding that a description-based cue can't pull a keyword-shaped gap
+closed when the actual obstacle is something else, here plausibly that
+these three question shapes are common and generic enough that the
+model doesn't experience them as needing a specialized skill at all,
+same category as the symptom-only principle-18 miss and the bare
+Characterization Test miss that both stayed open for the same reason.
+Not chased further this round — a fourth fix attempt without a new
+hypothesis about *why* would be the DRY Case A/B mistake repeating
+itself one principle string threin.
+
 ## `real-world-validation/` — real legacy codebases, starting 2026-08-24
 
 First real (non-synthetic) runs, on a real codebase — a real Java 7/8
