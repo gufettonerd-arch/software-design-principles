@@ -85,19 +85,23 @@ regardless of count," that's the same miss as flagging it outright — the
 instance-count framing is the failure being tested here, not just the
 yes/no verdict.
 
-**Update, 2026-09-08**: a third fix attempt targeted the actual gap the
-first two didn't control for — the existing worked counter-example used a
-numeric threshold (`o.getTotal() >= threshold`), a shape this snippet
-doesn't share at all (no numbers, just string concatenation). Added a new
-worked example in `principles.md` matching this snippet's *exact* surface
-shape (three one-line string-builders, same signature, no threshold to
-point at as "obviously different data"). Tested blind, N=4, fresh
-sessions given only the candidate guidance and this snippet (no answer
-key): **4/4 explicit, correct non-flags** — every response reasoned
-through the knowledge question by name and explicitly rejected the "no
-numbers = generic" framing, rather than falling back to instance
-counting. A real result, and a first for this case after two prior clean
-failures — but still one seed, not yet reverified against a second one
-the way every other N=4 finding in this project is before being called
-settled (see `principles/README.md`'s own standard for this). Treat as
-"a real result, not yet confirmed twice," not as closed.
+**Fixed, 2026-09-08, reverified 2026-09-09 — closed.** A third fix
+attempt targeted the actual gap the first two didn't control for — the
+existing worked counter-example used a numeric threshold
+(`o.getTotal() >= threshold`), a shape this snippet doesn't share at all
+(no numbers, just string concatenation). Added a new worked example in
+`principles.md` matching this snippet's *exact* surface shape (three
+one-line string-builders, same signature, no threshold to point at as
+"obviously different data"). Tested blind, N=4, fresh sessions given
+only the candidate guidance and this snippet (no answer key): **4/4
+explicit, correct non-flags** — every response reasoned through the
+knowledge question by name and explicitly rejected the "no numbers =
+generic" framing, rather than falling back to instance counting.
+**Reverified the next day on an independent second batch, same setup:
+4/4 again** — 8/8 total across two seeds, every single response
+explicitly naming the knowledge question rather than counting instances.
+Held to this project's own standard (a second seed clean moves a finding
+from "real, not yet confirmed" to "closed") — this one clears it. First
+case in this project's history where a third distinct fix attempt closed
+something two prior attempts (0/4, then 2/4) had left as a genuinely
+open, resistant limitation.
