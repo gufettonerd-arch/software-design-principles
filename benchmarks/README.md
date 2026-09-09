@@ -124,10 +124,11 @@ concrete worked counter-example — a numeric threshold, in a different
 domain (2/4, no better than the unedited baseline). **Two distinct fix
 approaches, two clean failures**, read at the time as a pattern-match
 instinct that resists in-context correction, not a wording gap — see
-**2026-09-08 update** below, which found a third approach that
-broke the streak. A worthwhile checklist audit came out of the original
-session too — reread the other 17 case files for the same confound shape
-Fail Fast/CQS had; found none serious enough to fix at the time.
+**DRY Case C, closed** below, where a third approach broke the streak and
+held on reverification. A worthwhile checklist audit came out of the
+original session too — reread the other 17 case files for the same
+confound shape Fail Fast/CQS had; found none serious enough to fix at
+the time.
 
 Extended same day to 2 more principles, SOLID and Readability, picked in
 order rather than for cause. SOLID came back clean (7/8). Readability
@@ -325,32 +326,53 @@ didn't fire on it — the response still caught and fixed the thread-safety
 problem on baseline reasoning alone, so nothing broke, but this is the
 first concrete instance of the skill staying silent on a prompt that
 matches one of its own 20 principles' textbook example almost verbatim.
-Consistent with the standing finding across all five real-world rounds
-(baseline judgment is often already sound, so a missed trigger doesn't
-always cost anything) — but a small sample, and the first real crack in
-an otherwise clean trigger record. Worth a larger boundary sample before
-treating 3/6 as a stable rate rather than one data point.
 
-**DRY Case C, revisited (2026-09-08)**: the "three clean failures" above
-weren't the end of the story. A third fix attempt targeted the actual gap
-the first two shared without either of them naming it — both prior
-attempts (the restructure, and the worked counter-example) reasoned about
-a *numeric threshold* shape; Case C's snippet has no numbers in it at all
-(three one-line string-concatenation methods). Added a new worked example
-to `principles.md`'s DRY section matching Case C's exact surface shape —
-same signature, string-building, nothing to point at as "obviously
-different data." Tested blind, N=4, fresh sessions given only the
-candidate guidance text and the bare snippet (no answer key, no skill
-invocation — just the excerpt pasted in): **4/4 explicit correct
-non-flags**, every response naming the knowledge question and explicitly
-rejecting "no numbers = generic" reasoning rather than falling back to
-instance counting. First clean result on this case after two prior clean
-failures — see `principles/cases/05-dry.md`'s own "Update, 2026-09-08"
-note for the exact wording and test setup. Held to the same bar as every
-other N=4 result here: real, not yet reverified against a second seed —
-a second seed clean would move this from "a real result" to "closed,"
-the same way other findings in this project have needed two seeds before
-being called settled.
+**Confirmed and fixed the same day**: 4 more prompts, all shaped around
+principle 18 specifically from different angles — a repeat of the cache
+scenario, a client-side Angular singleton variant, a symptom-only
+description with no code or jargon at all ("user A occasionally gets
+user B's data under load"), and a near-word-for-word match of the
+principle's own textbook example (`SimpleDateFormat` as an instance
+field on a singleton service). **0/4 triggered — 5/5 total** across both
+batches, on prompts ranging from a literal repeat to the principle's own
+worked example. Baseline reasoning got all 4 right anyway (correct
+thread-safety diagnoses, correct fixes, a genuinely thorough answer on
+the symptom-only prompt with no code to pattern-match against at all) —
+consistent with the standing finding that baseline judgment is often
+already sound, so this cost nothing in practice, but the skill itself
+never once engaged with its own subject matter. Root-caused same day:
+the `description` field that governs on-demand triggering names cues for
+interfaces, generic catches, magic numbers, and god-class extraction,
+but never concurrency, thread-safety, or shared/static state — principle
+18 had no keyword surface to match against, at all, regardless of how
+close a prompt came to its own example. **Fixed same day** (plugin
+1.2.9 → 1.3.0): added a concurrency/shared-state clause to the
+description. Not yet reverified against live routing — this session's
+own installed plugin copy was pinned to an older commit throughout
+testing (the exact staleness `check-plugin-sync.sh` exists to catch), so
+today's fix can't be confirmed to change anything until a synced install
+runs a fresh boundary round against principle 18 specifically.
+
+**DRY Case C, closed (2026-09-08, reverified 2026-09-09)**: the "two
+clean failures" above weren't the end of the story. A third fix attempt
+targeted the actual gap the first two shared without either of them
+naming it — both prior attempts (the restructure, and the worked
+counter-example) reasoned about a *numeric threshold* shape; Case C's
+snippet has no numbers in it at all (three one-line string-concatenation
+methods). Added a new worked example to `principles.md`'s DRY section
+matching Case C's exact surface shape — same signature, string-building,
+nothing to point at as "obviously different data." Tested blind, N=4,
+fresh sessions given only the candidate guidance text and the bare
+snippet (no answer key, no skill invocation — just the excerpt pasted
+in): **4/4 explicit correct non-flags**, every response naming the
+knowledge question and explicitly rejecting "no numbers = generic"
+reasoning rather than falling back to instance counting. **Reverified
+the next day on an independent second batch, same setup: 4/4 again —
+8/8 total across two seeds.** First case in this project's history where
+a third distinct fix attempt closed something two prior attempts (0/4,
+then 2/4) had left as a genuinely resistant, open limitation. See
+`principles/cases/05-dry.md`'s own update notes for the exact wording
+and both test setups.
 
 **Before running it again**: the case files under `principles/cases/`
 contain the snippet *and* the answer key ("Expected: ...") in the same
