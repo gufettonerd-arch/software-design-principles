@@ -387,6 +387,35 @@ this is the first day this project has closed two separate, independently
 diagnosed and fixed gaps with real before/after confirmation on the
 same principle.
 
+**Broader sample, 6 more principles (2026-09-09), left open — no clean
+fix story this time**: same shape as the principle-18 probes but spread
+across principles instead of repeated on one — Fail Fast, Tell Don't
+Ask, Composition over Inheritance, Anti-Corruption Layer,
+Characterization Test, and Package by feature, one blind live-routing
+probe each. **3/6 trigger** (Tell Don't Ask, Composition over
+Inheritance, Anti-Corruption Layer), **3/6 don't** (Fail Fast,
+Characterization Test, Package by feature). Deliberately *not* patched
+the way principle 18 was, because the causal story isn't there this
+time: two of the three hits (Composition over Inheritance,
+Anti-Corruption Layer) aren't literally named anywhere in the
+description — only "Tell Don't Ask" is, in the opening principle list
+— so whatever made those two fire isn't simple keyword presence, and a
+miss doesn't obviously trace to an absent keyword the way principle 18's
+did. More strikingly, one of the misses (Characterization Test) produced
+a textbook-perfect answer anyway — the exact term, a correct Michael
+Feathers citation, the right four-step procedure — entirely from
+baseline knowledge, with the skill never engaging. Fail Fast repeats the
+weakness this principle already had in the synthetic benchmark (the one
+case that missed on both seeds even with the skill loaded, see above),
+so at least that non-trigger isn't a total surprise. Read as a genuine
+open question rather than "5 more principles need a keyword patch":
+principle 18's fix worked because the miss had a clean, falsifiable
+cause (a concrete code shape with no matching word) that a fix could
+target and a before/after could confirm — this sample doesn't have
+that shape, so adding words to the description here would be a guess,
+not a diagnosis. Worth a larger, more systematic sample before touching
+anything, not a same-day patch like the last two.
+
 **DRY Case C, closed (2026-09-08, reverified 2026-09-09)**: the "two
 clean failures" above weren't the end of the story. A third fix attempt
 targeted the actual gap the first two shared without either of them
