@@ -532,6 +532,26 @@ Not chased further this round — a fourth fix attempt without a new
 hypothesis about *why* would just repeat the DRY Case A/B mistake on a
 different principle.
 
+**Attempted a systematic (not ad-hoc) trigger-accuracy sweep the same
+day** — see [`trigger-eval/`](trigger-eval/): 48 queries, all 20
+principles × 2 phrasing shapes (code-rich, abstract) + 8 out-of-scope
+distractors, meant to replace one-off sampling with a real, rerunnable
+dataset. **The attempt itself was invalidated by its own method, not by
+a bad result**: run as 6 batches of 8 queries per subagent to save
+dispatch overhead, and that batching is exactly what broke it — inside
+one conversation, the Skill tool only needs to load once for its content
+to leak into every later query in the same batch, so "Skill used: X" on
+a later query can mean *reuse*, not an independent trigger. Caught it
+concretely: the DRY code-rich query came back a hit in its batch,
+contradicting DRY's clean, independently-confirmed 0/3 above. Reran it
+twice as fully isolated single-query dispatches: **0/2, both explicit
+`none`** — the batched hit didn't hold up, DRY's miss stands. The real
+finding from this attempt is the method, not a number: trigger-accuracy
+data is only trustworthy from one probe per fully isolated session,
+never batched, regardless of how much cheaper batching looks — see
+`trigger-eval/README.md` for the full account. The 48-query dataset is
+kept as ready-to-use infrastructure for a properly isolated run later.
+
 ## `real-world-validation/` — real legacy codebases, starting 2026-08-24
 
 First real (non-synthetic) runs, on a real codebase — a real Java 7/8
