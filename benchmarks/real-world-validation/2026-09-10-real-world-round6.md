@@ -153,21 +153,20 @@ trusting A's report): `ManualSchedulingTest` and its fixture
 three extractions are behaviorally correct regardless of which
 verification method each session used to convince itself of that.
 
-**A plausible reason, not a confirmed one**: A's search wasn't scoped to
-the module under edit; B and C's searches (explicitly, in both reports)
-were framed around "does a fixture exist for this module" — and the real
-fixture lives in a sibling module (`backoffice-jar`, the module that
-actually assembles and runs `crsticketing-ama-sab` as a dependency), not
-inside `crsticketing-ama-sab` itself. The "verify before you build
-around it" checklist item's own wording and its one worked example (a
-file, a dependency, an endpoint, a cache) center on external
-dependencies and environment claims — the exact shape of round 5's SOAP
-case — not on "search sibling modules of a multi-module repo for
-existing test fixtures." That's a narrower trigger surface than this
-round's failure mode needed. Worth a targeted fix the same way principle
-18's gap was fixed after its own boundary-case test — but not done here
-without a second data point; this is one round's finding, not yet
-extended.
+**A plausible reason, not a confirmed one at the time** (see Addendum —
+extending this to N=2 the same day found it doesn't hold up as a
+repeatable pattern): A's search wasn't scoped to the module under edit;
+B and C's searches (explicitly, in both reports) were framed around
+"does a fixture exist for this module" — and the real fixture lives in
+a sibling module (`backoffice-jar`, the module that actually assembles
+and runs `crsticketing-ama-sab` as a dependency), not inside
+`crsticketing-ama-sab` itself. The "verify before you build around it"
+checklist item's own wording and its one worked example (a file, a
+dependency, an endpoint, a cache) center on external dependencies and
+environment claims — the exact shape of round 5's SOAP case — not on
+"search sibling modules of a multi-module repo for existing test
+fixtures." That's a narrower trigger surface than this round's failure
+mode needed.
 
 **Everything else converged**: same extraction shape (facade class +
 extracted parser class) across all three, same three real latent bugs
@@ -177,18 +176,55 @@ month/minute mixup, the cross-call singleton state leak — and all three
 verified clean against the real fixture once checked from outside. No
 regressions, no behavior changes, in any of the three.
 
+## Addendum — N=2 replication, same day (2026-09-10)
+
+The Comparison section above flagged its own explanation as "not
+confirmed... not done here without a second data point." Got that
+second data point the same day, cheaply: 2 isolated read-only
+with-skill probes (no worktree, no extraction, no commit — just the
+verification-search step in isolation) on a matched-shape second
+target, `SabreTkt.java` (same package, same god-method shape, and
+confirmed beforehand to have the identical trap: a real fixture,
+`DataTest.getReturnFileSabre()`, sitting in the same sibling module,
+`backoffice-jar`, that B and C missed for Amadeus).
+
+**Both probes found it immediately.** Both searched repo-wide (`grep
+-ril "sabre" .`, not scoped to `crsticketing-ama-sab`), both located
+`getReturnFileSabre()` **and** a second regression-fixture method
+(`sabreBug9million259990()`, pinned to a real historical production
+bug), both explicitly quoted the same "verify before you build around
+it" checklist clause as what drove the search before assuming synthetic
+data was needed.
+
+**This does not confirm the round's explanation — it undercuts it.**
+Combined tally across both sessions of this exact search behavior:
+**2 misses (round 6's B and C) + 2 hits (this replication) = 2/4.**
+That's not a repeatable, checklist-shaped gap the way principle 18's
+was (which went 0/5 clean across every probe before its fix, and 3/4
+after) — it's run-to-run variance on a specific search task, closer to
+the Strategy Case A flip or the Anti-Corruption Layer CONTRADICTED
+result that didn't repeat at seed4 earlier in this project's history.
+The correct read: **round 6 alone overstated a pattern from N=1.** The
+checklist item's wording may still be worth broadening someday, but not
+on the strength of this evidence — there's no clean before/after
+delta here the way there was for principle 18 or Fail Fast, just two
+runs each way.
+
 ## Verdict
 
 The skill's process discipline (playbook step citations, a written
 characterization test, documenting rather than silently fixing
-preserved bugs) showed up in B and C same as prior rounds — but the one
-thing this round specifically set out to test, whether the post-round-5
-"verify before you build around it" fix changes a pass-1 outcome, came
-back negative: both skill-touching sessions missed a real, directly
-discoverable fixture that unguided baseline found. Trust the extraction
-itself from any of the three arms here — all three are independently
-confirmed correct against real data. Don't yet trust that the checklist
-fix closes the class of failure round 5 found; this round suggests it's
-narrower than hoped (dependency/endpoint-shaped claims, not
-module-search-shaped ones), and that needs its own follow-up rather than
-being folded into this report as settled.
+preserved bugs) showed up in B and C same as prior rounds. What the
+round set out to test — whether the post-round-5 "verify before you
+build around it" fix changes a pass-1 outcome — came back negative on
+its own N=1, but a same-day N=2 replication on a matched second target
+came back positive both times, so the honest verdict is **inconclusive,
+not negative**: this specific search behavior varies run to run, and
+round 6 by itself wasn't enough data to call it a real, fixable gap.
+Trust the extraction itself from any of the three original arms — all
+three are independently confirmed correct against real data, regardless
+of which verification method convinced each session. Don't trust either
+"the checklist fix doesn't work" or "the checklist fix works" as
+settled from this round; a real answer needs a larger, properly isolated
+sample on this specific behavior, not two more rounds' worth of
+full extractions.
