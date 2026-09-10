@@ -6,7 +6,7 @@ on different axes, plus a non-synthetic one:
 [`real-world-validation/`](real-world-validation/) — a template for
 running baseline-vs-with-skill on one real flow in a real project, filled
 in as people actually run it (see `TEMPLATE.md`), not scored
-automatically like the two below. Five rounds filled in as of 2026-09-08,
+automatically like the two below. Six rounds filled in as of 2026-09-10,
 on three different real codebases — see the dedicated section near the
 bottom of this file. Everything here is real infrastructure
 — fixtures that compile and run, scorers that were self-tested against
@@ -706,3 +706,36 @@ unreachable-claim check) were folded into `TEMPLATE.md` and
 `ROUND-3-INSTRUCTIONS.md` the same day, alongside the skill's own new
 "verify before you build around it" checklist item — a round 6 is the
 next test of whether that actually changes a pass-1 outcome.
+
+**Round 6 ran on the same codebase as round 5, a different module and
+task shape** (2026-09-10) — see
+[the report](real-world-validation/2026-09-10-real-world-round6.md).
+Not a migration this time: a classic extraction, on a real
+1044-line **god method** (one giant undocumented method, not a
+multi-method god class) with zero existing tests in its own module and
+exactly one real caller — picked specifically to test whether round 5's
+"verify before you build around it" checklist fix changes a pass-1
+outcome. **It didn't, and not gently**: both skill-touching sessions
+(with-skill and the trigger-check session, which self-invoked the skill
+unprompted) searched for real ticket data, concluded none exists, and
+hand-built synthetic verification data instead — missing a real,
+directly discoverable test fixture that lived one module over
+(`backoffice-jar`, not the module being edited). The one session that
+found it was baseline, with no skill guidance at all. Independently
+reverified from outside all three sessions, not just taking any report
+at face value: the real fixture exists, and passes clean against **all
+three** sessions' extracted code, confirming all three extractions are
+behaviorally correct regardless of which verification method convinced
+each session of that. A plausible (not yet confirmed) explanation: the
+checklist item's own wording and worked example are shaped around
+external dependencies/endpoints — round 5's exact failure shape — not
+"search sibling modules of a multi-module repo for existing fixtures,"
+a narrower trigger surface than this round's failure needed. Everything
+else converged across all three: the same extraction shape (facade +
+extracted parser class), and the same three real latent bugs
+independently found and preserved, not silently fixed, by all three
+(a reference-equality string comparison, a `SimpleDateFormat` pattern
+using minute-of-hour instead of month, a cross-call state leak on a
+singleton bean) — consistent with the standing finding that this
+skill's measured effect is process legibility, not correcting judgment
+a careful session already gets right.
