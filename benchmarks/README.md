@@ -536,7 +536,7 @@ different principle.
 day** — see [`trigger-eval/`](trigger-eval/): 48 queries, all 20
 principles × 2 phrasing shapes (code-rich, abstract) + 8 out-of-scope
 distractors, meant to replace one-off sampling with a real, rerunnable
-dataset. **The attempt itself was invalidated by its own method, not by
+dataset. **The first attempt was invalidated by its own method, not by
 a bad result**: run as 6 batches of 8 queries per subagent to save
 dispatch overhead, and that batching is exactly what broke it — inside
 one conversation, the Skill tool only needs to load once for its content
@@ -545,12 +545,29 @@ a later query can mean *reuse*, not an independent trigger. Caught it
 concretely: the DRY code-rich query came back a hit in its batch,
 contradicting DRY's clean, independently-confirmed 0/3 above. Reran it
 twice as fully isolated single-query dispatches: **0/2, both explicit
-`none`** — the batched hit didn't hold up, DRY's miss stands. The real
-finding from this attempt is the method, not a number: trigger-accuracy
-data is only trustworthy from one probe per fully isolated session,
-never batched, regardless of how much cheaper batching looks — see
-`trigger-eval/README.md` for the full account. The 48-query dataset is
-kept as ready-to-use infrastructure for a properly isolated run later.
+`none`** — the batched hit didn't hold up, DRY's miss stands.
+
+**Run properly the same day, 40 fully isolated single-query dispatches
+(2026-09-10)**: the first real, trustworthy systematic hit-rate this
+benchmark has produced. **15/40 (37.5%) triggered on positive-expected
+queries, 0/8 distractors** — zero false positives. 5 principles clean
+2/2 (Fail Fast, Characterization Test, Package by feature,
+Anti-Corruption Layer, Modular Monolith — the first two are real
+evidence their earlier targeted fixes generalize beyond the exact
+prompts that proved them), 4 at 1/2 (Value Object, Tell Don't Ask, Law
+of Demeter, DDD strategic), 11 at 0/2 (SOLID, Composition over
+Inheritance, DRY, CQS, Specific exceptions, Readability, DDD tactical,
+Hexagonal, Strangler Fig, Shared state, Strategy). Several of the 0/2s
+had shown a clean N=1 hit earlier the same day under ad-hoc sampling —
+read as further confirmation that single-probe reads aren't settled
+data, the same lesson this project has drawn repeatedly (Strategy Case
+A, DDD tactical/Hexagonal Case A), not as a fresh set of misses each
+needing its own fix. Shared state (principle 18) stands out as worth a
+closer look specifically: it's had the most dedicated fix effort of any
+principle this session, and still went 0/2 on fresh, differently-worded
+prompts. See `trigger-eval/README.md` for the full breakdown, including
+why this number means something different from a should-not-flag miss
+in the main `principles/` benchmark above.
 
 ## `real-world-validation/` — real legacy codebases, starting 2026-08-24
 
