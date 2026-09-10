@@ -6,9 +6,9 @@ on different axes, plus a non-synthetic one:
 [`real-world-validation/`](real-world-validation/) — a template for
 running baseline-vs-with-skill on one real flow in a real project, filled
 in as people actually run it (see `TEMPLATE.md`), not scored
-automatically like the two below. Five rounds filled in as of 2026-09-08,
-on three different real codebases — see the dedicated section near the
-bottom of this file. Everything here is real infrastructure
+automatically like the two below. Seven rounds filled in as of
+2026-09-15, on four different real codebases — see the dedicated
+section near the bottom of this file. Everything here is real infrastructure
 — fixtures that compile and run, scorers that were self-tested against
 synthetic pass/fail cases before being trusted on real agent output — not
 a plan.
@@ -536,7 +536,7 @@ different principle.
 day** — see [`trigger-eval/`](trigger-eval/): 48 queries, all 20
 principles × 2 phrasing shapes (code-rich, abstract) + 8 out-of-scope
 distractors, meant to replace one-off sampling with a real, rerunnable
-dataset. **The attempt itself was invalidated by its own method, not by
+dataset. **The first attempt was invalidated by its own method, not by
 a bad result**: run as 6 batches of 8 queries per subagent to save
 dispatch overhead, and that batching is exactly what broke it — inside
 one conversation, the Skill tool only needs to load once for its content
@@ -545,12 +545,29 @@ a later query can mean *reuse*, not an independent trigger. Caught it
 concretely: the DRY code-rich query came back a hit in its batch,
 contradicting DRY's clean, independently-confirmed 0/3 above. Reran it
 twice as fully isolated single-query dispatches: **0/2, both explicit
-`none`** — the batched hit didn't hold up, DRY's miss stands. The real
-finding from this attempt is the method, not a number: trigger-accuracy
-data is only trustworthy from one probe per fully isolated session,
-never batched, regardless of how much cheaper batching looks — see
-`trigger-eval/README.md` for the full account. The 48-query dataset is
-kept as ready-to-use infrastructure for a properly isolated run later.
+`none`** — the batched hit didn't hold up, DRY's miss stands.
+
+**Run properly the same day, 40 fully isolated single-query dispatches
+(2026-09-10)**: the first real, trustworthy systematic hit-rate this
+benchmark has produced. **15/40 (37.5%) triggered on positive-expected
+queries, 0/8 distractors** — zero false positives. 5 principles clean
+2/2 (Fail Fast, Characterization Test, Package by feature,
+Anti-Corruption Layer, Modular Monolith — the first two are real
+evidence their earlier targeted fixes generalize beyond the exact
+prompts that proved them), 4 at 1/2 (Value Object, Tell Don't Ask, Law
+of Demeter, DDD strategic), 11 at 0/2 (SOLID, Composition over
+Inheritance, DRY, CQS, Specific exceptions, Readability, DDD tactical,
+Hexagonal, Strangler Fig, Shared state, Strategy). Several of the 0/2s
+had shown a clean N=1 hit earlier the same day under ad-hoc sampling —
+read as further confirmation that single-probe reads aren't settled
+data, the same lesson this project has drawn repeatedly (Strategy Case
+A, DDD tactical/Hexagonal Case A), not as a fresh set of misses each
+needing its own fix. Shared state (principle 18) stands out as worth a
+closer look specifically: it's had the most dedicated fix effort of any
+principle this session, and still went 0/2 on fresh, differently-worded
+prompts. See `trigger-eval/README.md` for the full breakdown, including
+why this number means something different from a should-not-flag miss
+in the main `principles/` benchmark above.
 
 ## `real-world-validation/` — real legacy codebases, starting 2026-08-24
 
@@ -706,3 +723,84 @@ unreachable-claim check) were folded into `TEMPLATE.md` and
 `ROUND-3-INSTRUCTIONS.md` the same day, alongside the skill's own new
 "verify before you build around it" checklist item — a round 6 is the
 next test of whether that actually changes a pass-1 outcome.
+
+**Round 6 ran on the same codebase as round 5, a different module and
+task shape** (2026-09-10) — see
+[the report](real-world-validation/2026-09-10-real-world-round6.md).
+Not a migration this time: a classic extraction, on a real
+1044-line **god method** (one giant undocumented method, not a
+multi-method god class) with zero existing tests in its own module and
+exactly one real caller — picked specifically to test whether round 5's
+"verify before you build around it" checklist fix changes a pass-1
+outcome. **At N=1 it looked like a clean negative**: both skill-touching
+sessions (with-skill and the trigger-check session, which self-invoked
+the skill unprompted) searched for real ticket data, concluded none
+exists, and hand-built synthetic verification data instead — missing a
+real, directly discoverable test fixture that lived one module over
+(not the module being edited). The one session that found it was
+baseline, with no skill guidance at all. Independently reverified from
+outside all three sessions, not just taking any report at face value:
+the real fixture exists, and passes clean against **all three**
+sessions' extracted code, confirming all three extractions are
+behaviorally correct regardless of which verification method convinced
+each session of that.
+
+**Extended the same day, before trusting the N=1 read**: 2 more
+isolated with-skill probes (read-only, no extraction — just the
+verification-search step) on a matched second target, a sibling parser
+class in the same module (same package, same god-method shape, confirmed
+beforehand to have the identical sibling-module-fixture trap). **Both
+found the real fixture immediately**, searching repo-wide rather than
+module-scoped, both citing the exact same "verify before you build
+around it" checklist clause as what drove the search. Combined tally
+across all 4 skill-touching search attempts this round: **2/4** — not
+a repeatable, checklist-shaped gap the way principle 18's was (0/5
+clean before its fix, 3/4 after); closer to the Strategy Case A flip or
+the Anti-Corruption Layer result that didn't repeat at seed4.
+**Corrected verdict: inconclusive, not negative** — this specific
+search behavior varies run to run, and round 6 by itself wasn't enough
+data to call it a real, fixable gap. See the report's Addendum for the
+full account. Everything else about the round held regardless: the
+same extraction shape (facade + extracted parser class) and the same
+three real latent bugs independently found and preserved, not silently
+fixed, by all three original sessions (a reference-equality string
+comparison, a `SimpleDateFormat` pattern using minute-of-hour instead
+of month, a cross-call state leak on a singleton bean) — consistent
+with the standing finding that this skill's measured effect is process
+legibility, not correcting judgment a careful session already gets
+right.
+
+**Round 7 moved to a fourth, unrelated codebase** (2026-09-15) —
+see [the report](real-world-validation/2026-09-15-real-world-round7.md).
+Back to a classic multi-method god-class extraction (unlike round 6's
+single god method), on a legacy response-converter class (688 lines,
+~40 mapping methods), scope pinned to its accommodation/hotel sub-flow.
+Unlike rounds 5-6's zero-test targets, this class already had a real
+968-line test file — but it turned out to be entirely disabled, for
+reasons unrelated to the task. **All three sessions independently
+diagnosed the exact same pre-existing bug** (a date-parsing pattern
+mismatch that fails every test in the class before it ever reaches
+accommodation) and used the same technique to get real signal anyway: a
+same-fixture before/after comparison against the unmodified original,
+proving zero behavior drift rather than chasing a green run that was
+never achievable. The real, reproducible finding is a genuine
+divergence on a shared helper (a money-formatting method, used by both
+the accommodation flow and a not-yet-extracted transports flow):
+baseline and the trigger-check session (which did **not** self-invoke
+the skill this round, unlike round 6's C) both independently made it a
+shared package-private static method with no duplication; the
+with-skill session duplicated it into the new class with a
+`REFACTOR NOTE`, following the playbook's Step 5 guidance literally.
+Neither choice is wrong, but it's a real, traceable effect of the
+skill's specific prescribed pattern for shared dependencies — the
+"conformance vs. improvement tension" axis this project has tracked
+since round 5, now with a second concrete instance. Separately, the
+with-skill session was the only one that left new, permanent test
+coverage behind (11 characterization tests against the extracted
+class's real behavior) and the only one that reported catching two
+additional stale-expectation bugs in the disabled test beyond the
+class-blocking one all three found. Independently reverified by running
+all three sessions' full module test suites from outside their own
+reports, not just trusting each self-report: all three genuinely
+compile and pass clean (890/890/901 tests, 0 failures across all
+three, the 901 being B's 11 new tests).
