@@ -715,27 +715,40 @@ Not a migration this time: a classic extraction, on a real
 multi-method god class) with zero existing tests in its own module and
 exactly one real caller — picked specifically to test whether round 5's
 "verify before you build around it" checklist fix changes a pass-1
-outcome. **It didn't, and not gently**: both skill-touching sessions
-(with-skill and the trigger-check session, which self-invoked the skill
-unprompted) searched for real ticket data, concluded none exists, and
-hand-built synthetic verification data instead — missing a real,
-directly discoverable test fixture that lived one module over
+outcome. **At N=1 it looked like a clean negative**: both skill-touching
+sessions (with-skill and the trigger-check session, which self-invoked
+the skill unprompted) searched for real ticket data, concluded none
+exists, and hand-built synthetic verification data instead — missing a
+real, directly discoverable test fixture that lived one module over
 (`backoffice-jar`, not the module being edited). The one session that
 found it was baseline, with no skill guidance at all. Independently
 reverified from outside all three sessions, not just taking any report
 at face value: the real fixture exists, and passes clean against **all
 three** sessions' extracted code, confirming all three extractions are
 behaviorally correct regardless of which verification method convinced
-each session of that. A plausible (not yet confirmed) explanation: the
-checklist item's own wording and worked example are shaped around
-external dependencies/endpoints — round 5's exact failure shape — not
-"search sibling modules of a multi-module repo for existing fixtures,"
-a narrower trigger surface than this round's failure needed. Everything
-else converged across all three: the same extraction shape (facade +
-extracted parser class), and the same three real latent bugs
-independently found and preserved, not silently fixed, by all three
-(a reference-equality string comparison, a `SimpleDateFormat` pattern
-using minute-of-hour instead of month, a cross-call state leak on a
-singleton bean) — consistent with the standing finding that this
-skill's measured effect is process legibility, not correcting judgment
-a careful session already gets right.
+each session of that.
+
+**Extended the same day, before trusting the N=1 read**: 2 more
+isolated with-skill probes (read-only, no extraction — just the
+verification-search step) on a matched second target, `SabreTkt.java`
+(same package, same god-method shape, confirmed beforehand to have the
+identical sibling-module-fixture trap). **Both found the real fixture
+immediately**, searching repo-wide rather than module-scoped, both
+citing the exact same "verify before you build around it" checklist
+clause as what drove the search. Combined tally across all 4
+skill-touching search attempts this round: **2/4** — not a repeatable,
+checklist-shaped gap the way principle 18's was (0/5 clean before its
+fix, 3/4 after); closer to the Strategy Case A flip or the
+Anti-Corruption Layer result that didn't repeat at seed4. **Corrected
+verdict: inconclusive, not negative** — this specific search behavior
+varies run to run, and round 6 by itself wasn't enough data to call it
+a real, fixable gap. See the report's Addendum for the full account.
+Everything else about the round held regardless: the same extraction
+shape (facade + extracted parser class) and the same three real latent
+bugs independently found and preserved, not silently fixed, by all
+three original sessions (a reference-equality string comparison, a
+`SimpleDateFormat` pattern using minute-of-hour instead of month, a
+cross-call state leak on a singleton bean) — consistent with the
+standing finding that this skill's measured effect is process
+legibility, not correcting judgment a careful session already gets
+right.
