@@ -562,12 +562,17 @@ had shown a clean N=1 hit earlier the same day under ad-hoc sampling —
 read as further confirmation that single-probe reads aren't settled
 data, the same lesson this project has drawn repeatedly (Strategy Case
 A, DDD tactical/Hexagonal Case A), not as a fresh set of misses each
-needing its own fix. Shared state (principle 18) stands out as worth a
-closer look specifically: it's had the most dedicated fix effort of any
+needing its own fix. Shared state (principle 18) stood out as worth a
+closer look specifically: it had the most dedicated fix effort of any
 principle this session, and still went 0/2 on fresh, differently-worded
-prompts. See `trigger-eval/README.md` for the full breakdown, including
-why this number means something different from a should-not-flag miss
-in the main `principles/` benchmark above.
+prompts. **Followed up on 2026-09-18**: 2 reruns of the original prompts
+plus 2 new phrasings found 2/4 — combined 3/6 (50%) across all shared-
+state probes run so far, close to the 37.5% overall average, not a
+uniquely broken principle. One durable thread in the data: the exact
+`private static SimpleDateFormat sdf` phrasing has now missed twice in a
+row despite being close to the principle's own textbook example —
+narrower follow-up candidate, not evidence the whole principle needs
+more work. See `trigger-eval/README.md` for the full breakdown.
 
 ## `real-world-validation/` — real legacy codebases, starting 2026-08-24
 

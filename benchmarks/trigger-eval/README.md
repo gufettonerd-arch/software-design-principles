@@ -102,3 +102,38 @@ skill was "wrong" the way a should-not-flag case miss in the main
 unprimed, the skill didn't engage. Distractor precision (0/8 false
 positives) is the one part of this that is a clean correct/incorrect
 measure, and it held perfectly.
+
+## Shared state follow-up (2026-09-18) — the flagged 0/2 doesn't hold up as a distinct gap
+
+Following through on the flag above: 2 fresh isolated single-query
+dispatches, same rule as everywhere else in this file (one query, one
+fully independent dispatch, no batching). Reran the exact `shared-state-1`
+and `shared-state-2` prompts, and added 2 new phrasings —
+`shared-state-3` (client-side, Angular `providedIn: 'root'` singleton
+caching a field, added to `queries.jsonl`) and `shared-state-4`
+(symptom-only: "two customers see each other's cart totals under load,"
+also added).
+
+**Result: 2/4 — `shared-state-1` re-missed (0/2 total, durably silent
+on this exact phrasing across both runs), `shared-state-2` flipped
+(missed originally, triggered this time — 1/2, genuine run-to-run
+inconsistency on identical wording), `shared-state-3` (client-side)
+triggered clean, `shared-state-4` (symptom-only) missed** — consistent
+with this project's standing finding that symptom-only prompts with no
+code or matching keywords structurally can't fire off a description-based
+trigger, the same shape as the original principle-18 symptom-only miss
+and the bare Characterization Test miss.
+
+**Combined shared-state tally across all 6 probes run so far: 3/6
+(50%)** — close to the 37.5% overall average across all 20 principles,
+not a uniquely broken principle the way the original 0/2 made it look.
+The one genuinely durable pattern in the data: `shared-state-1`'s exact
+phrasing (`private static SimpleDateFormat sdf` on a Spring `@Service`)
+has now missed twice in a row, despite being nearly the principle's own
+textbook example — worth a narrower look at *that specific phrasing*
+sometime, not the whole principle. Everything else here reads as the
+same run-to-run variance this project has documented repeatedly
+(Strategy Case A, DDD tactical/Hexagonal Case A, and half the 0/2s in
+the main sweep above) — extending N=2 to N=4-6 on the specific principle
+flagged as "worth a closer look" found exactly what the project's own
+prior lesson predicted: more data, not a confirmed gap.
