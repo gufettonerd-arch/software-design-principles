@@ -576,8 +576,15 @@ more work. **Same day**, extended the 4 principles that sat at 1/2
 (Value Object, Tell Don't Ask, Law of Demeter, DDD strategic) with 1
 more isolated probe each: **4/4 triggered**, all 4 now sitting around
 2/3 — no fixes made, nothing here showed a durable gap the way the
-earlier description-cue fixes did. See `trigger-eval/README.md` for the
-full breakdown.
+earlier description-cue fixes did. **Also closed the one remaining
+thread**: `shared-state-1`'s exact phrasing, still 0/2 after the round
+above, got 3 more isolated probes (a third rerun plus 2 same-shape
+variants swapping `SimpleDateFormat` for `Calendar`/`HashMap`) — **3/3
+triggered**, including the original phrasing. Combined tally 1/3, not
+0 — the hypothesis that overly-famous Java trivia suppresses triggering
+didn't hold up, and neither did the gap. Nothing left open on trigger
+accuracy that has a concrete next step without a new idea. See
+`trigger-eval/README.md` for the full breakdown.
 
 ## `real-world-validation/` — real legacy codebases, starting 2026-08-24
 

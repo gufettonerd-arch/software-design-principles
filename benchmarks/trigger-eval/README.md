@@ -160,3 +160,31 @@ sample continues to find more variance, not more confirmed gaps —
 consistent enough now across two separate follow-ups that it's probably
 the right default expectation for any principle sitting at 1/2 or 0/2
 on this dataset, rather than something to re-verify every time.
+
+## The one remaining thread, closed (2026-09-18) — `shared-state-1` wasn't durable either
+
+The narrower candidate left standing above: `shared-state-1`'s exact
+phrasing (`private static SimpleDateFormat sdf` on a Spring `@Service`)
+had missed twice in a row, worth checking whether it's a real,
+phrasing-specific gap — hypothesis: maybe a question this close to a
+famous, instantly-recognizable Java gotcha reads as "I already know
+this cold" and the model doesn't feel it needs the skill's checklist,
+unlike less iconic non-thread-safe cases.
+
+Tested with 3 more isolated probes: the exact `shared-state-1` phrasing
+run a third time, plus 2 new same-shape variants swapping the type for
+something less textbook-famous (`Calendar`, and a plain `HashMap` used
+as a manual cache — added to `queries.jsonl` as `shared-state-5/6`).
+**3/3 triggered, including the exact original phrasing.**
+
+**The hypothesis doesn't hold, and the "gap" doesn't either.**
+`shared-state-1`'s combined tally is now 1/3 — not 0, and not
+distinguishable from ordinary small-N variance once a third sample
+exists. No fix made, none needed. This closes out the Shared state
+investigation started above: at N=9 total across all 6 shared-state
+prompts and all 3 fresh follow-ups this session, nothing about this
+principle looks different from the general ~40-50% trigger rate the
+rest of the dataset shows. The original "worth a closer look" flag was
+correct methodologically (a real signal deserved a follow-up rather than
+being fixed or ignored on N=2) but the underlying gap it pointed at
+didn't survive more data — the right outcome to report either way.
