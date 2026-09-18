@@ -137,3 +137,26 @@ same run-to-run variance this project has documented repeatedly
 the main sweep above) — extending N=2 to N=4-6 on the specific principle
 flagged as "worth a closer look" found exactly what the project's own
 prior lesson predicted: more data, not a confirmed gap.
+
+## The four 1/2 principles extended to N=3 (2026-09-18)
+
+Same treatment as Shared state above, applied to the 4 principles that
+landed at 1/2 in the original sweep (Value Object, Tell Don't Ask, Law
+of Demeter, DDD strategic) — 1 new isolated probe each, new phrasing
+(added to `queries.jsonl` as `*-3`), not a rerun of the existing 2.
+
+**4/4 triggered.** Value Object, Tell Don't Ask, Law of Demeter, and DDD
+strategic all went from 1/2 to **2/3** on this new data point. Small N,
+same caveat as everywhere else in this file, but directionally
+consistent — none of the 4 look like a principle heading toward a
+durable 0-rate; all 4 sit around the same 2-in-3 range as the cleanest
+principles in the original sweep. No fixes made — nothing here showed
+the kind of durable, repeated miss that justified the earlier
+description-cue fixes (principle 18's original gap, Fail Fast,
+Characterization Test, Package by feature, DRY/Strangler Fig/
+Readability's unchanged 0/3s). Read together with the Shared state
+follow-up above: extending N on principles flagged from a single small
+sample continues to find more variance, not more confirmed gaps —
+consistent enough now across two separate follow-ups that it's probably
+the right default expectation for any principle sitting at 1/2 or 0/2
+on this dataset, rather than something to re-verify every time.

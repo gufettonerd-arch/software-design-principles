@@ -572,7 +572,12 @@ uniquely broken principle. One durable thread in the data: the exact
 `private static SimpleDateFormat sdf` phrasing has now missed twice in a
 row despite being close to the principle's own textbook example —
 narrower follow-up candidate, not evidence the whole principle needs
-more work. See `trigger-eval/README.md` for the full breakdown.
+more work. **Same day**, extended the 4 principles that sat at 1/2
+(Value Object, Tell Don't Ask, Law of Demeter, DDD strategic) with 1
+more isolated probe each: **4/4 triggered**, all 4 now sitting around
+2/3 — no fixes made, nothing here showed a durable gap the way the
+earlier description-cue fixes did. See `trigger-eval/README.md` for the
+full breakdown.
 
 ## `real-world-validation/` — real legacy codebases, starting 2026-08-24
 
