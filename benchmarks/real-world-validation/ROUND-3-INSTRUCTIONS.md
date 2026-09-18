@@ -219,13 +219,31 @@ section:
 1. Add a short section to `benchmarks/README.md`'s real-world-validation
    part (below the existing round summaries) — a few sentences,
    matching the style already there, not a rewrite of the existing text.
-2. Commit the new report file and the README update **from the main
+2. **Anonymize before committing anything — mandatory, not optional.**
+   Rounds 1, 2, 6, and 7 all pushed a real company name and/or real
+   class/package/module names into either the dedicated report or this
+   very README paragraph, undetected until a separate cleanup found them
+   — every time, the file content got fixed afterward but the original
+   leaking commit stayed reachable in this public repo's history until a
+   dedicated history rewrite closed it on 2026-09-18. Before `git add`:
+   - Replace every real identifier (company/product name, class/package/
+     module names, ticket numbers, internal filenames) with a generic
+     equivalent, in **both** the dedicated report file and the README
+     paragraph you just wrote — the README paragraph is a second,
+     independent place to leak the same thing, not covered by cleaning
+     the report alone.
+   - Grep both files for the real project/company name and anything
+     else identifying, right before staging — a final mechanical check.
+   - If you find a leak *after* something's already pushed, say so
+     explicitly and treat the original commit as still-exposed public
+     history, not just a file to patch forward.
+3. Commit the new report file and the README update **from the main
    repo clone**, not from inside any of the three worktrees.
-3. Push. **Nothing from worktrees A/B/C gets merged to the target
+4. Push. **Nothing from worktrees A/B/C gets merged to the target
    codebase's own `main`** — those stay as local branches for reference;
    only the report and README update go to the software-design-principles
    repo.
-4. Clean up the three worktrees once the report is written
+5. Clean up the three worktrees once the report is written
    (`git worktree remove` ×3) unless you want to keep poking at the
    diffs.
 

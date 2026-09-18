@@ -94,3 +94,32 @@ it did, and whether that was the right call given the task.
 
 One or two sentences — would you trust this on a task like this again,
 what would make it better next time.
+
+## Before committing and pushing (added 2026-09-18, mandatory)
+
+This repo is public. Rounds 1, 2, 6, and 7 all pushed a real company name
+and/or real class/package/module names from a proprietary codebase into
+this file's content before anyone caught it — every time, only the
+*current* file content got fixed afterward, not the git history that had
+already shipped it, so the leak stayed live and public until a dedicated
+history rewrite closed it. Don't repeat that. Before the first commit
+that includes this file:
+
+- [ ] Replace every real identifier with a generic equivalent: company/
+      product name, class/package/module names, ticket or issue numbers,
+      internal filenames (memory files, config files, anything with a
+      project-specific name baked in). Keep the *shape* (a 2413-line
+      class, a `PROV` flag, a JDBC-URL field) — that's the actual data —
+      just not the literal name.
+- [ ] Grep the finished file for the real project/company name and any
+      other identifying string you used while writing it, right before
+      `git add` — a final mechanical check, not just "I was careful."
+- [ ] Also check `benchmarks/README.md`'s index paragraph once you've
+      written it (Step 6 of `ROUND-3-INSTRUCTIONS.md`, or the equivalent
+      for whatever runbook you're using) — this is exactly where rounds 6
+      and 7 leaked a second time, in the summary, after the dedicated
+      report file itself was already clean.
+- [ ] If you ever find a leak *after* it's already been pushed: fixing
+      the current file content is not enough, the original commit is
+      still reachable in public history. Say so explicitly when you
+      report it — don't silently patch forward and let it look resolved.
