@@ -821,3 +821,16 @@ all three sessions' full module test suites from outside their own
 reports, not just trusting each self-report: all three genuinely
 compile and pass clean (890/890/901 tests, 0 failures across all
 three, the 901 being B's 11 new tests).
+
+**A sequential campaign is prepared, not yet run** (2026-09-18): see
+[`SEQUENTIAL-CAMPAIGN-INSTRUCTIONS.md`](real-world-validation/SEQUENTIAL-CAMPAIGN-INSTRUCTIONS.md)
+— a different shape from rounds 1–7. Every prior round compared
+baseline/with-skill/trigger-check in throwaway worktrees and merged
+nothing back, by design; that can't answer the question round 2 first
+raised (does the skill's marginal value shrink as a codebase
+accumulates its own conventions?) since it only ever compared *different*
+codebases at different maturity, never watched one *while* it matures.
+This runbook runs 5 extractions on the *same* project in sequence, each
+one actually merged (the one deliberate exception to the no-merge rule),
+with full A/B/C comparisons bookending it at rounds 1, 3, and 5 to track
+whether the baseline-vs-with-skill gap narrows over the sequence.
