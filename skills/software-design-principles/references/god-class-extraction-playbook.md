@@ -71,6 +71,7 @@ When a helper is also used by other flows not yet extracted (e.g. a validation/l
   ```
 - **When the second flow that needs it shows up**: don't duplicate again. Move the shared code into its own dedicated class/module (born when the question "does the next flow call it from here, or is there a dedicated class?" comes up), and update the `REFACTOR NOTE` on the original to point there instead of to the first extracted class.
 - This is Strangler Fig with an explicit completion criterion (see principle 15) — not "move it and see".
+- **If earlier extractions in this codebase already call the shared helper back on the god class**, that precedent is not a reason to skip this step silently. Pick one explicitly and say which in the commit message: follow this step (and note the divergence from the precedent), or follow the precedent because the helper encodes a business rule that two copies would let drift. Either is defensible; an unstated choice is not.
 
 ## Step 6 — The fix, isolated and last
 
@@ -110,16 +111,18 @@ Replace every generic ("catch everything") catch inherited from the original cod
 
 - Data-access blocks (connection/statement/result) → your language/library's specific data-access exception (e.g. `SQLException` in Java/JDBC).
 - Date/number parsing → the specific parsing exception (e.g. `ParseException` in Java), possibly alongside other realistic errors on missing data (e.g. an unexpected null value).
+- **Before narrowing, list what the old catch swallowed besides the specific type**: a `NullPointerException` from a null argument or a null column (`rs.getString(...).trim()`), a runtime exception from a nested call, a dereference moved *out* of the try block during the extraction. For each one: keep it caught, or show it can't happen (e.g. every caller already dereferences that value first). Narrowing that lets one of these escape changes the flow's observable behavior — Step 10's fail-safe rule applies.
 - Verify the narrowing with a test that *genuinely* forces that exception (e.g. a nonexistent DB schema for the data-access exception, a non-numeric date for the parsing exception) — don't just read the code, a catch that's too narrow and silently breaks is worse than one that's too wide.
 
 ## Step 10 — Robustness and safety, without changing the logic
 
 While the code is already under your eyes for the extraction, fix weaknesses that don't change *what* the flow decides — only *how solid/safe* it is while doing it. If a fix here would change an observable output, it doesn't belong in this step: go back to Step 6.
 
-- **Queries: parameters, not concatenation**, for every value that varies (id, codes, dates) — a bind parameter (e.g. `WHERE id = ?` with a typed JDBC parameter, or your library/ORM's parameterized equivalent), never `"WHERE id = " + value`. The schema/table name often stays concatenated because many libraries don't allow it to be parameterized — acceptable only if its value comes from a known, fixed set (e.g. a configuration qualifier), never from direct user input.
+- **Queries: parameters, not concatenation**, for every value that varies (id, codes, dates) — a bind parameter (e.g. `WHERE id = ?` with a typed JDBC parameter, or your library/ORM's parameterized equivalent), never `"WHERE id = " + value`. Bind with the **column's** type (a numeric column gets `setLong`/`setBigDecimal`, not `setString`): a type-mismatched bind only works through the database's implicit casting, which an in-memory test DB may allow and the production one may not. The schema/table name often stays concatenated because many libraries don't allow it to be parameterized — acceptable only if its value comes from a known, fixed set (e.g. a configuration qualifier), never from direct user input.
 - **No shared mutable state in static/global fields**: non-thread-safe mutable formatters/parsers (e.g. `SimpleDateFormat`/`Calendar` in Java) shared as a static field on a class used by concurrent requests (typical in a web god class) are a latent data-corruption bug under load. In the new class, instantiate them locally inside the method that uses them, or use the standard library's thread-safe equivalent if available.
 - **Immutability where the data allows it**: an immutable Value Object — no setters, fields set only at construction. An object that can't be mutated after construction is safe to pass around without defensive copies, and eliminates an entire class of bugs (mutation from an unexpected caller).
 - **Fail-safe on errors, preserving existing behavior**: if the original code already degrades to a neutral value (empty list, `0`, `false`) when a query/parsing fails, keep exactly that behavior in the exception narrowing (Step 9) — don't let it propagate "because it would be more correct": that's a silent logic change, to be decided explicitly with the team, not decided on a whim during an extraction.
+- **A hardening change that closes a real vulnerability is a finding, not just hardening.** If the concatenated value you just parameterized can come from request input (or the leaked value is a credential/token), say so explicitly in your report and commit message. Reporting "no bug fix" hides it from whoever decides whether the unrefactored copies elsewhere need the same fix.
 - **Don't log sensitive data**: if the flow touches PII/credentials, verify any logs added/moved don't print them, not even in error messages (a data-access exception's message can contain query fragments with values).
 - Run the build/test script.
 
@@ -158,6 +161,8 @@ Once the extraction is verified safe (Steps 1–12 done, tests green, coverage m
 - Ask explicitly: does anything about this class only make sense in light of where it came from? A comment referencing "the original method in GodClass," a name that echoes the old context, a parameter shaped the way the god class happened to pass it rather than the way this class actually needs it, a usage pattern that was a workaround for something the god class did nearby that no longer applies.
 - If this surfaces a genuine improvement (not a speculative one — see YAGNI in principle 5), treat it as its own small step: change, run the build/test script, don't fold it silently into an earlier commit.
 
+- **The first extraction in a codebase becomes the template for the next ones.** Later extractions copy its shape, including its questionable choices. Review it with that weight, and put any known caveat *in the code* (a short comment at the spot), not only in the review or the PR thread. A caveat left outside the code doesn't travel with the pattern.
+
 This is also why **one flow per pass** matters more than it looks: the fresh-eyes review works best right after the extraction, not three flows deep into the same god class and eager to move on.
 
 ---
@@ -167,7 +172,8 @@ This is also why **one flow per pass** matters more than it looks: the fresh-eye
 - [ ] Checked for concurrent work (other branches/recent commits on the same file) and for an existing extraction of the same flow elsewhere in the codebase, before starting
 - [ ] Decided explicitly — not by default — whether this is a faithful move or a framework-native/off-the-shelf replacement; if the latter, handled as its own isolated step, not folded into the move
 - [ ] Old code removed from the god class, verified "dead" even toward external templates/resources
-- [ ] Shared code duplicated with a `REFACTOR NOTE` and an explicit removal criterion (or consolidated, if this is the second consumer)
+- [ ] Shared code duplicated with a `REFACTOR NOTE` and an explicit removal criterion (or consolidated, if this is the second consumer), or a stated reason for following a different codebase precedent
+- [ ] Every catch narrowed only after checking what else it swallowed (null arguments/columns, nested runtime errors); vulnerabilities closed along the way reported as findings
 - [ ] Fix applied as its own isolated step, with a test that failed before and passes after
 - [ ] New class named for what it does (no `*Extracted`/`*New`/`*V2`/`*Refactored`-style placeholder); every method and local variable inside it renamed too — not just the ones renamed "for free" during the move
 - [ ] Short methods, clear names, targeted logs, no comments that just repeat the code
