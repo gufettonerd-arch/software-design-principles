@@ -8,7 +8,7 @@
 # Usage: benchmarks/check-plugin-sync.sh [branch]
 #   branch defaults to "master".
 #
-# Exit codes: 0 = in sync, 1 = stale (or fetch failed), 2 = plugin not installed.
+# Exit codes: 0 = in sync (or behind only on non-shipped files), 1 = stale (or fetch failed), 2 = plugin not installed.
 
 set -euo pipefail
 
@@ -37,6 +37,24 @@ if [ -z "$INSTALLED_SHA" ]; then
     exit 2
 fi
 
+# The install record's SHA only changes when the plugin version changes, so it can
+# lag behind while the shipped files are identical. Compare the files themselves
+# against this checkout first (keep the checkout up to date with git pull).
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+INSTALL_PATH=$(python3 -c "
+import json
+data = json.load(open('$INSTALLED_PLUGINS'))
+entries = data.get('plugins', {}).get('$REPO@$REPO', [])
+print(entries[0].get('installPath', '') if entries else '')
+" 2>/dev/null || true)
+if [ -n "$INSTALL_PATH" ] && [ -d "$INSTALL_PATH" ] \
+    && diff -rq --strip-trailing-cr "$REPO_ROOT/skills" "$INSTALL_PATH/skills" >/dev/null 2>&1 \
+    && diff -rq --strip-trailing-cr "$REPO_ROOT/hooks" "$INSTALL_PATH/hooks" >/dev/null 2>&1; then
+    echo "✅ Content in sync — installed skills/ and hooks/ are identical to this checkout"
+    echo "   ($(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo '?')), whatever the install record's SHA says."
+    exit 0
+fi
+
 LATEST_SHA=$(curl -sf "https://api.github.com/repos/$OWNER/$REPO/commits/$BRANCH" \
     | python3 -c "import json,sys; print(json.load(sys.stdin).get('sha',''))" 2>/dev/null || true)
 
@@ -51,10 +69,22 @@ if [ "$INSTALLED_SHA" = "$LATEST_SHA" ]; then
     exit 0
 fi
 
-BEHIND_COUNT=$(curl -sf "https://api.github.com/repos/$OWNER/$REPO/compare/$INSTALLED_SHA...$LATEST_SHA" \
-    | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('ahead_by','?'))" 2>/dev/null || echo "?")
+COMPARE=$(curl -sf "https://api.github.com/repos/$OWNER/$REPO/compare/$INSTALLED_SHA...$LATEST_SHA" || true)
+BEHIND_COUNT=$(echo "$COMPARE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('ahead_by','?'))" 2>/dev/null || echo "?")
+# Only files the plugin actually ships matter; benchmark/doc commits don't change what a session reads.
+SHIPPED_CHANGES=$(echo "$COMPARE" | python3 -c "
+import json, sys
+files = json.load(sys.stdin).get('files', [])
+print(sum(1 for f in files if f['filename'].startswith(('skills/', 'hooks/', '.claude-plugin/'))))
+" 2>/dev/null || echo "?")
 
-echo "⚠️  STALE — installed plugin is $BEHIND_COUNT commit(s) behind $BRANCH's tip."
+if [ "$SHIPPED_CHANGES" = "0" ]; then
+    echo "✅ Content in sync — installed plugin is $BEHIND_COUNT commit(s) behind $BRANCH's tip,"
+    echo "   but none of them touch skills/, hooks/ or .claude-plugin/."
+    exit 0
+fi
+
+echo "⚠️  STALE — installed plugin is $BEHIND_COUNT commit(s) behind $BRANCH's tip ($SHIPPED_CHANGES shipped file(s) changed)."
 echo "   Installed: $INSTALLED_SHA"
 echo "   Latest:    $LATEST_SHA"
 echo "   Any with-skill run right now reads the OLD version. Update the plugin"

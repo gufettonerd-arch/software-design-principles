@@ -174,7 +174,15 @@ must be told explicitly to do all its file reads and greps from inside
 its own worktree directory, not from any other checkout of the same
 repo — round 5 found a session read reference files from the main
 checkout by mistake and wrote a false claim into its own delivered code
-as a result.
+as a result. Give each session **its own scratch/log directory** in the
+prompt too (e.g. `<worktree>-scratch/`): the 2026-09-23 campaign found
+three parallel sessions writing build logs to the same shared temp file,
+and one of them read a sibling's test output as its own.
+
+Before dispatching, note whether the sessions will inherit **project
+memory or instruction files** (auto-memory, `CLAUDE.md`) that encode
+conventions derived from this skill. If they do, the baseline isn't
+convention-free: say so in the report, or run the baseline without them.
 
 - **Session A — baseline**: told explicitly **not** to consult any
   skill. Give it the task sentence from Step 3, working in the `a`

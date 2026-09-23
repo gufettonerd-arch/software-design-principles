@@ -32,7 +32,11 @@ same-day fixes (see the correction note at the top of the 2026-08-19
 report); round 5 found the same problem again, the orchestrating
 session's own installed copy 18 commits stale while it was writing round
 5's own fix. This was a manual check from 2026-08-19 to 2026-09-08; it's
-a script now.
+a script now. Since 2026-09-23 it first compares the installed `skills/` and
+`hooks/` with this checkout, because the install record's SHA only moves
+when the plugin version changes: bump `.claude-plugin/plugin.json`'s
+version whenever shipped files change, or `/plugin` won't refresh the
+install.
 
 ## `regressions/` — god-class extraction playbook
 

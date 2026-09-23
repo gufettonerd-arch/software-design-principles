@@ -75,6 +75,19 @@ with-skill only, told to use `software-design-principles`. Merge after
 review. No baseline or trigger-check this round — that's the cost
 saving that makes 5 rounds affordable instead of 15 isolated sessions.
 
+## Dispatch hygiene (added after the first run, 2026-09-23)
+
+- Give every session its own scratch/log directory in the prompt; a
+  shared temp path let one arm read another's build log.
+- Say in the report whether the arms inherited project memory or
+  `CLAUDE.md` conventions derived from this skill. In the first run they
+  did, so round 1's baseline already knew the skill's conventions and the
+  round-1 gap is understated. For a clean starting point, run round 1's
+  baseline without them.
+- If the target repo can't take commits, "merged" can be a local-only
+  integration branch with no upstream; branch each round's worktrees
+  from its current tip.
+
 ## What to record every round (in addition to the usual)
 
 Beyond the standard "what it did / anything notable" from
