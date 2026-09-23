@@ -7,7 +7,8 @@ on different axes, plus a non-synthetic one:
 running baseline-vs-with-skill on one real flow in a real project, filled
 in as people actually run it (see `TEMPLATE.md`), not scored
 automatically like the two below. Seven rounds filled in as of
-2026-09-15, on four different real codebases — see the dedicated
+2026-09-15, on four different real codebases, plus one 5-round
+sequential campaign (2026-09-23) — see the dedicated
 section near the bottom of this file. Everything here is real infrastructure
 — fixtures that compile and run, scorers that were self-tested against
 synthetic pass/fail cases before being trusted on real agent output — not
@@ -822,7 +823,7 @@ reports, not just trusting each self-report: all three genuinely
 compile and pass clean (890/890/901 tests, 0 failures across all
 three, the 901 being B's 11 new tests).
 
-**A sequential campaign is prepared, not yet run** (2026-09-18): see
+**A sequential campaign was prepared** (2026-09-18): see
 [`SEQUENTIAL-CAMPAIGN-INSTRUCTIONS.md`](real-world-validation/SEQUENTIAL-CAMPAIGN-INSTRUCTIONS.md)
 — a different shape from rounds 1–7. Every prior round compared
 baseline/with-skill/trigger-check in throwaway worktrees and merged
@@ -834,3 +835,29 @@ This runbook runs 5 extractions on the *same* project in sequence, each
 one actually merged (the one deliberate exception to the no-merge rule),
 with full A/B/C comparisons bookending it at rounds 1, 3, and 5 to track
 whether the baseline-vs-with-skill gap narrows over the sequence.
+
+**The sequential campaign has run** (2026-09-23): see
+[`2026-09-23-sequential-campaign.md`](real-world-validation/2026-09-23-sequential-campaign.md).
+5 extractions from the same ~14.5k-line legacy utility class. Each
+with-skill result was reviewed and merged into a local-only integration
+branch before the next round started. Full A/B/C comparisons ran at
+rounds 1, 3 and 5, and every suite was rerun from outside (539 → 616
+tests, 0 failures). **The gap shrinks, clearly on structure.** At round
+1 the arms split on how to handle a shared helper. By round 5 all three
+produced essentially the same diff: same class name, same rewired call
+sites. Every arm, baseline included, named an earlier merged commit of
+the campaign as its template. **The trigger-check session invoked the
+skill at rounds 1 and 3, but not at round 5**, saying the branch's
+recent commits already set the pattern. It's the first time this
+benchmark has watched that switch happen on one codebase. What the
+skill still added at round 5 was process: extract alongside the old
+code and prove the tests against it before deleting. It had no edge on
+finding bugs: at round 3 the baseline and the trigger arm named a
+pre-existing security issue that the with-skill arm fixed without
+recognising it. Two caveats temper the result. Project memory carrying
+skill-derived conventions was in every arm's context, baseline
+included. And a questionable choice from round 1's merged extraction
+was copied into the next two rounds, citing it: conventions propagate
+whole, flaws included. One methodology fix came out of it: give each
+arm its own scratch/log path, because a shared temp directory let one
+round-3 arm read another's build log.
